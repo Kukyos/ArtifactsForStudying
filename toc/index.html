@@ -4015,6 +4015,47 @@ function recalc(){
 recalc();
 var PILL={done:'done',now:'up next',ready:'not started',todo:'being built'};
 
+/* ---------- source pages: one per paper / assignment, listing every question as set and where it is solved ---------- */
+var SECS=[
+ {id:'s-nov25',t:'Nov/Dec 2025 endsem',d:'The most recent endsem paper. About 90% of the next paper looks like this one with the numbers changed.',re:/^Nov25 /},
+ {id:'s-supp',t:'Supplementary, June 2026',d:'The June 2026 supplementary paper (course 20CS2054).',re:/^Supp /},
+ {id:'s-ia2',t:'IA2 paper',d:'Internal Assessment 2. Diagrams marked rebuilt are redrawn machines of the same kind, since the original figure is not available.',re:/^IA2 /},
+ {id:'s-ia3',t:'IA3 paper',d:'Internal Assessment 3.',re:/^IA3 /},
+ {id:'s-qb',t:'Question bank',d:'The 23CS2046 question bank (6 modules).',re:/^QB /},
+ {id:'s-qa1',t:'QA1 · DFA design',d:'Quality Assignment 1 (07.08.2026): design DFAs.',re:/^QA1 /},
+ {id:'s-qa2',t:'QA2 · NFA to DFA',d:'Quality Assignment 2: subset construction and minimization.',re:/^QA2 /},
+ {id:'s-fa',t:'FA · RE · CFG assignment',d:'The teacher\u2019s ten-question practice set: NFA to DFA, DFA to RE, RE to NFA, minimization, CYK, CFG simplification, CNF, GNF, closure properties.',re:/^teacher (QB|question bank)/i},
+ {id:'s-pda',t:'PDA and TM assignment',d:'The teacher\u2019s six-question set on pushdown automata and Turing machines.',re:/^(teacher|PDA) assignment/i},
+ {id:'s-class',t:'Class assignment',d:'The class assignments (28.7.2026): DFA design and Thompson construction.',re:/^class assignment/i},
+ {id:'s-rem',t:'Remedial classes',d:'Questions from the remedial class sheets.',re:/^remedial/i},
+ {id:'s-ex',t:'Slide examples and problems',d:'Examples and problems worked in the teacher\u2019s slides and notes.',re:/./}
+];
+function natKey(k){return k.toLowerCase().replace(/\d+/g,function(n){return ('0000'+n).slice(-4)})}
+SECS.forEach(function(S){S.q=[]});
+PYQ.forEach(function(q){for(var i=0;i<SECS.length;i++){if(SECS[i].re.test(q[0])){SECS[i].q.push(q);break}}});
+SECS.forEach(function(S){S.q.sort(function(a,b){return natKey(a[0])<natKey(b[0])?-1:1})});
+SECS=SECS.filter(function(S){return S.q.length});
+var SRCMAP=null;
+function srcMap(){
+  if(SRCMAP)return SRCMAP;
+  SRCMAP=ALL.map(function(c){var t=[];(c.h||'').replace(/<span class="src">(.*?)<\/span>/g,function(m,x){t.push(x.replace(/<[^>]*>/g,''))});return t});
+  return SRCMAP;
+}
+function solvedIn(keys){
+  var res=keys.map(function(k){return new RegExp('(^|[^\\w])'+escRe(k)+'(?![\\w])')}),map=srcMap(),out=[];
+  ALL.forEach(function(c,i){if(map[i].some(function(x){return res.some(function(re){return re.test(x)})}))out.push('<a href="#'+c.id+'">'+c.no+' '+esc(c.t)+'</a>')});
+  return out;
+}
+function srcPage(S){
+  var uniq=[],at={};
+  S.q.forEach(function(q){if(at[q[1]]!==undefined)at[q[1]].keys.push(q[0]);else{at[q[1]]={q:q,keys:[q[0]]};uniq.push(at[q[1]])}});
+  var h='<button class="menu" aria-label="Open chunk list">\u2630 Chunks</button><div class="kicker" style="margin-top:12px">PAPERS AND ASSIGNMENTS</div><h1 style="font-size:1.8rem;margin-top:6px">'+esc(S.t)+'</h1><p>'+esc(S.d)+'</p><p class="log">'+uniq.length+' question'+(uniq.length===1?'':'s')+', each shown as set, with the chunks that solve it.</p>';
+  uniq.forEach(function(u){
+    var q=u.q,where=solvedIn(u.keys);
+    h+='<div class="pyq" id="q-'+esc(q[0].replace(/\W+/g,'-'))+'"><div class="log" style="margin:0 0 4px"><b>'+esc(q[0])+'</b>'+(q[2]?' \u00b7 '+esc(q[2]):'')+'</div>'+esc(q[1])+(q[3]?'<div class="log" style="margin:6px 0 0">This question comes with a diagram, shown in the solved model.</div>':'')+'<div class="log" style="margin:6px 0 0">'+(where.length?'Solved in: '+where.join(' \u00b7 '):'Not yet linked to a chunk.')+'</div></div>';
+  });
+  return h;
+}
 function side(cur){
   var h='<div class="brand"><span>TOC Tutor</span><small>23CS2046</small></div><div class="bar" aria-label="progress"><i style="width:'+PCT+'%"></i></div><div class="prog">'+DONE+' of '+TOTAL+' chunks done ('+PCT+'%)'+(BUILT<TOTAL?'<br>'+BUILT+' of '+TOTAL+' chunks built':'')+'</div>';
   h+='<a href="#home" class="home'+(cur==='home'?' on':'')+'">Overview</a>';
@@ -4022,6 +4063,8 @@ function side(cur){
     h+='<h4>Module '+m.n+'</h4>';
     m.chunks.forEach(function(c){h+='<a href="#'+c.id+'" class="'+(cur===c.id?'on':'')+'"><span class="dot '+(c.s==='done'?'done':c.s==='now'?'now':c.s==='ready'?'ready':'')+'"></span><span class="no">'+c.no+'</span><span>'+esc(c.t)+'</span></a>'});
   });
+  h+='<h4>Papers and assignments</h4>';
+  SECS.forEach(function(S){h+='<a href="#'+S.id+'" class="'+(cur===S.id?'on':'')+'"><span class="no">'+S.q.length+'</span><span>'+esc(S.t)+'</span></a>'});
   $('#side').innerHTML=h;
 }
 function home(){
@@ -4071,7 +4114,9 @@ function hydrate(root){
 function route(){
   var id=(location.hash||'#home').slice(1),main=$('#main');
   document.body.classList.remove('open');recalc();
-  if(id==='home'||!ALL.some(function(c){return c.id===id})){side('home');main.innerHTML=home()}
+  var SS=SECS.filter(function(S){return S.id===id})[0];
+  if(SS){side(id);main.innerHTML=srcPage(SS)}
+  else if(id==='home'||!ALL.some(function(c){return c.id===id})){side('home');main.innerHTML=home()}
   else{var i=ALL.map(function(c){return c.id}).indexOf(id);side(id);main.innerHTML=chunk(ALL[i],i)}
   hydrate(main);
   var mk=$('[data-mark]',main);if(mk)mk.onclick=function(){if(PROG[id])delete PROG[id];else PROG[id]=1;saveProg();var y=window.scrollY;route();window.scrollTo(0,y)};
