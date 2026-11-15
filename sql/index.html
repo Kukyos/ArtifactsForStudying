@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en" data-subject="sql">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SQL*Plus Drill</title>
+<script src="../shared/study.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one working column (prompt → editor → verdict), a narrow side rail for topic mastery and recent slips; rail drops below at phone width. */
+:root{
+  --bg:#f4f5f2; --panel:#ffffff; --fg:#1d211f; --muted:#5f6862; --line:#d9ddd6;
+  --accent:#1f6f5c; --accent-soft:#e2efe9; --code-bg:#f0f2ee;
+  --ok:#1f7a45; --ok-soft:#e1f2e7; --warn:#a15c00; --warn-soft:#fbefd9; --bad:#b3261e; --bad-soft:#f9e3e1;
+  --f-ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-code:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  --r:8px;
+}
+:root[data-theme="dark"]{
+  --bg:#141715; --panel:#1c201e; --fg:#e7ebe6; --muted:#9aa49d; --line:#2e3431;
+  --accent:#5cc0a2; --accent-soft:#1d332c; --code-bg:#121513;
+  --ok:#5ccf8c; --ok-soft:#183324; --warn:#e8a64a; --warn-soft:#3a2b14; --bad:#f2847c; --bad-soft:#3b1d1b; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-ui)}
+.wrap{max-width:1120px;margin:0 auto;padding:56px 20px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:16px}
+h1{font:600 22px/1.2 var(--f-code);margin:0;letter-spacing:-.01em}
+h1 .prompt{color:var(--accent)}
+.stats{display:flex;gap:16px;font:500 13px var(--f-code);color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--fg);font-weight:600}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.main{padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:500 12px var(--f-code);padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.tag.gen{background:var(--code-bg);color:var(--muted)}
+.q{font-size:18px;line-height:1.45;margin:0;text-wrap:pretty}
+.q code,.inline{font:500 .92em var(--f-code);background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.editor{position:relative}
+.editor .sqlp{position:absolute;left:12px;top:11px;font:500 14px var(--f-code);color:var(--muted);pointer-events:none}
+textarea{width:100%;min-height:140px;resize:vertical;font:14px/1.55 var(--f-code);color:var(--fg);background:var(--code-bg);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px 10px 54px;tab-size:2}
+textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:500 14px var(--f-ui);border-radius:6px;padding:8px 14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.kbd{font:12px var(--f-code);color:var(--muted);margin-left:auto}
+.hint{font:13px var(--f-code);color:var(--muted);background:var(--code-bg);border-radius:6px;padding:8px 10px}
+.verdict{border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--line)}
+.verdict.correct{background:var(--ok-soft);border-color:transparent}
+.verdict.almost{background:var(--warn-soft);border-color:transparent}
+.verdict.wrong{background:var(--bad-soft);border-color:transparent}
+.vhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.pill{font:600 12px var(--f-code);text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:4px;color:var(--panel)}
+.correct .pill{background:var(--ok)} .almost .pill{background:var(--warn)} .wrong .pill{background:var(--bad)}
+.slips{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.slips li{font-size:14px}
+.slips del{font:500 13px var(--f-code);color:var(--bad);text-decoration:line-through;text-decoration-thickness:2px}
+.slips ins{font:600 13px var(--f-code);color:var(--ok);text-decoration:none}
+.slips .why{color:var(--muted)}
+pre{margin:0;font:13px/1.5 var(--f-code);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:pre}
+.label{font:600 11px var(--f-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.mem{display:flex;flex-wrap:wrap;gap:6px}
+.mem span{font:600 13px var(--f-code);padding:2px 8px;border-radius:4px;background:var(--panel);border:1px solid var(--line)}
+.note{font-size:13px;color:var(--muted)}
+aside{display:flex;flex-direction:column;gap:16px;min-width:0}
+aside .card{padding:16px}
+aside h2{font:600 13px var(--f-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}
+.topic{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:6px 0;border:0;background:none;width:100%;text-align:left;border-radius:0;cursor:pointer}
+.topic:hover .tname{color:var(--accent)}
+.topic.on .tname{color:var(--accent);font-weight:600}
+.tname{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpct{font:500 12px var(--f-code);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{grid-column:1/-1;height:4px;background:var(--code-bg);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.sliplog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.sliplog code{font:12px var(--f-code)}
+.sliplog .t{font-weight:600}
+details summary{cursor:pointer;font:600 13px var(--f-ui);color:var(--muted)}
+details pre{margin-top:8px;font-size:12px}
+.status{font-size:13px;color:var(--muted);min-height:1.2em}
+@media (prefers-reduced-motion:no-preference){.verdict{animation:in .18s ease-out}@keyframes in{from{transform:translateY(4px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="prompt">SQL&gt;</span> drill</h1>
+    <div class="stats" aria-live="polite">
+      <span>answered <b id="sAns">0</b></span>
+      <span>correct <b id="sOk">0</b></span>
+      <span>streak <b id="sStreak">0</b></span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card main" aria-labelledby="qText">
+      <div class="meta">
+        <span class="tag" id="qTopic">Create &amp; alter</span>
+        <span class="tag gen" id="qSource" hidden>new for you</span>
+      </div>
+      <p class="q" id="qText">Loading…</p>
+
+      <div class="editor">
+        <span class="sqlp" aria-hidden="true">SQL&gt;</span>
+        <label for="answer" class="label" style="position:absolute;left:-9999px">Your query</label>
+        <textarea id="answer" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="type it exactly as you would in SQL*Plus"></textarea>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="btnCheck">Check</button>
+        <button id="btnHint">Keyword hint</button>
+        <button id="btnShow">Show answer</button>
+        <button id="btnNext">Next question</button>
+        <span class="kbd">Ctrl+Enter checks · Ctrl+→ next</span>
+      </div>
+      <div class="hint" id="hint" hidden></div>
+      <div class="status" id="status" role="status"></div>
+      <div id="result"></div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h2>Topics</h2>
+        <div id="topics"></div>
+        <p class="note" style="margin:10px 0 0">Tap a topic to drill only that. Tap again for mixed.</p>
+      </div>
+      <div class="card" id="genCard" hidden>
+        <h2>Weak spots</h2>
+        <button id="btnGen" style="width:100%">Make new questions on my weak spots</button>
+        <p class="note" id="genNote" style="margin:8px 0 0">Claude writes fresh questions from your slips.</p>
+      </div>
+      <div class="card">
+        <h2>Recent slips</h2>
+        <ul class="sliplog" id="slipLog"><li class="note">No slips yet. Every mistake you make lands here.</li></ul>
+      </div>
+      <div class="card">
+        <h2>Progress</h2>
+        <p class="note" style="margin:0 0 8px">Saved in this browser only.</p>
+        <button id="btnReset" style="width:100%">Reset my progress</button>
+      </div>
+      <div class="card">
+        <details>
+          <summary>Tables the questions use</summary>
+          <pre id="schemaBox"></pre>
+        </details>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const TOPICS = ["Create & alter","Insert, update, delete","Commit, grant, SQL*Plus","Select & group by","Joins & subqueries","Set operators","Views","PL/SQL blocks","Functions & procedures","Triggers"];
+
+const SCHEMA = `users    (id NUMBER PK, name VARCHAR2, email VARCHAR2, password VARCHAR2, phone VARCHAR2)
+location (venueid NUMBER PK, name, address, city, state, country)   -- was "venue"
+event    (eventid NUMBER PK, name, eventdate DATE, eventtime TIMESTAMP, venueid -> location, description)
+ticket   (ticketid NUMBER PK, eventid -> event, userid, seatnumber, price NUMBER(10,2), status)
+            status is 'confirmed' / 'reserved' / 'cancelled'
+employee (ename, city)   company (cname, city)   emp_company (ename, cname, salary, jdate)
+emp_shift (ename, shift)`;
+
+const BANK = [
+ ["Create & alter","Type the query to create a table <code>users</code> with <code>userid</code> NUMBER(10) as primary key, <code>name</code> VARCHAR2(255) and <code>email</code> VARCHAR2(255).","CREATE TABLE users (userid NUMBER(10) PRIMARY KEY, name VARCHAR2(255), email VARCHAR2(255));"],
+ ["Create & alter","Type the query to add a column <code>age</code> NUMBER(3) to <code>users</code>.","ALTER TABLE users ADD (age NUMBER(3));"],
+ ["Create & alter","Type the query to remove the column <code>age</code> from <code>users</code>.","ALTER TABLE users DROP COLUMN age;"],
+ ["Create & alter","Type the query to rename the table <code>venue</code> to <code>location</code>.","RENAME venue TO location;"],
+ ["Create & alter","Type the query to change <code>description</code> in <code>event</code> to VARCHAR2(1000).","ALTER TABLE event MODIFY (description VARCHAR2(1000));"],
+ ["Create & alter","Type the query to rename the column <code>userid</code> to <code>id</code> in <code>users</code>.","ALTER TABLE users RENAME COLUMN userid TO id;"],
+ ["Create & alter","Type the query to add a unique constraint named <code>uq_email</code> on <code>email</code> in <code>users</code>.","ALTER TABLE users ADD CONSTRAINT uq_email UNIQUE (email);"],
+ ["Create & alter","Type the query to add a foreign key named <code>fk_venue</code> on <code>event.venueid</code> referencing <code>location(venueid)</code>.","ALTER TABLE event ADD CONSTRAINT fk_venue FOREIGN KEY (venueid) REFERENCES location(venueid);"],
+ ["Create & alter","Type the query to add a check constraint <code>chk_id</code> so <code>id</code> in <code>users</code> stays between 101 and 105.","ALTER TABLE users ADD CONSTRAINT chk_id CHECK (id BETWEEN 101 AND 105);"],
+ ["Create & alter","Type the query that removes every row from <code>users</code> but keeps the table (and cannot be rolled back).","TRUNCATE TABLE users;"],
+ ["Create & alter","Type the command that shows the columns and types of <code>ticket</code>.","DESC ticket"],
+ ["Create & alter","Type the query that lists all your tables.","SELECT table_name FROM user_tables;"],
+ ["Insert, update, delete","Type the query to insert user 106, name 'Frank Moore', email 'frank@mail.com' into <code>users</code> (only those three columns).","INSERT INTO users (id, name, email) VALUES (106, 'Frank Moore', 'frank@mail.com');"],
+ ["Insert, update, delete","Type the query to insert event 401 named 'Food Fest' on 1 October 2023 at venue 1 into <code>event</code> (columns eventid, name, eventdate, venueid).","INSERT INTO event (eventid, name, eventdate, venueid) VALUES (401, 'Food Fest', TO_DATE('2023-10-01','YYYY-MM-DD'), 1);"],
+ ["Insert, update, delete","Type the query to change the email of user 102 to 'bob.new@mail.com'.","UPDATE users SET email = 'bob.new@mail.com' WHERE id = 102;"],
+ ["Insert, update, delete","Type the query to delete the user whose email is 'example@example.com'.","DELETE FROM users WHERE email = 'example@example.com';"],
+ ["Insert, update, delete","Type the query to delete all cancelled tickets.","DELETE FROM ticket WHERE status = 'cancelled';"],
+ ["Insert, update, delete","Type the query to give every ticket priced above 30 a 2% discount and every other ticket a 4% discount, in one statement.","UPDATE ticket SET price = CASE WHEN price > 30 THEN price * 0.98 ELSE price * 0.96 END;"],
+ ["Commit, grant, SQL*Plus","Type the command that saves all your inserts and updates permanently.","COMMIT;"],
+ ["Commit, grant, SQL*Plus","Type the command that marks a savepoint called <code>sp1</code>.","SAVEPOINT sp1;"],
+ ["Commit, grant, SQL*Plus","Type the command that undoes everything after savepoint <code>sp1</code>.","ROLLBACK TO sp1;"],
+ ["Commit, grant, SQL*Plus","Type the query that lets user <code>john</code> read the <code>users</code> table.","GRANT SELECT ON users TO john;"],
+ ["Commit, grant, SQL*Plus","Type the query that takes INSERT on <code>event</code> away from <code>mary</code>.","REVOKE INSERT ON event FROM mary;"],
+ ["Commit, grant, SQL*Plus","Type the SQL*Plus command that turns autocommit on.","SET AUTOCOMMIT ON"],
+ ["Commit, grant, SQL*Plus","Type the SQL*Plus command you need before DBMS_OUTPUT.PUT_LINE prints anything.","SET SERVEROUTPUT ON"],
+ ["Select & group by","Type the query that counts the users.","SELECT COUNT(*) FROM users;"],
+ ["Select & group by","Type the query that counts only the confirmed tickets.","SELECT COUNT(*) FROM ticket WHERE status = 'confirmed';"],
+ ["Select & group by","Type the query that shows all events, newest <code>eventdate</code> first.","SELECT * FROM event ORDER BY eventdate DESC;"],
+ ["Select & group by","Type the query that shows the average ticket price for each event.","SELECT eventid, AVG(price) FROM ticket GROUP BY eventid;"],
+ ["Select & group by","Type the query that shows events after 30 July 2023.","SELECT * FROM event WHERE eventdate > TO_DATE('30-07-2023','DD-MM-YYYY');"],
+ ["Select & group by","Type the query that adds up the price of all confirmed tickets.","SELECT SUM(price) FROM ticket WHERE status = 'confirmed';"],
+ ["Select & group by","Type the query that shows each user's name and email joined as one column called <code>display</code>, like 'Alice - alice@mail.com'.","SELECT name || ' - ' || email AS display FROM users;"],
+ ["Select & group by","Type the query that lists event ids that have more than one ticket, with their ticket count.","SELECT eventid, COUNT(*) FROM ticket GROUP BY eventid HAVING COUNT(*) > 1;"],
+ ["Select & group by","Type the query that shows users whose name starts with 'A'.","SELECT * FROM users WHERE name LIKE 'A%';"],
+ ["Joins & subqueries","Type the query that shows the names of users who have a reserved ticket (use a join).","SELECT u.name FROM users u JOIN ticket t ON u.id = t.userid WHERE t.status = 'reserved';"],
+ ["Joins & subqueries","Type the query that shows names of users who have no tickets at all (use NOT EXISTS).","SELECT name FROM users u WHERE NOT EXISTS (SELECT 1 FROM ticket t WHERE t.userid = u.id);"],
+ ["Joins & subqueries","Type the query that shows the names of events held in London (use IN with a subquery on location).","SELECT name FROM event WHERE venueid IN (SELECT venueid FROM location WHERE city = 'London');"],
+ ["Joins & subqueries","Type the query that shows every venue name with its event names, keeping venues that have no events.","SELECT l.name, e.name FROM location l LEFT JOIN event e ON e.venueid = l.venueid;"],
+ ["Set operators","Type the query that shows cities where company 'Acc' is located but 'TATA' is not.","SELECT city FROM company WHERE cname = 'Acc' MINUS SELECT city FROM company WHERE cname = 'TATA';"],
+ ["Set operators","Type the query that shows cities common to companies 'Acc' and 'TATA'.","SELECT city FROM company WHERE cname = 'Acc' INTERSECT SELECT city FROM company WHERE cname = 'TATA';"],
+ ["Set operators","Type the query that lists all employee names from <code>employee</code> and <code>emp_company</code>, keeping duplicates.","SELECT ename FROM employee UNION ALL SELECT ename FROM emp_company;"],
+ ["Views","Type the query that creates a view <code>user_names</code> holding the id and name of every user.","CREATE VIEW user_names AS SELECT id, name FROM users;"],
+ ["Views","Type the query that creates a view <code>music_events</code> of eventid and name for events at venue 1, refusing inserts that don't belong to venue 1.","CREATE VIEW music_events AS SELECT eventid, name, venueid FROM event WHERE venueid = 1 WITH CHECK OPTION;"],
+ ["Views","Type the query that deletes the view <code>user_names</code>.","DROP VIEW user_names;"],
+ ["Views","Type the query that lists all your views.","SELECT view_name FROM user_views;"],
+ ["PL/SQL blocks","Type a PL/SQL block that prints Hello.","BEGIN\n  DBMS_OUTPUT.PUT_LINE('Hello');\nEND;\n/"],
+ ["PL/SQL blocks","Type a PL/SQL block that prints the numbers 1 to 10 using a FOR loop.","BEGIN\n  FOR i IN 1..10 LOOP\n    DBMS_OUTPUT.PUT_LINE(i);\n  END LOOP;\nEND;\n/"],
+ ["PL/SQL blocks","Type a PL/SQL block that divides 10 by 0 and prints 'cannot divide by zero' instead of crashing.","DECLARE\n  z NUMBER;\nBEGIN\n  z := 10 / 0;\nEXCEPTION\n  WHEN ZERO_DIVIDE THEN\n    DBMS_OUTPUT.PUT_LINE('cannot divide by zero');\nEND;\n/"],
+ ["Functions & procedures","Type a function <code>sum_to_50</code> that returns the sum of 1 to 50.","CREATE OR REPLACE FUNCTION sum_to_50 RETURN NUMBER IS\n  total NUMBER := 0;\nBEGIN\n  FOR i IN 1..50 LOOP\n    total := total + i;\n  END LOOP;\n  RETURN total;\nEND;\n/"],
+ ["Functions & procedures","Type the query that calls the function <code>rect_area(4, 5)</code> and shows its result.","SELECT rect_area(4, 5) FROM dual;"],
+ ["Functions & procedures","Type a procedure <code>circle_area</code> that takes a radius <code>r</code> and prints the area.","CREATE OR REPLACE PROCEDURE circle_area (r IN NUMBER) AS\nBEGIN\n  DBMS_OUTPUT.PUT_LINE(3.14159 * r * r);\nEND;\n/"],
+ ["Functions & procedures","Type the command that runs the procedure <code>circle_area</code> with radius 5.","EXEC circle_area(5)"],
+ ["Functions & procedures","Type a function <code>is_palindrome(n IN NUMBER)</code> that returns 'Palindrome' or 'Not a palindrome'.","CREATE OR REPLACE FUNCTION is_palindrome (n IN NUMBER) RETURN VARCHAR2 IS\n  temp NUMBER := n;\n  rev NUMBER := 0;\nBEGIN\n  WHILE temp > 0 LOOP\n    rev := rev * 10 + MOD(temp, 10);\n    temp := TRUNC(temp / 10);\n  END LOOP;\n  IF rev = n THEN\n    RETURN 'Palindrome';\n  ELSE\n    RETURN 'Not a palindrome';\n  END IF;\nEND;\n/"],
+ ["Functions & procedures","Type a function <code>digit_sum(n IN NUMBER)</code> that returns the sum of the digits of n.","CREATE OR REPLACE FUNCTION digit_sum (n IN NUMBER) RETURN NUMBER IS\n  temp NUMBER := n;\n  s NUMBER := 0;\nBEGIN\n  WHILE temp > 0 LOOP\n    s := s + MOD(temp, 10);\n    temp := TRUNC(temp / 10);\n  END LOOP;\n  RETURN s;\nEND;\n/"],
+ ["Functions & procedures","Type a function <code>fib_series(n IN NUMBER)</code> that returns the first n Fibonacci numbers as text, like '0 1 1 2 3'.","CREATE OR REPLACE FUNCTION fib_series (n IN NUMBER) RETURN VARCHAR2 IS\n  a NUMBER := 0;\n  b NUMBER := 1;\n  c NUMBER;\n  res VARCHAR2(4000) := '';\nBEGIN\n  FOR i IN 1..n LOOP\n    res := res || a || ' ';\n    c := a + b;\n    a := b;\n    b := c;\n  END LOOP;\n  RETURN res;\nEND;\n/"],
+ ["Triggers","Type a trigger <code>trg_user_update</code> that prints the old and new email whenever a row in <code>users</code> is updated.","CREATE OR REPLACE TRIGGER trg_user_update\nBEFORE UPDATE ON users\nFOR EACH ROW\nBEGIN\n  DBMS_OUTPUT.PUT_LINE('Old: ' || :OLD.email || ' New: ' || :NEW.email);\nEND;\n/"],
+ ["Triggers","Type a trigger <code>trg_user_delete</code> that prints the name of every user deleted from <code>users</code>.","CREATE OR REPLACE TRIGGER trg_user_delete\nAFTER DELETE ON users\nFOR EACH ROW\nBEGIN\n  DBMS_OUTPUT.PUT_LINE('Deleted: ' || :OLD.name);\nEND;\n/"],
+ ["Triggers","Type a trigger <code>trg_no_cheap</code> that stops any ticket being inserted with a price below 10, with error -20001.","CREATE OR REPLACE TRIGGER trg_no_cheap\nBEFORE INSERT ON ticket\nFOR EACH ROW\nBEGIN\n  IF :NEW.price < 10 THEN\n    RAISE_APPLICATION_ERROR(-20001, 'Price too low');\n  END IF;\nEND;\n/"],
+ ["Triggers","Type the query that switches off the trigger <code>trg_user_update</code> without deleting it.","ALTER TRIGGER trg_user_update DISABLE;"],
+ ["Triggers","Type the query that deletes the trigger <code>trg_user_delete</code>.","DROP TRIGGER trg_user_delete;"],
+].map(([topic,q,a],i)=>({id:"b"+i,topic,q,a,src:"bank"}));
+
+const KW = new Set("SELECT FROM WHERE INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE ALTER ADD DROP COLUMN MODIFY RENAME TO CONSTRAINT PRIMARY KEY FOREIGN REFERENCES UNIQUE CHECK BETWEEN AND OR NOT NULL TRUNCATE DESC ORDER BY GROUP HAVING ASC COUNT SUM AVG MIN MAX DISTINCT AS JOIN ON LEFT IN EXISTS UNION ALL INTERSECT MINUS VIEW WITH OPTION OR REPLACE COMMIT ROLLBACK SAVEPOINT GRANT REVOKE AUTOCOMMIT SERVEROUTPUT FUNCTION PROCEDURE RETURN IS BEGIN END DECLARE LOOP FOR WHILE IF THEN ELSIF ELSE EXCEPTION WHEN TRIGGER BEFORE AFTER EACH ROW EXEC DUAL TO_DATE DBMS_OUTPUT.PUT_LINE CASE ZERO_DIVIDE MOD TRUNC LIKE DISABLE ENABLE RAISE_APPLICATION_ERROR :NEW :OLD NUMBER VARCHAR2 USER_TABLES USER_VIEWS".split(" "));
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const plain = html => { const d=document.createElement("div"); d.innerHTML=html; return d.textContent; };
+
+/* ---------- state (per visitor, stored in this browser) ---------- */
+const BLANK = () => ({ topics:{}, slips:[], generated:[], answered:0, correct:0, streak:0, recent:[] });
+let state = BLANK();
+let cur = null, hintUsed = false, checked = false, focusTopic = null;
+let docRef = null, sample = null;
+
+function blankTopic(){ return {seen:0, ok:0, almost:0}; }
+function acc(t){ const s=state.topics[t]; if(!s||!s.seen) return null; return (s.ok + .5*s.almost)/s.seen; }
+
+let writing=false, again=false;
+function save(){
+  try{ localStorage.setItem("sqldrill", JSON.stringify(state)); }catch(e){}
+  if(!docRef) return;
+  if(writing){ again=true; return; }
+  writing=true;
+  docRef.set(JSON.parse(JSON.stringify(state)))
+    .catch(()=>{ docRef=null; })
+    .finally(()=>{ writing=false; if(again){ again=false; save(); } });
+}
+function merge(s){
+  if(!s || typeof s!=="object") return;
+  state = Object.assign(BLANK(), s);
+}
+
+/* ---------- picking questions ---------- */
+function pool(){ return BANK.concat(state.generated||[]); }
+function pick(){
+  const all = pool().filter(q => !focusTopic || q.topic===focusTopic);
+  const recent = new Set(state.recent.slice(-6));
+  const cands = all.filter(q=>!recent.has(q.id));
+  const list = cands.length ? cands : all;
+  const weights = list.map(q=>{
+    const a = acc(q.topic);
+    let w = a===null ? 2.5 : 1 + 3*(1-a);
+    if(q.src==="gen" && !q.done) w += 2;
+    return w;
+  });
+  let r = Math.random()*weights.reduce((x,y)=>x+y,0);
+  for(let i=0;i<list.length;i++){ r-=weights[i]; if(r<=0) return list[i]; }
+  return list[list.length-1];
+}
+function next(){
+  cur = pick(); hintUsed=false; checked=false;
+  $("qTopic").textContent = cur.topic;
+  $("qSource").hidden = cur.src!=="gen";
+  $("qText").innerHTML = cur.q;
+  $("answer").value = "";
+  $("hint").hidden = true;
+  $("result").innerHTML = "";
+  $("status").textContent = "";
+  $("btnCheck").disabled = false;
+  $("answer").focus({preventScroll:true});
+}
+
+/* ---------- hint: the keyword skeleton, in order ---------- */
+function skeleton(a){
+  const noStr = a.replace(/'[^']*'/g," ");
+  const toks = noStr.match(/:?[A-Za-z_][A-Za-z0-9_.$]*|\/|;/g)||[];
+  const out=[];
+  for(const t of toks){
+    const u=t.toUpperCase();
+    if(KW.has(u)||t==="/"||t===";") out.push(u);
+  }
+  return out.join("  ");
+}
+
+/* ---------- offline grader ---------- */
+function norm(s){
+  return s.replace(/\s+/g," ").replace(/\s*([(),;=|<>*+\-\/:])\s*/g,"$1").trim().toUpperCase().replace(/;+$/,"").replace(/\/$/,"").trim();
+}
+function offlineGrade(ans){
+  if(!ans.trim()) return {verdict:"wrong",summary:"Nothing typed.",slips:[],corrected:cur.a,memorize:[],tag:"blank"};
+  if(norm(ans)===norm(cur.a)) return {verdict:"correct",summary:"Matches the reference answer.",slips:[],corrected:"",memorize:[],tag:""};
+  const need = skeleton(cur.a).split(/\s+/).filter(Boolean);
+  const have = new Set(skeleton(ans).split(/\s+/));
+  const missing = [...new Set(need.filter(k=>!have.has(k)))];
+  const slips = missing.map(k=>({typed:"(missing)",should_be:k,why:"keyword from the reference answer"}));
+  return {verdict: missing.length<=1 ? "almost":"wrong",
+          summary: missing.length ? "Missing keyword"+(missing.length>1?"s":"")+": "+missing.join(", ")+"." : "Different from the reference answer; compare carefully.",
+          slips, corrected:cur.a, memorize:[], tag: missing[0] ? missing[0]+" keyword" : "different form", offline:true};
+}
+
+/* ---------- Claude grader (only when opened on claude.ai) ---------- */
+function gradePrompt(ans){
+  return `You are grading a student's answer in an Oracle SQL*Plus lab-exam drill. The student is memorising exact Oracle syntax the night before the exam, so be strict about syntax and fair about style.
+
+QUESTION: ${plain(cur.q)}
+REFERENCE ANSWER (one valid answer; others can be valid):
+${cur.a}
+
+TABLES:
+${SCHEMA}
+
+STUDENT ANSWER:
+<<<
+${ans}
+>>>
+
+Rules:
+- Dialect: Oracle SQL and PL/SQL typed at the SQL*Plus prompt.
+- "correct": it would run in Oracle and does exactly what was asked. Accept equivalent valid forms: other alias names, keyword case, whitespace and line breaks, optional AS, implicit vs explicit join, ALTER TABLE x RENAME TO y vs RENAME x TO y, VARCHAR vs VARCHAR2, any valid PL/SQL that produces the asked result.
+- "almost": the logic is right but it would fail or misbehave because of a small slip: a misspelled or missing keyword (VALUES, INTO, COLUMN, BY, TO/FROM in GRANT/REVOKE, etc.), double quotes around text, missing semicolon after a SQL statement, missing "/" line after a PL/SQL block / function / procedure / trigger, missing colon in :NEW/:OLD, ADD COLUMN instead of ADD (...), LIMIT or EXCEPT instead of Oracle forms, missing parentheses, a wrong date literal. SQL*Plus commands (DESC, SET ..., EXEC) need no semicolon; do not penalise one either.
+- "wrong": wrong approach, wrong table or column, missing WHERE so it hits every row, or blank.
+- slips: every concrete mistake, smallest span. "typed" is the exact text the student wrote (or "(missing)"), "should_be" the fix, "why" at most 12 words.
+- corrected: the student's own answer with only the slips fixed, keeping their names and layout. Empty string if correct.
+- memorize: 2 to 5 keyword phrases of this answer in order, like ["INSERT INTO","VALUES (...)"].
+- tag: if not correct, a 2 to 4 word name of the thing missed, like "VALUES keyword" or "slash after PL/SQL"; otherwise "".
+- summary: one short sentence to the student.
+
+Reply with only JSON:
+{"verdict":"correct|almost|wrong","summary":"","slips":[{"typed":"","should_be":"","why":""}],"corrected":"","memorize":[""],"tag":""}`;
+}
+
+async function check(){
+  if(checked || !cur) return;
+  const ans = $("answer").value;
+  if(!ans.trim()){ $("status").textContent="Type your query first."; return; }
+  $("btnCheck").disabled = true;
+  let g = null;
+  try{
+    if(sample){
+      $("status").textContent = "Checking…";
+      try{
+        g = await Promise.race([
+          sample.json(gradePrompt(ans), {modelTier:"quick"}),
+          new Promise((_,rej)=>setTimeout(()=>rej({code:"timeout"}),20000))
+        ]);
+        if(!g || !["correct","almost","wrong"].includes(g.verdict)) throw {code:"invalid_json"};
+      }catch(e){
+        if(e && (e.code==="not_granted"||e.code==="sampling_disabled"||e.code==="not_declared")) sample=null;
+        g = offlineGrade(ans);
+        g.offline = true;
+      }
+    } else g = offlineGrade(ans);
+    $("status").textContent = "";
+    checked = true;
+    record(g);
+    render(g);
+  }catch(err){
+    checked = false;
+    $("btnCheck").disabled = false;
+    $("status").textContent = "Check failed: " + (err && err.message || err) + " (press Check again)";
+  }
+}
+
+function record(g){
+  const t = cur.topic;
+  state.topics[t] = state.topics[t] || blankTopic();
+  const s = state.topics[t];
+  s.seen++;
+  let v = g.verdict;
+  if(hintUsed && v==="correct") v="almost";
+  if(v==="correct") s.ok++; else if(v==="almost") s.almost++;
+  state.answered++;
+  if(v==="correct"){ state.correct++; state.streak++; } else state.streak=0;
+  if(v!=="correct"){
+    const sl = (g.slips||[]).slice(0,3).map(x=>({typed:String(x.typed||""),should:String(x.should_be||"")}));
+    state.slips.push({tag:String(g.tag||"mistake"), topic:t, q:plain(cur.q).slice(0,160), slips:sl, at:Date.now()});
+    state.slips = state.slips.slice(-40);
+  }
+  if(cur.src==="gen"){ const gq=state.generated.find(x=>x.id===cur.id); if(gq) gq.done=true; }
+  state.recent.push(cur.id); state.recent = state.recent.slice(-10);
+  save(); paintSide();
+}
+
+function render(g){
+  const v = (hintUsed && g.verdict==="correct") ? "almost" : g.verdict;
+  const label = {correct:"Correct",almost:"Almost",wrong:"Not yet"}[v];
+  let h = `<div class="verdict ${v}"><div class="vhead"><span class="pill">${label}</span><span>${esc(g.summary||"")}${hintUsed&&g.verdict==="correct"?" (counted as almost because you used the hint)":""}</span></div>`;
+  const slips = (g.slips||[]).filter(s=>s && (s.typed||s.should_be));
+  if(slips.length){
+    h += `<ul class="slips">` + slips.map(s=>`<li>${s.typed&&s.typed!=="(missing)"?`<del>${esc(s.typed)}</del> → `:`missing → `}<ins>${esc(s.should_be||"")}</ins>${s.why?` <span class="why">${esc(s.why)}</span>`:""}</li>`).join("") + `</ul>`;
+  }
+  if(g.corrected && v!=="correct"){ h += `<div class="label">Your answer, fixed</div><pre>${esc(g.corrected)}</pre>`; }
+  h += `<div class="label">Reference answer</div><pre>${esc(cur.a)}</pre>`;
+  if(g.memorize && g.memorize.length){ h += `<div class="label">Memorise</div><div class="mem">${g.memorize.map(m=>`<span>${esc(m)}</span>`).join("")}</div>`; }
+  if(g.offline) h += `<p class="note" style="margin:0">Checked by keyword match, so small wording differences can be marked wrong. Compare with the reference.</p>`;
+  h += `</div>`;
+  $("result").innerHTML = h;
+  $("btnNext").focus({preventScroll:true});
+}
+
+function showAnswer(){
+  if(!cur) return;
+  if(!checked){ checked=true; record({verdict:"wrong",slips:[],tag:"looked up answer"}); }
+  $("result").innerHTML = `<div class="verdict wrong"><div class="vhead"><span class="pill">Answer</span><span>Type it out once yourself before moving on.</span></div><pre>${esc(cur.a)}</pre><div class="label">Keywords in order</div><div class="mem">${skeleton(cur.a).split(/\s{2}/).filter(Boolean).map(k=>`<span>${esc(k)}</span>`).join("")}</div></div>`;
+  $("btnCheck").disabled = true;
+}
+
+/* ---------- generate questions on weak spots (claude.ai only) ---------- */
+async function generate(){
+  if(!sample){ $("genNote").textContent = "Claude isn't available on this page right now, so only the built-in questions can be used."; return; }
+  const btn=$("btnGen"); btn.disabled=true; $("genNote").textContent="Writing questions… this takes up to a minute.";
+  const ranked = TOPICS.map(t=>({t,a:acc(t)})).sort((x,y)=>(x.a??.6)-(y.a??.6)).slice(0,4).map(x=>x.t+(x.a===null?" (not practised yet)":` (${Math.round(x.a*100)}%)`));
+  const slips = state.slips.slice(-12).map(s=>`- [${s.topic}] ${s.tag}: `+s.slips.map(x=>`typed "${x.typed}" should be "${x.should}"`).join("; "));
+  const avoid = pool().slice(-25).map(q=>"- "+plain(q.q).slice(0,120));
+  const prompt = `Write 6 new practice questions for an Oracle SQL*Plus lab-exam drill. The student is memorising exact Oracle syntax (keywords like VALUES, INTO, the "/" after PL/SQL).
+
+Weakest topics: ${ranked.join(", ")}
+Recent slips:
+${slips.join("\n")||"(none yet)"}
+
+Make most questions hit the slips and weak topics above, phrased differently from before, so the student must type the same keywords in a new context.
+Allowed topic names (use exactly one per question): ${TOPICS.join(" | ")}
+Tables:
+${SCHEMA}
+
+Each question:
+- starts with "Type the" and names exact table, column, object names and values, so there is one clear answer;
+- asks for one SQL statement, one SQL*Plus command, or one PL/SQL unit (put "/" on its own last line for PL/SQL);
+- "a" is a correct Oracle answer.
+Do not repeat these:
+${avoid.join("\n")}
+
+Reply with only a JSON array: [{"topic":"","q":"","a":""}]`;
+  try{
+    const arr = await sample.json(prompt, {cache:false});
+    const fresh = (Array.isArray(arr)?arr:[]).filter(x=>x&&x.q&&x.a).slice(0,8).map((x,i)=>({
+      id:"g"+Date.now().toString(36)+i, topic: TOPICS.includes(x.topic)?x.topic:"Select & group by",
+      q: esc(String(x.q)), a: String(x.a), src:"gen"
+    }));
+    if(!fresh.length) throw {code:"empty"};
+    state.generated = (state.generated||[]).concat(fresh).slice(-80);
+    save();
+    $("genNote").textContent = `Added ${fresh.length} questions. They come up first.`;
+    cur = null; next();
+  }catch(e){
+    $("genNote").textContent = e && e.code==="rate_limited" ? "Too many requests just now. Try again in a minute." : e && e.code==="not_granted" ? "Claude wasn't allowed for this page, so new questions can't be made." : "Couldn't make questions this time. Try again.";
+    if(e && e.code==="not_granted") sample=null;
+  }finally{ btn.disabled=false; }
+}
+
+/* ---------- side rail ---------- */
+function paintSide(){
+  $("sAns").textContent = state.answered; $("sOk").textContent = state.correct; $("sStreak").textContent = state.streak;
+  $("topics").innerHTML = TOPICS.map(t=>{
+    const a = acc(t), s = state.topics[t];
+    const pct = a===null ? "–" : Math.round(a*100)+"%";
+    const cls = a===null ? "" : a<.5 ? "lo" : a<.8 ? "mid" : "";
+    return `<button class="topic${focusTopic===t?" on":""}" data-t="${esc(t)}" aria-pressed="${focusTopic===t}"><span class="tname">${esc(t)}</span><span class="tpct">${pct}${s&&s.seen?` · ${s.seen}`:""}</span><span class="bar"><i class="${cls}" style="width:${a===null?0:Math.round(a*100)}%"></i></span></button>`;
+  }).join("");
+  const log = state.slips.slice(-6).reverse();
+  $("slipLog").innerHTML = log.length ? log.map(s=>`<li><span class="t">${esc(s.tag)}</span><br>${s.slips.slice(0,2).map(x=>`<code>${esc(x.typed||"(missing)")}</code> → <code>${esc(x.should)}</code>`).join("<br>")||`<span class="note">${esc(s.topic)}</span>`}</li>`).join("") : `<li class="note">No slips yet. Every mistake you make lands here.</li>`;
+}
+
+/* ---------- wiring ---------- */
+$("schemaBox").textContent = SCHEMA;
+$("btnCheck").onclick = check;
+$("btnNext").onclick = next;
+$("btnShow").onclick = showAnswer;
+$("btnGen").onclick = generate;
+$("btnReset").onclick = ()=>{ if(confirm("Reset your SQL drill progress in this browser?")){ state = BLANK(); save(); paintSide(); next(); } };
+$("btnHint").onclick = ()=>{ if(!cur) return; hintUsed=true; const h=$("hint"); h.hidden=false; h.textContent="Keywords in order:  "+skeleton(cur.a); };
+$("topics").addEventListener("click", e=>{ const b=e.target.closest(".topic"); if(!b) return; const t=b.dataset.t; focusTopic = focusTopic===t?null:t; paintSide(); next(); });
+$("answer").addEventListener("keydown", e=>{
+  if((e.ctrlKey||e.metaKey) && e.key==="Enter"){ e.preventDefault(); checked ? next() : check(); }
+  else if((e.ctrlKey||e.metaKey) && e.key==="ArrowRight"){ e.preventDefault(); next(); }
+  else if(e.key==="Tab" && !e.shiftKey){ e.preventDefault(); const t=e.target, s=t.selectionStart; t.setRangeText("  ", s, t.selectionEnd, "end"); }
+});
+document.addEventListener("keydown", e=>{ if(e.target.id!=="answer" && (e.ctrlKey||e.metaKey) && e.key==="Enter" && checked){ e.preventDefault(); next(); } });
+
+try{ const s = JSON.parse(localStorage.getItem("sqldrill")||"null"); if(s) merge(s); }catch(e){}
+paintSide(); next();
+
+/* Claude feedback + cloud sync only exist when this page runs as a claude.ai artifact. */
+(async()=>{
+  const use = window.claude && window.claude.use ? window.claude.use.bind(window.claude) : null;
+  if(!use) return;
+  const [s, d] = await Promise.all([use("sample").catch(()=>null), use("db").catch(()=>null)]);
+  sample = s;
+  if(sample) $("genCard").hidden = false;
+  if(d){
+    const ref = d.doc("progress/main");
+    try{
+      const snap = await ref.get();
+      if(snap.exists){
+        const remote = snap.data();
+        if((remote.answered||0) >= (state.answered||0)) merge(remote);
+      }
+      docRef = ref; paintSide(); save();
+    }catch(e){}
+  }
+})();
+</script>
+</body>
+</html>

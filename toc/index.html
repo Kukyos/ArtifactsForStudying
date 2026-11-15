@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en" data-subject="toc">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TOC Tutor</title>
+<script src="../shared/study.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: fixed left rail of chunks + one reading column. Accent teal = navigation/state,
+   violet = grammar variables, amber = terminals (same colours in text, trees and steppers). */
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --ink:#111c26; --muted:#566775; --line:#d8e0e6;
+  --accent:#0a6f8f; --accent-soft:#dff0f5; --accent-ink:#ffffff;
+  --var:#6d2fb0; --var-bg:#efe6fa; --term:#a8480a; --term-bg:#fdeedd;
+  --ok:#1b7f45; --ok-soft:#e0f3e8; --warn:#a8480a; --warn-soft:#fdeedd; --code:#eaf0f4;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --side:290px;
+}
+:root[data-theme="dark"]{
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;padding:0}
+h1,h2,h3{line-height:1.25;text-wrap:balance;margin:0}
+h2{font-size:1.25rem;margin-top:2rem} h3{font-size:1.05rem;margin-top:1.4rem}
+p{margin:.6rem 0} a{color:var(--accent)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+code{background:var(--code);padding:.08em .35em;border-radius:4px}
+.v{color:var(--var);font-weight:600} .t{color:var(--term);font-weight:600}
+/* Sidebar pinned flush to the left edge; content column fills the rest. */
+.shell{display:grid;grid-template-columns:var(--side) minmax(0,1fr);min-height:100vh}
+#side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:20px 12px 30px max(12px,env(safe-area-inset-left,0px));
+  border-right:1px solid var(--line);background:var(--surface)}
+#side h4{margin:20px 0 6px;padding:0 10px;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side a{display:flex;gap:10px;align-items:baseline;padding:5px 10px;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.92rem;text-align:left}
+#side a:hover{background:var(--accent-soft)} #side a.on{background:var(--accent-soft);font-weight:600}
+#side a .no{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:2.2rem;flex:none}
+#side a.home{margin-top:12px}
+.dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--muted);flex:none;transform:translateY(1px)}
+.dot.done{background:var(--ok);border-color:var(--ok)} .dot.now{border-color:var(--accent);background:var(--accent-soft)}
+.brand{display:flex;align-items:baseline;gap:10px;font-weight:600;padding:0 10px;font-size:1.05rem}
+.brand small{color:var(--muted);font-weight:400;font-family:var(--mono);font-size:.78rem}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:10px 10px 0}
+.bar i{display:block;height:100%;background:var(--ok)}
+.prog{padding:6px 10px 0;font-size:.8rem;color:var(--muted)}
+main{padding:24px clamp(20px,4vw,56px) 80px;min-width:0;max-width:1060px;width:100%}
+.menu{display:none}
+.kicker{font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.04em}
+.pill{display:inline-block;font-size:.74rem;padding:1px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-left:8px;vertical-align:middle}
+.pill.done{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.now{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.chip{font-size:.78rem;font-family:var(--mono);padding:2px 8px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+.card.model{border-left:4px solid var(--accent)}
+.card h3:first-child{margin-top:0}
+.callout{background:var(--warn-soft);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:.95rem}
+.callout.ok{background:var(--ok-soft)}
+.tbl{border-collapse:collapse;width:100%;font-size:.93rem}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.tbl th{background:var(--code);font-weight:600}
+.scroll{overflow-x:auto;max-width:100%}
+.g{font-family:var(--mono);font-size:.95rem;white-space:pre-wrap}
+.gbox{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;white-space:pre;overflow-x:auto;margin:10px 0}
+ol.practice{padding-left:0;list-style:none;counter-reset:q;display:grid;gap:12px}
+ol.practice>li{counter-increment:q;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+ol.practice>li::before{content:"Q" counter(q);font-family:var(--mono);font-weight:600;color:var(--accent);margin-right:8px}
+.src{font-family:var(--mono);font-size:.74rem;background:var(--code);padding:1px 7px;border-radius:4px;color:var(--muted);margin-right:6px}
+details.ans{margin-top:8px} details.ans summary{cursor:pointer;color:var(--accent);font-size:.9rem;font-weight:500}
+details.ans>div{margin-top:8px;padding:10px 14px;background:var(--ok-soft);border-radius:8px;font-size:.95rem}
+button,.btn{font:inherit;font-size:.9rem;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:7px}
+.btn{text-decoration:none;display:inline-block}
+button:hover,.btn:hover{border-color:var(--accent)} button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=number]{font:inherit;font-family:var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:5px 9px;max-width:100%}
+.w{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.w .cap{font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.form{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0;font-family:var(--mono);font-size:1.1rem}
+.tok{padding:2px 8px;border-radius:6px;border:1px solid var(--line);min-width:1.9rem;text-align:center}
+.tok.var{background:var(--var-bg);color:var(--var);border-color:transparent;font-weight:600}
+.tok.term{background:var(--term-bg);color:var(--term);font-weight:600;border-color:transparent}
+button.tok.var{cursor:pointer;font:inherit;font-family:var(--mono);font-size:1.1rem;font-weight:600}
+.tok.var.sel{outline:2px solid var(--var);outline-offset:1px}
+.tok.dis{opacity:.4;cursor:default}
+.log{font-family:var(--mono);font-size:.88rem;color:var(--muted);margin:8px 0}
+.log b{color:var(--ink);font-weight:500}
+.split{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.split>*{min-width:0}
+.msg{margin-top:8px;font-size:.93rem}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--warn)}
+svg text{font-family:var(--mono)}
+.tn-v{fill:var(--var-bg);stroke:var(--var);stroke-width:1.5}
+.tn-v.pend{stroke-dasharray:3 3;fill:var(--surface)}
+.tn-t{fill:var(--term);font-weight:600;font-size:14px}
+.tn-vt{fill:var(--var);font-weight:600;font-size:14px}
+.tn-e{fill:var(--muted);font-style:italic;font-size:14px}
+.tn-l{stroke:var(--muted);stroke-width:1.3;fill:none}
+.fa-c{fill:var(--surface);stroke:var(--ink);stroke-width:1.6}
+.fa-c.cur{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.4}
+.fa-e{stroke:var(--ink);stroke-width:1.5;fill:none}
+.fa-a{fill:var(--ink)}
+.fa-t{fill:var(--ink);font-size:14px}
+.fa-l{fill:var(--accent);font-size:14px;font-weight:600}
+.ring{fill:var(--surface);stroke:var(--ink);stroke-width:1.4}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:38px;flex-wrap:wrap}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.big{font-size:2.6rem;font-weight:600;line-height:1;font-family:var(--mono)}
+.scrim{display:none}
+@media (max-width:820px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  #side{position:fixed;inset:0 auto 0 0;width:min(86vw,var(--side));z-index:30;transform:translateX(-105%);transition:transform .2s;height:100%;box-shadow:0 0 24px rgba(0,0,0,.25)}
+  body.open #side{transform:none}
+  body.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+  main{padding:56px 16px 80px}
+  .menu{display:inline-block}
+}
+@media (prefers-reduced-motion:reduce){#side{transition:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav id="side" aria-label="Chunks"></nav>
+  <main id="main"></main>
+</div>
+<div class="scrim" onclick="document.body.classList.remove('open')"></div>
+
+<script>
+/* ---------- helpers ---------- */
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+var NS='http://www.w3.org/2000/svg';
+
+/* ---------- parse trees ---------- */
+function parseTree(src){
+  var toks=src.match(/[^\s\[\]]+|[\[\]]/g),i=0;
+  function node(){
+    var s=toks[i++],n={s:s,k:[]};
+    if(toks[i]==='['){i++;while(toks[i]!==']')n.k.push(node());i++}
+    if(s==='ε')n.e=true;
+    return n;
+  }
+  return node();
+}
+function isVarName(s){return /^[A-Z]/.test(s)}
+function treeSVG(root,opts){
+  opts=opts||{};var x=0,gap=opts.gap||40,dy=52,maxD=0,pad=26;
+  (function walk(n,d){
+    n.d=d;if(d>maxD)maxD=d;
+    if(!n.k.length){n.x=x;x+=gap;return}
+    n.k.forEach(function(c){walk(c,d+1)});
+    n.x=(n.k[0].x+n.k[n.k.length-1].x)/2;
+  })(root,0);
+  var W=Math.max(x-gap+pad*2,80),H=(maxD+1)*dy+pad,out='';
+  (function draw(n){
+    var cx=n.x+pad,cy=n.d*dy+pad;
+    n.k.forEach(function(c){
+      out+='<line class="tn-l" x1="'+cx+'" y1="'+(cy+14)+'" x2="'+(c.x+pad)+'" y2="'+(c.d*dy+pad-14)+'"/>';
+      draw(c);
+    });
+    var v=n.pend||(isVarName(n.s)&&!n.e);
+    if(v) out+='<circle class="tn-v'+(n.pend?' pend':'')+'" cx="'+cx+'" cy="'+cy+'" r="14"/><text class="tn-vt" x="'+cx+'" y="'+(cy+5)+'" text-anchor="middle">'+esc(n.s)+'</text>';
+    else out+='<text class="'+(n.e?'tn-e':'tn-t')+'" x="'+cx+'" y="'+(cy+5)+'" text-anchor="middle">'+esc(n.s)+'</text>';
+  })(root);
+  return '<svg xmlns="'+NS+'" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="parse tree">'+out+'</svg>';
+}
+function yieldOf(n,out){
+  out=out||[];
+  if(!n.k.length){if(!n.e&&!n.pend&&!(n.v))out.push(n.s)}
+  else n.k.forEach(function(c){yieldOf(c,out)});
+  return out;
+}
+function hydrateTrees(root){
+  $$('.tree',root).forEach(function(el){
+    var t=parseTree(el.dataset.t);
+    el.innerHTML='<div class="scroll">'+treeSVG(t)+'</div>'+(el.dataset.noyield?'':'<div class="log">yield: <b>'+esc(yieldOf(t).join(''))+'</b></div>');
+  });
+}
+
+/* ---------- derivation stepper ---------- */
+function mkDeriv(el){
+  var G=JSON.parse(el.dataset.g),start=el.dataset.start||Object.keys(G)[0],goal=(el.dataset.goal||'').replace(/\s/g,'');
+  var ops=[],mode='L',selIdx=null;
+  function isVar(s){return Object.prototype.hasOwnProperty.call(G,s)}
+  function build(){
+    var root={s:start,k:[],pend:true,v:true};
+    ops.forEach(function(o){
+      var pv=pending(root),n=pv[o.i];
+      n.pend=false;
+      n.k=o.rhs.split(' ').map(function(t){return isVar(t)?{s:t,k:[],pend:true,v:true}:{s:t,k:[],e:t==='ε'}});
+    });
+    return root;
+  }
+  function front(n,o){o=o||[];if(n.e)return o;if(!n.k.length){o.push(n);return o}n.k.forEach(function(c){front(c,o)});return o}
+  function pending(r){return front(r).filter(function(n){return n.v&&n.pend})}
+  function draw(){
+    var root=build(),fr=front(root),pv=pending(root);
+    if(mode==='L')selIdx=pv.length?0:null; else if(mode==='R')selIdx=pv.length?pv.length-1:null;
+    else if(selIdx!==null&&selIdx>=pv.length)selIdx=null;
+    var form=fr.map(function(n){return n.s}).join('');
+    var h='<div class="row" role="group" aria-label="mode"><span class="mono" style="font-size:.85rem;color:var(--muted)">replace:</span>'+
+      [['L','leftmost'],['R','rightmost'],['A','my choice']].map(function(m){return '<button data-mode="'+m[0]+'" class="'+(mode===m[0]?'sel':'')+'">'+m[1]+'</button>'}).join('')+'</div>';
+    h+='<div class="form" aria-live="polite">';
+    var vi=0;
+    fr.forEach(function(n){
+      if(n.v&&n.pend){
+        var idx=vi++,sel=idx===selIdx;
+        var can=mode==='A';
+        h+= can ? '<button class="tok var'+(sel?' sel':'')+'" data-pick="'+idx+'">'+esc(n.s)+'</button>' : '<span class="tok var'+(sel?' sel':' dis')+'">'+esc(n.s)+'</span>';
+      } else h+='<span class="tok term">'+esc(n.s)+'</span>';
+    });
+    if(!fr.length)h+='<span class="tok">ε</span>';
+    h+='</div>';
+    if(pv.length){
+      if(selIdx===null) h+='<div class="msg">Click a variable to choose where to apply a rule.</div>';
+      else{
+        var sym=pv[selIdx].s;
+        h+='<div class="row"><span class="mono" style="font-size:.85rem;color:var(--muted)">apply:</span>'+G[sym].map(function(r,ri){return '<button data-rule="'+ri+'" class="mono">'+esc(sym)+' → '+esc(r)+'</button>'}).join('')+'</div>';
+      }
+    }else{
+      h+= goal ? (form===goal?'<div class="msg ok">Done. All terminals, and the yield is <b>'+esc(form)+'</b>, which is the target.</div>':'<div class="msg bad">Done, but the yield is <b>'+esc(form||'ε')+'</b>, not '+esc(goal)+'. Undo and take a different path.</div>')
+                    : '<div class="msg ok">Done. The yield is <b>'+esc(form||'ε')+'</b>.</div>';
+    }
+    var tmp=[];ops.forEach(function(o,i){var sub=ops.slice(0,i+1);
+      var rt={s:start,k:[],pend:true,v:true};
+      sub.forEach(function(oo){var p=pending(rt)[oo.i];p.pend=false;p.k=oo.rhs.split(' ').map(function(t){return isVar(t)?{s:t,k:[],pend:true,v:true}:{s:t,k:[],e:t==='ε'}})});
+      tmp.push('<div>⇒ <b>'+esc(front(rt).map(function(n){return n.s}).join('')||'ε')+'</b>  <span>('+esc(o.lhs)+' → '+esc(o.rhs)+')</span></div>');
+    });
+    h+='<div class="log"><div>'+esc(start)+'</div>'+tmp.join('')+'</div>';
+    h+='<div class="row"><button data-undo '+(ops.length?'':'disabled')+'>Undo</button><button data-reset '+(ops.length?'':'disabled')+'>Reset</button></div>';
+    el.innerHTML='<div class="split"><div style="flex:1 1 300px">'+h+'</div><div style="flex:1 1 240px"><div class="cap" style="font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:6px">Parse tree so far</div><div class="scroll">'+treeSVG(root)+'</div></div></div>';
+    $$('[data-mode]',el).forEach(function(b){b.onclick=function(){mode=b.dataset.mode;if(mode==='A')selIdx=null;draw()}});
+    $$('[data-pick]',el).forEach(function(b){b.onclick=function(){selIdx=+b.dataset.pick;draw()}});
+    $$('[data-rule]',el).forEach(function(b){b.onclick=function(){
+      var sym=pv[selIdx].s,rhs=G[sym][+b.dataset.rule];
+      ops.push({i:selIdx,lhs:sym,rhs:rhs});if(mode==='A')selIdx=null;draw();
+    }});
+    var u=$('[data-undo]',el);if(u)u.onclick=function(){ops.pop();draw()};
+    var rs=$('[data-reset]',el);if(rs)rs.onclick=function(){ops=[];selIdx=null;draw()};
+  }
+  draw();
+}
+
+/* ---------- state diagrams ---------- */
+function faSVG(spec,cur){
+  var R=22,minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9,S={};
+  spec.states.forEach(function(s){S[s.id]=s;minx=Math.min(minx,s.x);maxx=Math.max(maxx,s.x);miny=Math.min(miny,s.y);maxy=Math.max(maxy,s.y)});
+  var padL=56,padT=84,padB=84,padR=40;
+  var W=maxx-minx+padL+padR,H=maxy-miny+padT+padB,ox=padL-minx,oy=padT-miny,o='';
+  o+='<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="fa-a" d="M0 0L10 5L0 10z"/></marker></defs>';
+  spec.edges.forEach(function(e){
+    var a=S[e.f],b=S[e.t],ax=a.x+ox,ay=a.y+oy,bx=b.x+ox,by=b.y+oy;
+    if(e.f===e.t){
+      var sg=e.loop==='down'?1:-1;
+      o+='<path class="fa-e" marker-end="url(#ah)" d="M'+(ax-13)+' '+(ay+sg*R*.85)+' C'+(ax-38)+' '+(ay+sg*(R+38))+' '+(ax+38)+' '+(ay+sg*(R+38))+' '+(ax+13)+' '+(ay+sg*R*.85)+'"/>';
+      o+='<text class="fa-l" x="'+ax+'" y="'+(ay+sg*(R+34)+(sg>0?12:-4))+'" text-anchor="middle">'+esc(e.l)+'</text>';
+      return;
+    }
+    var mx=(ax+bx)/2,my=(ay+by)/2,dx=bx-ax,dy=by-ay,len=Math.sqrt(dx*dx+dy*dy)||1,px=-dy/len,py=dx/len,bend=e.bend||0;
+    var cx=mx+px*bend*2,cy=my+py*bend*2;
+    function trim(sx,sy){var ux=cx-sx,uy=cy-sy,l=Math.sqrt(ux*ux+uy*uy)||1;return[sx+ux/l*R,sy+uy/l*R]}
+    var p0=trim(ax,ay),p1=trim(bx,by);
+    o+='<path class="fa-e" marker-end="url(#ah)" d="M'+p0[0]+' '+p0[1]+' Q'+cx+' '+cy+' '+p1[0]+' '+p1[1]+'"/>';
+    var lx=.25*p0[0]+.5*cx+.25*p1[0],ly=.25*p0[1]+.5*cy+.25*p1[1],sgn=bend>=0?1:-1;
+    o+='<text class="fa-l" x="'+(lx+px*sgn*12)+'" y="'+(ly+py*sgn*12+5)+'" text-anchor="middle">'+esc(e.l)+'</text>';
+  });
+  spec.states.forEach(function(s){
+    var x=s.x+ox,y=s.y+oy,on=cur&&cur.indexOf(s.id)>=0;
+    if(s.start)o+='<path class="fa-e" marker-end="url(#ah)" d="M'+(x-R-30)+' '+y+' L'+(x-R-2)+' '+y+'"/>';
+    o+='<circle class="fa-c'+(on?' cur':'')+'" cx="'+x+'" cy="'+y+'" r="'+R+'"/>';
+    if(s.accept)o+='<circle class="fa-c'+(on?' cur':'')+'" style="fill:none" cx="'+x+'" cy="'+y+'" r="'+(R-5)+'"/>';
+    o+='<text class="fa-t" x="'+x+'" y="'+(y+5)+'" text-anchor="middle">'+esc(s.id)+'</text>';
+  });
+  return '<svg xmlns="'+NS+'" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="state diagram">'+o+'</svg>';
+}
+function mkFA(el){
+  var spec=JSON.parse(el.dataset.fa),start=spec.states.filter(function(s){return s.start}).map(function(s){return s.id});
+  var inp=el.dataset.input||'',pos=0,cur=start.slice();
+  function step(sym){
+    var nx=[];
+    spec.edges.forEach(function(e){if(cur.indexOf(e.f)>=0&&e.l.split(',').map(function(x){return x.trim()}).indexOf(sym)>=0&&nx.indexOf(e.t)<0)nx.push(e.t)});
+    return nx;
+  }
+  function draw(){
+    var acc=spec.states.filter(function(s){return s.accept}).map(function(s){return s.id});
+    var done=pos>=inp.length,ok=cur.some(function(c){return acc.indexOf(c)>=0});
+    var h='<div class="scroll">'+faSVG(spec,cur)+'</div>';
+    h+='<div class="row"><label for="'+el.id+'-in" class="mono" style="font-size:.85rem;color:var(--muted)">input</label><input type="text" id="'+el.id+'-in" value="'+esc(inp)+'" size="12" autocomplete="off" spellcheck="false"><button data-go>Load</button><button data-step class="primary" '+(done?'disabled':'')+'>Step</button></div>';
+    h+='<div class="form" style="margin-top:8px">'+inp.split('').map(function(c,i){return '<span class="tok '+(i<pos?'term':'')+'" style="'+(i===pos?'outline:2px solid var(--accent)':'')+'">'+esc(c)+'</span>'}).join('')+(inp?'':'<span class="log">type a string, then Load</span>')+'</div>';
+    h+='<div class="log">states: <b>{'+cur.join(', ')+'}</b></div>';
+    if(done&&inp.length)h+='<div class="msg '+(ok?'ok':'bad')+'">'+(ok?'Accepted: the machine ends in a double-circle state.':'Rejected: it ends in '+(cur.length?'a non-final state.':'no state at all (dead end).'))+'</div>';
+    else if(!inp.length)h+='<div class="msg">'+(ok?'The empty string is accepted.':'The empty string is rejected.')+'</div>';
+    el.innerHTML=h;
+    $('[data-go]',el).onclick=function(){inp=$('input',el).value.replace(/\s/g,'');pos=0;cur=start.slice();draw()};
+    $('input',el).onkeydown=function(e){if(e.key==='Enter'){$('[data-go]',el).onclick()}};
+    var sb=$('[data-step]',el);if(sb)sb.onclick=function(){cur=step(inp[pos]);pos++;draw()};
+  }
+  draw();
+}
+var faN=0;
+
+/* ---------- classifier (chunk 1.5) ---------- */
+var CLS=[
+ {g:'S → aS | bA\nA → bA | ε',a:3,why:'Every left side is one variable, and every right side is terminals followed by at most one variable at the END (aS, bA, ε). That is right-linear, so Type 3. Language: aⁿ b⁺, i.e. any number of a, then one or more b.'},
+ {g:'S → aSb | ab',a:2,why:'One variable on the left, so context-free. But the variable sits in the MIDDLE (aSb), so it is not linear, so not Type 3. Type 2. Language: aⁿbⁿ, n ≥ 1.'},
+ {g:'S → aSBC | aBC\nCB → BC\naB → ab\nbB → bb\nbC → bc\ncC → cc',a:1,why:'Rules like CB → BC have two symbols on the left, so it is not context-free. But no rule shrinks (|left| ≤ |right| everywhere), so Type 1. Language: aⁿbⁿcⁿ, n ≥ 1.'},
+ {g:'S → ACaB\nCa → aaC\nCB → DB | E\naD → Da\nAD → AC\naE → Ea\nAE → ε',a:0,why:'AE → ε has 2 symbols on the left and 0 on the right. A shrinking rule breaks Type 1, so it is Type 0. Language: a^(2ⁿ), n ≥ 1 (the a\'s double on every pass).'},
+ {g:'S → Sa | b',a:3,why:'One variable on the left, and the variable comes FIRST on the right (Sa). That is left-linear, which is also Type 3. A grammar may not mix left- and right-linear rules.'},
+ {g:'S → aA\nA → Sb | b',a:2,why:'Context-free. Look at A → Sb: a variable followed by a terminal inside a rule that is also reached from aA. The variable is not at the end of every rule, and the grammar is not purely left-linear either, so it is Type 2. Language: aⁿbⁿ, n ≥ 1.'}
+];
+function mkClass(el){
+  var i=0,done={};
+  function draw(){
+    var c=CLS[i],h='<div class="row"><span class="mono" style="font-size:.85rem;color:var(--muted)">grammar '+(i+1)+' of '+CLS.length+'</span></div><div class="gbox">'+esc(c.g)+'</div><div class="row" role="group" aria-label="choose type">';
+    [3,2,1,0].forEach(function(t){h+='<button data-t="'+t+'" class="'+(done[i]===t?(t===c.a?'sel':''):'')+'">Type '+t+'</button>'});
+    h+='</div>';
+    if(done[i]!==undefined)h+='<div class="msg '+(done[i]===c.a?'ok':'bad')+'">'+(done[i]===c.a?'Correct. ':'Not quite: it is Type '+c.a+'. ')+esc(c.why)+'</div>';
+    h+='<div class="row" style="margin-top:10px"><button data-prev '+(i?'':'disabled')+'>Previous</button><button data-next '+(i<CLS.length-1?'':'disabled')+'>Next</button></div>';
+    el.innerHTML=h;
+    $$('[data-t]',el).forEach(function(b){b.onclick=function(){done[i]=+b.dataset.t;draw()}});
+    $('[data-prev]',el).onclick=function(){i--;draw()};$('[data-next]',el).onclick=function(){i++;draw()};
+  }
+  draw();
+}
+
+/* ---------- strings of length k (chunk 1.1) ---------- */
+function mkSigma(el){
+  el.innerHTML='<div class="row"><label for="sg-a" class="mono" style="font-size:.85rem;color:var(--muted)">alphabet</label><input type="text" id="sg-a" value="a,b" size="8"><label for="sg-k" class="mono" style="font-size:.85rem;color:var(--muted)">k</label><input type="number" id="sg-k" value="2" min="0" max="6" style="width:4.5rem"></div><div class="log" id="sg-n"></div><div class="form" id="sg-o"></div>';
+  function go(){
+    var al=$('#sg-a').value.split(',').map(function(s){return s.trim()}).filter(Boolean).filter(function(v,i,a){return a.indexOf(v)===i}).slice(0,4);
+    var k=Math.max(0,Math.min(6,+$('#sg-k').value||0)),cnt=Math.pow(al.length,k);
+    var list=[''];for(var j=0;j<k;j++){var nx=[];for(var q=0;q<list.length&&nx.length<200;q++)for(var r=0;r<al.length;r++)nx.push(list[q]+al[r]);list=nx}
+    $('#sg-n').innerHTML='|Σ|='+al.length+', so |Σ<sup>'+k+'</sup>| = '+al.length+'<sup>'+k+'</sup> = <b>'+cnt+'</b>'+(cnt>list.length?' (showing the first '+list.length+')':'');
+    $('#sg-o').innerHTML=list.slice(0,64).map(function(s){return '<span class="tok term">'+(s===''?'ε':esc(s))+'</span>'}).join('')+(list.length>64?'<span class="tok">…</span>':'');
+  }
+  $('#sg-a').oninput=go;$('#sg-k').oninput=go;go();
+}
+
+/* ---------- content ---------- */
+function P(src,ans){return '<li>'+src+'<details class="ans"><summary>Show answer</summary><div>'+ans+'</div></details></li>'}
+function DER(g,goal,cap){return '<div class="w"><div class="cap">'+cap+'</div><div class="deriv" data-g=\''+g+'\' data-goal="'+goal+'"></div></div>'}
+function TR(t,cap){return '<div class="w"><div class="cap">'+cap+'</div><div class="tree" data-t="'+t+'"></div></div>'}
+
+var C11='<p>TOC studies machines that read text and say yes or no. This chunk gives exact words for "text". Nothing else is assumed.</p>'+
+'<h2>The vocabulary</h2><div class="scroll"><table class="tbl"><tr><th>Term</th><th>Meaning</th><th>Example</th></tr>'+
+'<tr><td>Alphabet <b>Σ</b></td><td>a finite, non-empty set of symbols</td><td><code>{0,1}</code>, <code>{a,b}</code></td></tr>'+
+'<tr><td>String</td><td>a finite sequence of symbols from Σ. |w| is its length</td><td>|abba| = 4</td></tr>'+
+'<tr><td><b>ε</b></td><td>the empty string, length 0. εw = wε = w</td><td>|ε| = 0</td></tr>'+
+'<tr><td>wⁿ</td><td>w written n times, w⁰ = ε</td><td>(ab)² = abab</td></tr>'+
+'<tr><td>Σᵏ</td><td>all strings of length exactly k, and |Σᵏ| = |Σ|ᵏ</td><td>{a,b}: Σ² = {aa,ab,ba,bb}</td></tr>'+
+'<tr><td>Σ*</td><td>all strings of any length, including ε. Infinite</td><td>Σ⁰∪Σ¹∪Σ²∪…</td></tr>'+
+'<tr><td>Σ⁺</td><td>Σ* without ε</td><td>Σ* − {ε}</td></tr>'+
+'<tr><td>Language</td><td>any set of strings over Σ, i.e. any subset of Σ*</td><td>strings ending in 01</td></tr></table></div>'+
+'<div class="w"><div class="cap">Try it: strings of length k</div><div id="sigma"></div></div>'+
+'<h2>ε vs ∅ vs {ε}</h2><div class="scroll"><table class="tbl"><tr><th></th><th>What it is</th><th>Strings inside</th></tr>'+
+'<tr><td><b>ε</b></td><td>one string, the empty one</td><td>it is a string</td></tr>'+
+'<tr><td><b>∅</b></td><td>a language with no strings (an empty box)</td><td>0</td></tr>'+
+'<tr><td><b>{ε}</b></td><td>a language whose only string is ε (a box holding a blank page)</td><td>1</td></tr></table></div>'+
+'<h2>Operations on languages</h2><ul><li><b>Union, intersection</b>: strings in either, strings in both.</li>'+
+'<li><b>Concatenation</b> L₁L₂ = {xy : x∈L₁, y∈L₂}. {a,b}{c,d} = {ac,ad,bc,bd}.</li>'+
+'<li><b>Star</b> L* = zero or more strings of L glued together. <b>Plus</b> L⁺ = one or more.</li>'+
+'<li><b>Reverse</b> Lᴿ, <b>complement</b> L̅ = Σ* − L.</li></ul>'+
+'<div class="callout"><b>Fact:</b> ε ∈ L* always (L⁰ = {ε}). ε ∈ L⁺ only if ε ∈ L already.</div>'+
+'<h2>Prefix, suffix, substring</h2><p>For <code>abba</code>: prefixes ε, a, ab, abb, abba. Suffixes ε, a, ba, bba, abba. Substrings include <code>bb</code>. "Ends with 01" means 01 is a suffix. "Starts with 1" means 1 is a prefix.</p>'+
+'<h2>Solved models</h2>'+
+'<div class="card model"><h3>A. List strings of a given length that fit a pattern</h3><p><span class="src">Nov25 Q1</span> Σ={0,1}, L = strings ending in <code>01</code>. Strings of length 3?</p><p>Last two symbols are fixed, so one free slot, 0 or 1: <code>001</code>, <code>101</code>.</p></div>'+
+'<div class="card model"><h3>B. Two free slots</h3><p><span class="src">Supp Q1</span> Σ={a,b}, ends with <code>ba</code>, length 4. Two free slots, so 2² = 4 strings: <code>aaba, abba, baba, bbba</code>. Check the count: |Σ|^(free slots).</p></div>'+
+'<div class="card model"><h3>C. Language facts</h3><p><span class="src">Assg1</span> L = {a, ab, aba}. |L| = 3 (the number of strings). Longest <code>aba</code>, shortest <code>a</code>.</p></div>'+
+'<div class="card model"><h3>D. ε in L* and L⁺</h3><p><span class="src">Assg1</span> L = {ab, ba}. ε ∈ L*: yes, pick zero strings. ε ∈ L⁺: no, every string in L has length 2.</p></div>'+
+'<h2>Practice</h2><ol class="practice">'+
+P('<span class="src">Nov25 style</span>Σ={0,1}, strings ending with <code>10</code>. List the strings of length 4.','2 free slots: <code>0010, 0110, 1010, 1110</code>.')+
+P('<span class="src">Supp style</span>Σ={a,b}, strings starting with <code>ab</code>. List the strings of length 4.','<code>abaa, abab, abba, abbb</code>.')+
+P('<span class="src">Assg1</span>What is |abba|? Differentiate Kleene star and Kleene plus.','|abba| = 4. Star = zero or more strings (includes ε). Plus = one or more (excludes ε unless ε ∈ L).')+
+P('<span class="src">Assg1</span>Σ={a,b}. List all strings of length 2. How many strings are in Σ⁵?','<code>aa, ab, ba, bb</code>. |Σ⁵| = 2⁵ = 32.')+
+P('L₁={a,ab}, L₂={b,ba}. Write L₁L₂ and L₁∪L₂.','L₁L₂ = {ab, aba, abb, abba} (a·b, a·ba, ab·b, ab·ba). L₁∪L₂ = {a, ab, b, ba}.')+
+P('L={0,11}. List L². Is ε in L* and in L⁺?','L² = {00, 011, 110, 1111}. ε ∈ L*: yes. ε ∈ L⁺: no.')+
+'</ol>';
+
+var C12='<p>A <b>grammar</b> is a set of rewriting rules that <i>generates</i> the strings of a language. A machine accepts strings; a grammar produces them.</p>'+
+'<h2>The four parts: G = (V, T, P, S)</h2><div class="scroll"><table class="tbl"><tr><th></th><th>Name</th><th>Meaning</th><th>Example</th></tr>'+
+'<tr><td><b>V</b></td><td>variables</td><td>placeholders that get replaced, written in capitals</td><td><span class="v">S, A, B</span></td></tr>'+
+'<tr><td><b>T</b></td><td>terminals</td><td>the real symbols, never replaced</td><td><span class="t">a, b, 0, 1</span></td></tr>'+
+'<tr><td><b>P</b></td><td>productions</td><td>rewriting rules <code>A → α</code>. The bar <code>|</code> means "or"</td><td class="g">S → aSb | ε</td></tr>'+
+'<tr><td><b>S</b></td><td>start symbol</td><td>where every derivation begins</td><td><span class="v">S</span></td></tr></table></div>'+
+'<h2>Derivation</h2><p><b>⇒</b> is one step, <b>⇒*</b> is zero or more. A string that still has variables is a <i>sentential form</i>; one with only terminals is a <i>sentence</i>. The language is <code>L(G) = { w ∈ T* : S ⇒* w }</code>.</p>'+
+'<h2>Leftmost and rightmost</h2><p>With several variables in the string you must choose one. <b>Leftmost derivation (LMD)</b> always replaces the leftmost variable. <b>Rightmost (RMD)</b> always the rightmost.</p>'+
+'<h2>Parse tree</h2><p>Root = <span class="v">S</span>. Each internal node is a variable, and its children (left to right) are the right side of the rule used. Leaves are terminals or ε. The <b>yield</b> is the leaves read left to right. A tree records <i>which rules</i> were used, not the order.</p>'+
+'<div class="callout ok">Play with the steppers. Switch between leftmost and rightmost on the second one: the steps change order, the tree does not.</div>'+
+'<h2>Solved models</h2>'+
+'<div class="card model"><h3>1. Derive a string <span class="src">IA2 2d</span><span class="src">Supp Q5</span></h3><p>Grammar <span class="g">S → aSb | ε</span>. Derive <code>aabb</code>: <span class="g">S ⇒ aSb ⇒ aaSbb ⇒ aabb</span>. Language: aⁿbⁿ, n ≥ 0.</p></div>'+
+DER('{"S":["a S b","ε"]}','aabb','Stepper: S → aSb | ε, target aabb')+
+'<div class="card model"><h3>2. Two variables: LMD vs RMD</h3><p>Grammar <span class="g">S → AB, A → aA | a, B → bB | b</span>, string <code>aabb</code>.</p><p><b>LMD:</b> <span class="g">S ⇒ AB ⇒ aAB ⇒ aaB ⇒ aabB ⇒ aabb</span><br><b>RMD:</b> <span class="g">S ⇒ AB ⇒ AbB ⇒ Abb ⇒ aAbb ⇒ aabb</span></p><p>Same five rules, different order, same tree. Language a⁺b⁺.</p></div>'+
+DER('{"S":["A B"],"A":["a A","a"],"B":["b B","b"]}','aabb','Stepper: try leftmost, then reset and try rightmost')+
+'<div class="card model"><h3>3. Leftmost derivation on an operator grammar <span class="src">Supp Q12</span></h3><p>Grammar <span class="g">E → E+E | E*E | id</span>, string <code>id+id*id</code>. Always replace the leftmost E:</p><p class="g">E ⇒ E+E ⇒ id+E ⇒ id+E*E ⇒ id+id*E ⇒ id+id*id</p></div>'+
+'<div class="card model"><h3>4. Read the yield of a tree <span class="src">IA2 2a</span></h3><p>Read the leaves left to right. Do not read the variables.</p></div>'+
+TR('S[A[a A[a]] c B[b]]','Yield of this tree')+
+'<h2>Practice</h2><ol class="practice">'+
+P('<span class="src">IA2 2d</span>Derive <b>aaabbb</b> from <span class="g">S → aSb | ε</span>, showing every step.','<span class="g">S ⇒ aSb ⇒ aaSbb ⇒ aaaSbbb ⇒ aaabbb</span>')+
+P('<span class="src">Supp Q5</span>Derive <b>000111</b> from <span class="g">S → 0S1 | ε</span>.','<span class="g">S ⇒ 0S1 ⇒ 00S11 ⇒ 000S111 ⇒ 000111</span>')+
+P('<span class="src">Supp Q12</span>Leftmost derivation of <b>b−b*b</b> from <span class="g">T → T+T | T−T | T*T | b</span>.','<span class="g">T ⇒ T−T ⇒ b−T ⇒ b−T*T ⇒ b−b*T ⇒ b−b*b</span> (each step replaces the leftmost T).')+
+P('<span class="src">IA2 2a</span>Yield of the tree: S has children (S, a, B). That S has children (S, a, B), and its inner S has one child, c. Both B nodes have children (a, b).','Leaves left to right: <code>c</code>, then <code>a a b</code>, then <code>a</code>, then <code>a b</code>. Yield = <b>caabaab</b>.')+
+P('Grammar <span class="g">S → AB, A → aA | a, B → bB | b</span>. LMD and RMD of <b>aaabb</b>, and the tree.','<b>LMD:</b> <span class="g">S ⇒ AB ⇒ aAB ⇒ aaAB ⇒ aaaB ⇒ aaabB ⇒ aaabb</span><br><b>RMD:</b> <span class="g">S ⇒ AB ⇒ AbB ⇒ Abb ⇒ aAbb ⇒ aaAbb ⇒ aaabb</span><br>Tree: S → A B; A → a A, twice, then A → a; B → b B then B → b.')+
+P('Grammar <span class="g">S → aSa | bSb | c</span>. Derive <b>abcba</b>. What strings does it generate?','<span class="g">S ⇒ aSa ⇒ abSba ⇒ abcba</span>. It generates w c w<sup>R</sup> for w ∈ {a,b}*.')+
+'</ol>';
+
+var C13='<p>Now you get a language and must write the grammar. Questions Q1–Q3 of the question bank are built on this.</p>'+
+'<h2>The method</h2><div class="card"><p><b>Rule 1. Dependent counts get nested.</b> If the number of b\'s depends on the number of a\'s, use a rule that adds both at once around the middle: <span class="g">S → aSb</span>. The counts can never drift apart.</p><p><b>Rule 2. Independent parts get their own variable</b> and are joined: <span class="g">S → AB, A → aA | a, B → bB | b</span> gives a⁺b⁺.</p><p><b>Rule 3. Always add a stopping rule</b> (<span class="g">S → ab</span> or <span class="g">S → ε</span>).</p><p><b>Test it:</b> derive n=1 and n=2. If both are right and nothing else appears, you are almost certainly right.</p></div>'+
+'<h2>Solved models</h2>'+
+'<div class="card model"><h3>1. L = { aⁿb²ⁿ : n ≥ 1 } <span class="src">QB Q1</span></h3><p>Each a needs two b\'s: <span class="g">S → aSbb | abb</span>. Derive <code>aabbbb</code>: <span class="g">S ⇒ aSbb ⇒ aabbbb</span>. One variable per step, so LMD = RMD.</p></div>'+
+DER('{"S":["a S b b","a b b"]}','aabbbb','Stepper: aabbbb')+
+'<div class="card model"><h3>2. Even palindromes over {0,1} <span class="src">QB Q2</span></h3><p>Match the outer pair, then the next pair inward: <span class="g">S → 0S0 | 1S1 | ε</span>. For odd palindromes add <span class="g">| 0 | 1</span>.</p><p><b>Is it regular?</b> No. A finite machine would have to remember the entire first half, which can be any length. The proof is the pumping lemma, chunk 2.10.</p></div>'+
+DER('{"S":["0 S 0","1 S 1","ε"]}','011110','Stepper: 011110')+
+'<div class="card model"><h3>3. L = { aⁿbᵐcⁿ : n ≥ 1, m ≥ 0 } <span class="src">QB Q3</span></h3><p>a and c depend on each other (nest). The b\'s in the middle are independent (own variable): <span class="g">S → aSc | aBc, B → bB | ε</span>.</p></div>'+
+DER('{"S":["a S c","a B c"],"B":["b B","ε"]}','aabcc','Stepper: aabcc')+
+'<div class="card model"><h3>4. L = { aⁿbᵐcⁿ⁺ᵐ : n, m ≥ 1 } <span class="src">Nov25 Q20a language</span></h3><p>cⁿ⁺ᵐ = cᵐcⁿ, so the shape is aⁿ [ bᵐcᵐ ] cⁿ, which is nesting inside nesting: <span class="g">S → aSc | aBc, B → bBc | bc</span>. You will build the PDA for this language in Module 4.</p></div>'+
+DER('{"S":["a S c","a B c"],"B":["b B c","b c"]}','aabccc','Stepper: aabccc (n=2, m=1, so 3 c\'s)')+
+'<h2>Practice</h2><ol class="practice">'+
+P('L = { a²ⁿbⁿ : n ≥ 1 }. Grammar, then derive <b>aaaabb</b>.','<span class="g">S → aaSb | aab</span>. <span class="g">S ⇒ aaSb ⇒ aaaabb</span>.')+
+P('<span class="src">QB Q20</span>L = { aⁿbᵐcᵐdⁿ : n, m ≥ 1 }. Grammar, then derive <b>aabcdd</b>.','<span class="g">S → aSd | aBd, B → bBc | bc</span>. <span class="g">S ⇒ aSd ⇒ aaBdd ⇒ aabcdd</span>.')+
+P('<span class="src">Class assignment</span>Strings over {0,1} that start with 1 and end with 0. Write a grammar.','<span class="g">S → 1A, A → 0A | 1A | 0</span>. Smallest string: S ⇒ 1A ⇒ 10.')+
+'</ol>';
+
+var C14='<h2>Definition</h2><p>A grammar is <b>ambiguous</b> if at least one string it generates has <b>two or more different parse trees</b>. Equivalent: two different leftmost derivations, or two different rightmost derivations.</p>'+
+'<div class="callout"><b>Common trap:</b> an LMD and an RMD of the <i>same tree</i> are not ambiguity. You need two different <i>trees</i>.</div>'+
+'<p><b>Why it matters:</b> a tree is the meaning. For 2+3*4, one tree gives 2+(3·4)=14 and another gives (2+3)·4=20.</p>'+
+'<h2>How to prove ambiguity</h2><ol><li>Pick one short string the grammar generates.</li><li>Show two different parse trees (or two different LMDs).</li><li>Conclude: "two distinct trees for the same string, so the grammar is ambiguous."</li></ol>'+
+'<p>Ambiguity belongs to the grammar, not the language. The same language can have an ambiguous and an unambiguous grammar. (Some languages are <i>inherently ambiguous</i>: every grammar for them is. Know the term.)</p>'+
+'<h2>Solved models</h2>'+
+'<div class="card model"><h3>1. The aab grammar <span class="src">Nov25 Q13</span><span class="src">Supp Q13</span></h3><p>The same question in both papers. <span class="g">S → AB | aaB, A → a | aA, B → b</span>, string <code>aab</code>.</p><p><b>Tree 1:</b> <span class="g">S ⇒ AB ⇒ aAB ⇒ aaB ⇒ aab</span><br><b>Tree 2:</b> <span class="g">S ⇒ aaB ⇒ aab</span></p></div>'+
+'<div class="split"><div style="flex:1 1 220px">'+TR('S[A[a A[a]] B[b]]','Tree 1: S → AB')+'</div><div style="flex:1 1 220px">'+TR('S[a a B[b]]','Tree 2: S → aaB')+'</div></div>'+
+'<div class="card model"><h3>2. The expression grammar <span class="src">QB Q4</span><span class="src">Remedial 1</span></h3><p><span class="g">E → E+E | E*E | id</span>, string <code>id+id*id</code>. Start with E → E+E for one tree, E → E*E for the other.</p></div>'+
+'<div class="split"><div style="flex:1 1 280px">'+TR('E[E[id] + E[E[id] * E[id]]]','Tree A: + at the root, id + (id*id)')+'</div><div style="flex:1 1 280px">'+TR('E[E[E[id] + E[id]] * E[id]]','Tree B: * at the root, (id+id) * id')+'</div></div>'+
+DER('{"E":["E + E","E * E","id"]}','id+id*id','Try it: build id+id*id twice with a different first rule')+
+'<div class="card model"><h3>3. Remove the ambiguity <span class="src">QB Q4b</span></h3><p>One variable per priority level: E for sums, T for products, F for the smallest units.</p><div class="gbox">E → E + T | T\nT → T * F | F\nF → ( E ) | id</div><p>A <code>+</code> can only be created at the E level, above the T level where <code>*</code> lives. So a product is always finished before a sum can use it: <code>*</code> binds tighter. <code>E → E+T</code> is left-recursive, so a+b+c groups as (a+b)+c.</p></div>'+
+DER('{"E":["E + T","T"],"T":["T * F","F"],"F":["( E )","id"]}','id+id*id','Try to make a tree with * at the top. You cannot.')+
+'<h2>Practice</h2><ol class="practice">'+
+P('Define an ambiguous grammar. Is ambiguity a property of the grammar or the language?','A grammar where some string has two or more parse trees (or two LMDs / two RMDs). A property of the <b>grammar</b>: the same language can have an ambiguous and an unambiguous grammar.')+
+P('<span class="src">Supp Q12 grammar</span>Show <span class="g">T → T+T | T−T | T*T | b</span> is ambiguous for <b>b−b*b</b>.','Tree A: T → T−T with the right T → T*T, meaning b−(b*b). Tree B: T → T*T with the left T → T−T, meaning (b−b)*b. <br><b>LMD A:</b> <span class="g">T ⇒ T−T ⇒ b−T ⇒ b−T*T ⇒ b−b*T ⇒ b−b*b</span><br><b>LMD B:</b> <span class="g">T ⇒ T*T ⇒ T−T*T ⇒ b−T*T ⇒ b−b*T ⇒ b−b*b</span>')+
+P('Show <span class="g">S → aS | Sa | a</span> is ambiguous for <b>aa</b>.','Tree 1: S ⇒ aS ⇒ aa (first a comes from the rule S → aS). Tree 2: S ⇒ Sa ⇒ aa (the first a comes from S → a, the second from S → Sa). Different trees, same string.')+
+P('Show <span class="g">S → SS | (S) | ε</span> is ambiguous for <b>()()()</b>.','S → SS can group it as [()] [()()] or as [()()] [()]. Two different trees for the same string.')+
+P('<span class="src">QB Q4b</span>Unambiguous grammar for <span class="g">E → E+E | E−E | E*E | E/E | id</span> with * and / above + and −. Unique tree for <b>id−id*id</b>.','<span class="g">E → E+T | E−T | T\nT → T*F | T/F | F\nF → id</span>Derivation: <span class="g">E ⇒ E−T ⇒ T−T ⇒ F−T ⇒ id−T ⇒ id−T*F ⇒ id−F*F ⇒ id−id*F ⇒ id−id*id</span>. The subtraction is at the top, the product is below it.')+
+'</ol>';
+
+var C15='<p>Noam Chomsky sorted grammars into four types by how restricted the rules are. Each type matches a kind of machine. This closes Module 1.</p>'+
+'<h2>The four types</h2><div class="scroll"><table class="tbl"><tr><th>Type</th><th>Grammar</th><th>Rule form (α → β)</th><th>Language</th><th>Machine</th><th>Example</th></tr>'+
+'<tr><td><b>3</b></td><td>Regular</td><td class="g">A → aB | a | ε (right-linear)<br>or A → Ba | a (left-linear)</td><td>regular</td><td>finite automaton (DFA/NFA)</td><td class="g">S → aS | b</td></tr>'+
+'<tr><td><b>2</b></td><td>Context-free</td><td class="g">A → α<br>one variable on the left</td><td>context-free (CFL)</td><td>pushdown automaton (PDA)</td><td class="g">S → aSb | ab</td></tr>'+
+'<tr><td><b>1</b></td><td>Context-sensitive</td><td class="g">α → β with |α| ≤ |β|<br>(never shrinks)</td><td>context-sensitive (CSL)</td><td>linear bounded automaton (LBA)</td><td>aⁿbⁿcⁿ</td></tr>'+
+'<tr><td><b>0</b></td><td>Unrestricted</td><td class="g">α → β<br>α has at least one variable</td><td>recursively enumerable (RE)</td><td>Turing machine</td><td>a^(2ⁿ)</td></tr></table></div>'+
+'<div class="w"><div class="cap">Regular ⊂ context-free ⊂ context-sensitive ⊂ recursively enumerable</div><div class="scroll"><svg xmlns="'+NS+'" viewBox="0 0 560 350" width="560" height="350" role="img" aria-label="nested language classes">'+
+'<ellipse class="ring" cx="280" cy="180" rx="265" ry="160"/><ellipse class="ring" cx="280" cy="180" rx="220" ry="128"/><ellipse class="ring" cx="280" cy="180" rx="170" ry="96"/><ellipse class="ring" cx="280" cy="180" rx="112" ry="56"/>'+
+'<g text-anchor="middle" style="fill:var(--ink);font-size:12px"><text x="280" y="40">Type 0 · RE · Turing machine</text><text x="280" y="72">Type 1 · context-sensitive · LBA</text><text x="280" y="104">Type 2 · context-free · PDA</text><text x="280" y="176" style="font-weight:600">Type 3</text><text x="280" y="194">regular · finite automaton</text></g></svg></div></div>'+
+'<p>Every Type 3 grammar is also Type 2, 1 and 0. The inclusions are proper, and each ring has a language that the ring inside it cannot handle:</p>'+
+'<div class="scroll"><table class="tbl"><tr><th>Language</th><th>Lives in</th><th>Not in</th></tr><tr><td>strings ending in 01</td><td>regular</td><td>-</td></tr><tr><td>aⁿbⁿ</td><td>context-free</td><td>regular</td></tr><tr><td>aⁿbⁿcⁿ</td><td>context-sensitive</td><td>context-free</td></tr><tr><td>language of a universal TM (Module 6)</td><td>recursively enumerable</td><td>context-sensitive/decidable</td></tr></table></div>'+
+'<h2>Definitions you must write in one line</h2><ul>'+
+'<li><b>Right-linear grammar</b> <span class="src">Supp Q4</span>: every rule is <code>A → xB</code> or <code>A → x</code>, where A, B are variables and x is a string of terminals. (Left-linear: <code>A → Bx | x</code>.)</li>'+
+'<li><b>Unrestricted grammar</b> <span class="src">Supp Q9</span>: rules <code>α → β</code> with α containing at least one variable and no other restriction. Type 0.</li>'+
+'<li><b>Linear bounded automaton</b> <span class="src">Supp Q14</span>: a Turing machine whose tape is limited to the cells holding the input (between two end markers). It accepts the context-sensitive languages.</li>'+
+'<li>Machine for context-sensitive grammar: <b>LBA</b>. Machine for recursively enumerable languages: <b>Turing machine</b>.</li></ul>'+
+'<h2>How to classify a grammar</h2><div class="card"><ol>'+
+'<li>Is the left side always <b>one variable</b>? If not, go to step 4.</li>'+
+'<li>Yes, so it is at least Type 2. Are all rules <b>right-linear</b> (variable only at the very end) or all <b>left-linear</b> (variable only at the very start)? Then <b>Type 3</b>. Otherwise <b>Type 2</b>.</li>'+
+'<li>(Done.)</li>'+
+'<li>Does every rule satisfy |left| ≤ |right|? Then <b>Type 1</b>. If any rule shrinks (like <code>AE → ε</code>), it is <b>Type 0</b>.</li></ol>'+
+'<p>Always give the <b>most restrictive</b> type that fits, and say why.</p></div>'+
+'<div class="w"><div class="cap">Classify the grammar (question bank Q5 and variations)</div><div id="classify"></div></div>'+
+'<h2>Solved models</h2>'+
+'<div class="card model"><h3>1. Compare the languages of the Chomsky hierarchy <span class="src">Nov25 Q11</span><span class="src">Supp Q11</span></h3><p>Asked in both papers, 3 marks. Write the four-row table above (type, grammar form, language class, machine), then one line: "Regular ⊂ CFL ⊂ CSL ⊂ RE, each strictly larger than the one before."</p></div>'+
+'<div class="card model"><h3>2. Classify with justification <span class="src">QB Q5</span></h3><p><b>(i)</b> <span class="g">S → aS | bA, A → bA | ε</span>: Type 3 (right-linear). Language aⁿb⁺.<br><b>(ii)</b> <span class="g">S → aSb | ab</span>: Type 2 (one variable on the left, variable in the middle so not linear). Language aⁿbⁿ, n≥1.<br><b>(iii)</b> The aSBC grammar: Type 1 (CB → BC has two symbols on the left, but no rule shrinks). Language aⁿbⁿcⁿ, n≥1.</p></div>'+
+'<h2>Practice</h2><ol class="practice">'+
+P('<span class="src">Nov25 Q11</span>Compare the languages described in the Chomsky hierarchy.','Table: Type 3 regular, right/left-linear rules, finite automaton. Type 2 context-free, A → α, PDA. Type 1 context-sensitive, |α| ≤ |β|, LBA. Type 0 unrestricted, any α → β (α has a variable), Turing machine. Regular ⊂ CFL ⊂ CSL ⊂ RE.')+
+P('<span class="src">Supp Q4, Q8, Q9, Q10</span>Define a right-linear grammar. Name the automaton for context-sensitive grammars. Define an unrestricted grammar. Name a machine that accepts RE languages.','See "Definitions" above: rules A → xB | x; the LBA; rules α → β with α containing a variable; the Turing machine.')+
+P('<span class="src">Supp Q14</span>State the concept of a Linear Bounded Automaton.','A Turing machine that may not use tape beyond the input (tape length is linear in the input). It accepts exactly the context-sensitive languages.')+
+P('<span class="src">QB Q5(iv)</span>Classify <span class="g">S → ACaB, Ca → aaC, CB → DB | E, aD → Da, AD → AC, aE → Ea, AE → ε</span> and describe the language.','Type 0, because <span class="g">AE → ε</span> shrinks (2 symbols on the left, 0 on the right). The language is { a^(2ⁿ) : n ≥ 1 }: each pass of C across the a\'s doubles them, and E ends the process.')+
+P('Classify <span class="g">S → Sa | b</span> and <span class="g">S → aSb | ε</span>.','<span class="g">S → Sa | b</span>: left-linear, Type 3 (language ba*). <span class="g">S → aSb | ε</span>: Type 2 (variable in the middle). Language aⁿbⁿ, n≥0.')+
+'</ol>';
+
+var MODS=[
+ {n:1,name:'Grammars and Chomsky hierarchy',chunks:[
+  {no:'1.1',t:'Alphabet, string, language',s:'done',h:C11,exam:['Nov25 Q1','Supp Q1','IA2 1a','Assg1']},
+  {no:'1.2',t:'Grammar, derivation, parse tree',s:'done',h:C12,exam:['Supp Q5','Supp Q12','IA2 2a','IA2 2d']},
+  {no:'1.3',t:'Designing grammars',s:'done',h:C13,exam:['QB Q1-Q3','Nov25 Q20a']},
+  {no:'1.4',t:'Ambiguity',s:'done',h:C14,exam:['Nov25 Q13','Supp Q13','QB Q4']},
+  {no:'1.5',t:'Chomsky hierarchy',s:'now',h:C15,exam:['Nov25 Q11','Supp Q11','QB Q5','Supp Q4, Q8, Q9, Q14']}]},
+ {n:2,name:'Finite automata and regular languages',chunks:[
+  {no:'2.1',t:'DFA basics and design'},{no:'2.2',t:'NFA'},{no:'2.3',t:'ε-NFA and ε-closure'},{no:'2.4',t:'Subset construction'},
+  {no:'2.5',t:'Regular expressions, algebra, homomorphism'},{no:'2.6',t:'Thompson: RE to NFA'},{no:'2.7',t:'DFA minimization'},
+  {no:'2.8',t:'DFA to RE'},{no:'2.9',t:'Closure properties (regular)'},{no:'2.10',t:'Pumping lemma (regular)'},{no:'2.11',t:'Moore and Mealy'}]},
+ {n:3,name:'Context-free languages',chunks:[{no:'3.1',t:'Simplification'},{no:'3.2',t:'CNF'},{no:'3.3',t:'GNF'},{no:'3.4',t:'CYK'},{no:'3.5',t:'CFL closure and non-closure'},{no:'3.6',t:'Pumping lemma (CFL)'}]},
+ {n:4,name:'Pushdown automata',chunks:[{no:'4.1',t:'PDA basics and acceptance'},{no:'4.2',t:'PDA design and ID trace'},{no:'4.3',t:'CFG to PDA'},{no:'4.4',t:'PDA to CFG'},{no:'4.5',t:'DPDA vs NPDA'}]},
+ {n:5,name:'Turing machines',chunks:[{no:'5.1',t:'TM basics and ID'},{no:'5.2',t:'TM as acceptor'},{no:'5.3',t:'TM computing functions'},{no:'5.4',t:'Variants and simulation'},{no:'5.5',t:'Type-0 grammar and TM'}]},
+ {n:6,name:'Undecidability (Q24, compulsory)',chunks:[{no:'6.1',t:'Recursive vs RE'},{no:'6.2',t:'Closure and the L / complement theorem'},{no:'6.3',t:'Universal TM'},{no:'6.4',t:'Halting problem, L_d, L_u'},{no:'6.5',t:"Rice's theorem"},{no:'6.6',t:'PCP and MPCP'},{no:'6.7',t:'Decidable vs undecidable'}]}
+];
+var ALL=[];MODS.forEach(function(m){m.chunks.forEach(function(c){c.id='c'+c.no.replace('.','-');c.mod=m;ALL.push(c)})});
+/* Progress is per visitor: stored in this browser only (localStorage). */
+var PKEY='toc-progress-v1',PROG={};
+try{PROG=JSON.parse(localStorage.getItem(PKEY))||{}}catch(e){PROG={}}
+function saveProg(){try{localStorage.setItem(PKEY,JSON.stringify(PROG))}catch(e){}}
+var TOTAL=ALL.length,DONE=0,PCT=0;
+function recalc(){
+  var nowSet=false;
+  ALL.forEach(function(c){
+    if(PROG[c.id])c.s='done';
+    else if(!nowSet){c.s='now';nowSet=true}
+    else c.s='todo';
+  });
+  DONE=ALL.filter(function(c){return c.s==='done'}).length;PCT=Math.round(DONE/TOTAL*100);
+}
+
+/* ---------- views ---------- */
+function side(cur){
+  var h='<div class="brand"><span>TOC Tutor</span><small>23CS2046</small></div><div class="bar" aria-label="progress"><i style="width:'+PCT+'%"></i></div><div class="prog">'+DONE+' of '+TOTAL+' chunks done ('+PCT+'%)</div>';
+  h+='<a href="#home" class="home'+(cur==='home'?' on':'')+'">Overview</a>';
+  MODS.forEach(function(m){
+    h+='<h4>Module '+m.n+'</h4>';
+    m.chunks.forEach(function(c){h+='<a href="#'+c.id+'" class="'+(cur===c.id?'on':'')+'"><span class="dot '+(c.s==='done'?'done':c.s==='now'?'now':'')+'"></span><span class="no">'+c.no+'</span><span>'+esc(c.t)+'</span></a>'});
+  });
+  $('#side').innerHTML=h;
+}
+function home(){
+  var nxt=ALL.filter(function(c){return c.s!=='done'})[0];
+  var h='<button class="menu" aria-label="Open chunk list">☰ Chunks</button><div class="kicker" style="margin-top:12px">THEORY OF COMPUTATION · ENDSEM PLAN</div><h1 style="font-size:1.9rem;margin-top:6px">Where you are</h1>';
+  h+='<div class="card"><div class="row" style="gap:22px;align-items:flex-end"><div><div class="big">'+PCT+'%</div><div class="log">'+DONE+' of '+TOTAL+' chunks done</div></div><div style="flex:1 1 220px"><div class="bar" style="margin:0"><i style="width:'+PCT+'%"></i></div><p style="margin:10px 0 0">'+(nxt?'Next: <a href="#'+nxt.id+'"><b>'+nxt.no+' '+esc(nxt.t)+'</b></a>':'All chunks done.')+'</p></div></div></div>';
+  h+='<div class="mods">'+MODS.map(function(m){var d=m.chunks.filter(function(c){return c.s==='done'}).length,p=Math.round(d/m.chunks.length*100);
+    return '<div class="card" style="margin:0"><div class="kicker">MODULE '+m.n+'</div><div style="font-weight:600;margin:2px 0 8px">'+esc(m.name)+'</div><div class="bar" style="margin:0"><i style="width:'+p+'%"></i></div><div class="log" style="margin:6px 0 0">'+d+' / '+m.chunks.length+'</div></div>'}).join('')+'</div>';
+  h+='<h2>Two pictures, two jobs</h2><p>Grammars (Modules 1 and 3) are drawn as <b>parse trees</b>: they show how a string was <i>generated</i>. Machines (Modules 2, 4, 5) are drawn as <b>state diagrams</b>: they show how a string is <i>read</i>. You need both. Here is each.</p>';
+  h+='<div class="split"><div style="flex:1 1 280px">'+TR('S[a S[a S[ε] b] b]','Parse tree for aabb from S → aSb | ε')+'</div>';
+  h+='<div style="flex:1 1 320px"><div class="w"><div class="cap">State diagram: odd number of b\'s (Nov25 Q4)</div><div class="fa" id="fa-home" data-input="abab" data-fa=\''+JSON.stringify({states:[{id:'q0',x:60,y:60,start:1},{id:'q1',x:220,y:60,accept:1}],edges:[{f:'q0',t:'q0',l:'a'},{f:'q1',t:'q1',l:'a'},{f:'q0',t:'q1',l:'b',bend:30},{f:'q1',t:'q0',l:'b',bend:30}]})+'\'></div></div></div></div>';
+  h+='<p class="log" style="margin-top:24px">Progress is saved in this browser only. <button data-resetprog>Reset progress</button></p>';
+  h+='<div class="callout ok">Press Step on the machine. It starts in q0, reads one letter at a time, and accepts when it ends in a double circle.</div>';
+  return h;
+}
+function chunk(c,i){
+  var h='<button class="menu" aria-label="Open chunk list">☰ Chunks</button><div class="kicker" style="margin-top:12px">MODULE '+c.mod.n+' · '+esc(c.mod.name.toUpperCase())+'</div><h1 style="font-size:1.8rem;margin-top:6px">'+c.no+' '+esc(c.t)+'<span class="pill '+c.s+'">'+(c.s==='done'?'done':c.s==='now'?'up next':'not started')+'</span></h1>';
+  if(c.exam)h+='<div class="chips" aria-label="where this appears">'+c.exam.map(function(e){return '<span class="chip">'+esc(e)+'</span>'}).join('')+'</div>';
+  if(!c.h)h+='<div class="card"><p>This chunk has not been taught yet. Ask for the next chunk in the chat and it will appear here.</p></div>';
+  else h+=c.h;
+  h+='<div class="card" style="margin-top:28px"><div class="row" style="justify-content:space-between"><span>'+(c.s==='done'?'You marked this chunk as done.':'Finished this chunk?')+'</span><button data-mark class="'+(c.s==='done'?'':'primary')+'">'+(c.s==='done'?'Mark as not done':'Mark as done')+'</button></div></div>';
+  var p=ALL[i-1],n=ALL[i+1];
+  h+='<div class="nav">'+(p?'<a class="btn" href="#'+p.id+'">← '+p.no+' '+esc(p.t)+'</a>':'<span></span>')+(n?'<a class="btn" href="#'+n.id+'">'+n.no+' '+esc(n.t)+' →</a>':'')+'</div>';
+  return h;
+}
+function hydrate(root){
+  hydrateTrees(root);
+  $$('.deriv',root).forEach(mkDeriv);
+  $$('.fa',root).forEach(function(el){if(!el.id)el.id='fa'+(faN++);mkFA(el)});
+  var s=$('#sigma',root);if(s)mkSigma(s);
+  var c=$('#classify',root);if(c)mkClass(c);
+  $$('.g',root).forEach(function(el){
+    if(el.dataset.done)return;el.dataset.done=1;
+    el.innerHTML=el.innerHTML.replace(/(<[^>]*>)|([A-Z])/g,function(m,tag,cap){return tag?tag:'<span class="v">'+cap+'</span>'});
+  });
+  $$('.gbox',root).forEach(function(el){
+    el.innerHTML=el.innerHTML.replace(/[A-Z]/g,function(m){return '<span class="v">'+m+'</span>'});
+  });
+}
+function route(){
+  var id=(location.hash||'#home').slice(1),main=$('#main');
+  document.body.classList.remove('open');recalc();
+  if(id==='home'||!ALL.some(function(c){return c.id===id})){side('home');main.innerHTML=home()}
+  else{var i=ALL.map(function(c){return c.id}).indexOf(id);side(id);main.innerHTML=chunk(ALL[i],i)}
+  hydrate(main);
+  var mk=$('[data-mark]',main);if(mk)mk.onclick=function(){if(PROG[id])delete PROG[id];else PROG[id]=1;saveProg();var y=window.scrollY;route();window.scrollTo(0,y)};
+  var rp=$('[data-resetprog]',main);if(rp)rp.onclick=function(){if(confirm('Reset all progress in this browser?')){PROG={};saveProg();route()}};
+  var mb=$('.menu',main);if(mb)mb.onclick=function(){document.body.classList.toggle('open')};
+  var a=$('#side a.on');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest'});
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',route);
+route();
+</script>
+</body>
+</html>

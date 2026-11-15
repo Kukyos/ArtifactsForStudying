@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en" data-subject="pandas">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pandas Drill</title>
+<script src="../shared/study.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one working column (prompt → notebook cell → verdict), a narrow side rail for topic mastery and recent slips; rail drops below at phone width. */
+:root{
+  --bg:#f3f4f7; --panel:#ffffff; --fg:#1b1e26; --muted:#5d6475; --line:#d8dbe3;
+  --accent:#2f5bb7; --accent-soft:#e3eaf8; --code-bg:#f1f3f7; --prompt:#2f5bb7;
+  --ok:#1f7a45; --ok-soft:#e1f2e7; --warn:#a15c00; --warn-soft:#fbefd9; --bad:#b3261e; --bad-soft:#f9e3e1;
+  --f-ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-code:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  --r:8px;
+}
+:root[data-theme="dark"]{
+  --bg:#13151b; --panel:#1b1e26; --fg:#e6e8ee; --muted:#9aa1b2; --line:#2d313c;
+  --accent:#7ea3f0; --accent-soft:#1f2a42; --code-bg:#111318; --prompt:#7ea3f0;
+  --ok:#5ccf8c; --ok-soft:#183324; --warn:#e8a64a; --warn-soft:#3a2b14; --bad:#f2847c; --bad-soft:#3b1d1b; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--f-ui)}
+.wrap{max-width:1120px;margin:0 auto;padding:56px 20px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:16px}
+h1{font:600 22px/1.2 var(--f-code);margin:0;letter-spacing:-.01em}
+h1 .prompt{color:var(--prompt)}
+.stats{display:flex;gap:16px;font:500 13px var(--f-code);color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--fg);font-weight:600}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.main{padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:500 12px var(--f-code);padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.tag.gen{background:var(--code-bg);color:var(--muted)}
+.q{font-size:18px;line-height:1.45;margin:0;text-wrap:pretty}
+.q code,.inline{font:500 .92em var(--f-code);background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cell{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start}
+.cell .inp{font:500 13px var(--f-code);color:var(--prompt);padding-top:11px;white-space:nowrap}
+textarea{width:100%;min-height:130px;resize:vertical;font:14px/1.55 var(--f-code);color:var(--fg);background:var(--code-bg);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);padding:10px 12px;tab-size:4}
+textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:500 14px var(--f-ui);border-radius:6px;padding:8px 14px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.kbd{font:12px var(--f-code);color:var(--muted);margin-left:auto}
+.hint{font:13px var(--f-code);color:var(--muted);background:var(--code-bg);border-radius:6px;padding:8px 10px}
+.verdict{border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--line)}
+.verdict.correct{background:var(--ok-soft);border-color:transparent}
+.verdict.almost{background:var(--warn-soft);border-color:transparent}
+.verdict.wrong{background:var(--bad-soft);border-color:transparent}
+.vhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.pill{font:600 12px var(--f-code);text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:4px;color:var(--panel)}
+.correct .pill{background:var(--ok)} .almost .pill{background:var(--warn)} .wrong .pill{background:var(--bad)}
+.slips{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.slips li{font-size:14px}
+.slips del{font:500 13px var(--f-code);color:var(--bad);text-decoration:line-through;text-decoration-thickness:2px}
+.slips ins{font:600 13px var(--f-code);color:var(--ok);text-decoration:none}
+.slips .why{color:var(--muted)}
+pre{margin:0;font:13px/1.5 var(--f-code);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;overflow-x:auto;white-space:pre}
+.label{font:600 11px var(--f-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.mem{display:flex;flex-wrap:wrap;gap:6px}
+.mem span{font:600 13px var(--f-code);padding:2px 8px;border-radius:4px;background:var(--panel);border:1px solid var(--line)}
+.note{font-size:13px;color:var(--muted)}
+aside{display:flex;flex-direction:column;gap:16px;min-width:0}
+aside .card{padding:16px}
+aside h2{font:600 13px var(--f-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}
+.topic{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:6px 0;border:0;background:none;width:100%;text-align:left;border-radius:0;cursor:pointer}
+.topic:hover .tname{color:var(--accent)}
+.topic.on .tname{color:var(--accent);font-weight:600}
+.tname{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpct{font:500 12px var(--f-code);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{grid-column:1/-1;height:4px;background:var(--code-bg);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.sliplog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.sliplog code{font:12px var(--f-code)}
+.sliplog .t{font-weight:600}
+details summary{cursor:pointer;font:600 13px var(--f-ui);color:var(--muted)}
+details pre{margin-top:8px;font-size:12px}
+.status{font-size:13px;color:var(--muted);min-height:1.2em}
+@media (prefers-reduced-motion:no-preference){.verdict{animation:in .18s ease-out}@keyframes in{from{transform:translateY(4px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="prompt">In [ ]:</span> pandas drill</h1>
+    <div class="stats" aria-live="polite">
+      <span>answered <b id="sAns">0</b></span>
+      <span>correct <b id="sOk">0</b></span>
+      <span>streak <b id="sStreak">0</b></span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card main" aria-labelledby="qText">
+      <div class="meta">
+        <span class="tag" id="qTopic">Load &amp; inspect</span>
+        <span class="tag gen" id="qSource" hidden>new for you</span>
+      </div>
+      <p class="q" id="qText">Loading…</p>
+
+      <div class="cell">
+        <span class="inp" aria-hidden="true">In [ ]:</span>
+        <div>
+          <label for="answer" class="label" style="position:absolute;left:-9999px">Your code</label>
+          <textarea id="answer" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="type the code exactly as you would in the Jupyter cell"></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="btnCheck">Check</button>
+        <button id="btnHint">Hint</button>
+        <button id="btnShow">Show answer</button>
+        <button id="btnNext">Next question</button>
+        <span class="kbd">Ctrl+Enter checks · Ctrl+→ next</span>
+      </div>
+      <div class="hint" id="hint" hidden></div>
+      <div class="status" id="status" role="status"></div>
+      <div id="result"></div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h2>Topics</h2>
+        <div id="topics"></div>
+        <p class="note" style="margin:10px 0 0">Tap a topic to drill only that. Tap again for mixed.</p>
+      </div>
+      <div class="card" id="genCard" hidden>
+        <h2>Weak spots</h2>
+        <button id="btnGen" style="width:100%">Make new questions on my weak spots</button>
+        <p class="note" id="genNote" style="margin:8px 0 0">Claude writes fresh questions from your slips.</p>
+      </div>
+      <div class="card">
+        <h2>Recent slips</h2>
+        <ul class="sliplog" id="slipLog"><li class="note">No slips yet. Every mistake you make lands here.</li></ul>
+      </div>
+      <div class="card">
+        <h2>Progress</h2>
+        <p class="note" style="margin:0 0 8px">Saved in this browser only.</p>
+        <button id="btnReset" style="width:100%">Reset my progress</button>
+      </div>
+      <div class="card">
+        <details>
+          <summary>Data the questions use</summary>
+          <pre id="schemaBox"></pre>
+        </details>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const TOPICS = ["NumPy arrays","Series & DataFrame","Load & inspect","Missing values","Select & filter","Add & delete","Sort, group, pivot, rank","Statistics","Plots"];
+
+const SCHEMA = `Already imported:  numpy as np, pandas as pd,
+                   matplotlib.pyplot as plt, seaborn as sns
+
+df = pd.read_csv("students.csv")   (already loaded unless asked)
+  student_id   text    S01, S02 ...
+  gender       text    M / F
+  city         text    Chennai / Kochi / Pune   (2 missing)
+  study_hours  float
+  sleep_hours  float   (3 missing)
+  attendance   int     (2 outliers: 6, 9)
+  prev_marks   int
+  marks        int
+  passed       text    Yes / No
+
+num  = df.select_dtypes(include="number")   (when a question says num)
+
+temps = 24 random temperatures (NumPy array)
+grid  = temps.reshape(4, 6)
+a, b  = two NumPy arrays of 3 numbers each`;
+
+const BANK = [
+ ["NumPy arrays","Type the code that fixes the random seed to 1021 and makes <code>temps</code>, an array of 24 random numbers between 20 and 40.","np.random.seed(1021)\ntemps = np.random.uniform(20, 40, 24)"],
+ ["NumPy arrays","Type the code that rounds every value in <code>temps</code> to 1 decimal place and stores it back in <code>temps</code>.","temps = np.round(temps, 1)"],
+ ["NumPy arrays","Type the code that shows the value at position 12 of <code>temps</code>.","temps[12]"],
+ ["NumPy arrays","Type the code that shows the last value of <code>temps</code> without using its length.","temps[-1]"],
+ ["NumPy arrays","Type the code that shows the first 6 values of <code>temps</code>.","temps[:6]"],
+ ["NumPy arrays","Type the code that shows positions 6 to 11 (both included) of <code>temps</code>.","temps[6:12]"],
+ ["NumPy arrays","Type the code that shows every second value of <code>temps</code>.","temps[::2]"],
+ ["NumPy arrays","Type the code that reshapes <code>temps</code> into 4 rows and 6 columns and stores it in <code>grid</code>.","grid = temps.reshape(4, 6)"],
+ ["NumPy arrays","Type the code that shows column 0 of <code>grid</code> (every row).","grid[:, 0]"],
+ ["NumPy arrays","Type the code that shows the value in row 1, column 2 of <code>grid</code>.","grid[1, 2]"],
+ ["NumPy arrays","Type the code that shows only the values in <code>temps</code> above 35.","temps[temps > 35]"],
+ ["NumPy arrays","Type the code that shows the values in <code>temps</code> between 25 and 30, both included.","temps[(temps >= 25) & (temps <= 30)]"],
+ ["NumPy arrays","Type the code that shows <code>temps</code> sorted from highest to lowest.","np.sort(temps)[::-1]"],
+ ["NumPy arrays","Type the code that splits <code>temps</code> into 4 equal parts called <code>p1</code>, <code>p2</code>, <code>p3</code>, <code>p4</code>.","p1, p2, p3, p4 = np.split(temps, 4)"],
+ ["NumPy arrays","Type the code that joins arrays <code>a</code> and <code>b</code> end to end into one array.","np.concatenate((a, b))"],
+ ["NumPy arrays","Type the code that stacks array <code>a</code> on top of array <code>b</code> (2 rows).","np.vstack((a, b))"],
+ ["NumPy arrays","Type the code that shows the mean of each ROW of <code>grid</code>.","grid.mean(axis=1)"],
+ ["NumPy arrays","Type the code that shows the mean of each COLUMN of <code>grid</code>.","grid.mean(axis=0)"],
+ ["NumPy arrays","Type the code that shows the positions (indexes) in <code>temps</code> where the value is above 35.","np.where(temps > 35)[0]"],
+ ["NumPy arrays","Type the code that shows the position of the largest value in <code>temps</code>.","temps.argmax()"],
+ ["NumPy arrays","Type a for loop that prints the position and value of every reading in <code>temps</code> above 35.","for hour, t in enumerate(temps):\n    if t > 35:\n        print(hour, t)"],
+ ["Series & DataFrame","Type the code that makes a Series <code>s</code> with values 12, 7, 30 and labels 'bolts', 'nuts', 'screws'.","s = pd.Series([12, 7, 30], index=[\"bolts\", \"nuts\", \"screws\"])"],
+ ["Series & DataFrame","Type the code that makes a DataFrame <code>table</code> with a column <code>product</code> ('bolt', 'nut') and a column <code>stock</code> (120, 75), using a dictionary.","table = pd.DataFrame({\"product\": [\"bolt\", \"nut\"], \"stock\": [120, 75]})"],
+ ["Series & DataFrame","Type the code that turns the Python list <code>[3, 5, 8]</code> into a NumPy array <code>arr</code>.","arr = np.array([3, 5, 8])"],
+ ["Load & inspect","Type the four import lines for numpy, pandas, matplotlib's pyplot and seaborn with their usual short names.","import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns"],
+ ["Load & inspect","Type the code that loads <code>students.csv</code> into <code>df</code>.","df = pd.read_csv(\"students.csv\")"],
+ ["Load & inspect","Type the code that loads the Excel file <code>marks.xlsx</code> into <code>df</code>.","df = pd.read_excel(\"marks.xlsx\")"],
+ ["Load & inspect","Type the code that shows the first 10 rows of <code>df</code>.","df.head(10)"],
+ ["Load & inspect","Type the code that shows the last 8 rows of <code>df</code>.","df.tail(8)"],
+ ["Load & inspect","Type the code that shows information about <code>df</code>: every column, how many non-empty values, and its type.","df.info()"],
+ ["Load & inspect","Type the code that shows the number of rows and columns of <code>df</code>.","df.shape"],
+ ["Load & inspect","Type the code that shows the column names of <code>df</code>.","df.columns"],
+ ["Load & inspect","Type the code that shows the data type of every column.","df.dtypes"],
+ ["Load & inspect","Type the code that shows the statistical summary (count, mean, std, min, quartiles, max) of the number columns.","df.describe()"],
+ ["Load & inspect","Type the code that removes hidden spaces from the start and end of every column name.","df.columns = df.columns.str.strip()"],
+ ["Missing values","Type the code that counts the missing values in each column.","df.isnull().sum()"],
+ ["Missing values","Type the code that counts the missing values in the whole table (one number).","df.isnull().sum().sum()"],
+ ["Missing values","Type the code that shows only the rows that have at least one missing value.","df[df.isnull().any(axis=1)]"],
+ ["Missing values","Type the code that fills the missing values in <code>sleep_hours</code> with that column's mean.","df[\"sleep_hours\"] = df[\"sleep_hours\"].fillna(df[\"sleep_hours\"].mean())"],
+ ["Missing values","Type the code that fills the missing values in <code>sleep_hours</code> with that column's median.","df[\"sleep_hours\"] = df[\"sleep_hours\"].fillna(df[\"sleep_hours\"].median())"],
+ ["Missing values","Type the code that fills the missing values in the text column <code>city</code> with its most common value.","df[\"city\"] = df[\"city\"].fillna(df[\"city\"].mode()[0])"],
+ ["Missing values","Type the code that deletes every row that has a missing value and keeps the result in <code>df</code>.","df = df.dropna()"],
+ ["Select & filter","Type the code that shows only the <code>marks</code> column.","df[\"marks\"]"],
+ ["Select & filter","Type the code that shows only the columns <code>student_id</code>, <code>city</code> and <code>marks</code>.","df[[\"student_id\", \"city\", \"marks\"]]"],
+ ["Select & filter","Type the code that shows rows 5 to 9 by position.","df.iloc[5:10]"],
+ ["Select & filter","Type the code that shows the first 5 rows and the columns at positions 1, 2 and 3.","df.iloc[0:5, 1:4]"],
+ ["Select & filter","Type the code that shows the students with marks above 80.","df[df[\"marks\"] > 80]"],
+ ["Select & filter","Type the code that shows students from Chennai who scored more than 70.","df[(df[\"city\"] == \"Chennai\") & (df[\"marks\"] > 70)]"],
+ ["Select & filter","Type the code that shows students with attendance below 50 OR marks below 30.","df[(df[\"attendance\"] < 50) | (df[\"marks\"] < 30)]"],
+ ["Select & filter","Type the code that shows only <code>student_id</code> and <code>marks</code> of students with marks above 80, using <code>loc</code>.","df.loc[df[\"marks\"] > 80, [\"student_id\", \"marks\"]]"],
+ ["Select & filter","Type the code that shows students from Kochi or Pune using <code>isin</code>.","df[df[\"city\"].isin([\"Kochi\", \"Pune\"])]"],
+ ["Add & delete","Type the code that adds a column <code>total_hours</code> = study_hours + sleep_hours.","df[\"total_hours\"] = df[\"study_hours\"] + df[\"sleep_hours\"]"],
+ ["Add & delete","Type the code that adds a column <code>grade</code> that is 'A' when marks is 75 or more and 'B' otherwise.","df[\"grade\"] = np.where(df[\"marks\"] >= 75, \"A\", \"B\")"],
+ ["Add & delete","Type the code that deletes the column <code>total_hours</code> and keeps the result in <code>df</code>.","df = df.drop(columns=[\"total_hours\"])"],
+ ["Add & delete","A dictionary <code>new</code> holds one student's values. Type the code that adds it as a new row at the bottom of <code>df</code>.","df.loc[len(df)] = new"],
+ ["Add & delete","Type the code that deletes the row with index 5 and keeps the result in <code>df</code>.","df = df.drop(index=5)"],
+ ["Add & delete","Type the code that renames the column <code>marks</code> to <code>score</code>.","df = df.rename(columns={\"marks\": \"score\"})"],
+ ["Sort, group, pivot, rank","Type the code that sorts <code>df</code> by marks, highest first.","df.sort_values(\"marks\", ascending=False)"],
+ ["Sort, group, pivot, rank","Type the code that sorts by city A to Z, and inside each city by marks highest first.","df.sort_values([\"city\", \"marks\"], ascending=[True, False])"],
+ ["Sort, group, pivot, rank","Type the code that shows the average marks for each city.","df.groupby(\"city\")[\"marks\"].mean()"],
+ ["Sort, group, pivot, rank","Type the code that shows the mean, max and count of marks for each city and gender combination.","df.groupby([\"city\", \"gender\"])[\"marks\"].agg([\"mean\", \"max\", \"count\"])"],
+ ["Sort, group, pivot, rank","Type the code that makes a pivot table of mean marks with cities as rows and gender as columns.","pd.pivot_table(df, values=\"marks\", index=\"city\", columns=\"gender\", aggfunc=\"mean\")"],
+ ["Sort, group, pivot, rank","Type the code that adds a column <code>rank</code> ranking marks with the dense method, highest mark = rank 1.","df[\"rank\"] = df[\"marks\"].rank(method=\"dense\", ascending=False)"],
+ ["Sort, group, pivot, rank","Type the code that counts how many students there are in each city.","df[\"city\"].value_counts()"],
+ ["Sort, group, pivot, rank","Type the code that shows how many different cities there are (one number).","df[\"city\"].nunique()"],
+ ["Statistics","Type the code that keeps only the number columns of <code>df</code> in a new table <code>num</code>.","num = df.select_dtypes(include=\"number\")"],
+ ["Statistics","Type the code that shows the mean of every number column (use <code>num</code>).","num.mean()"],
+ ["Statistics","Type the code that shows the median of every number column (use <code>num</code>).","num.median()"],
+ ["Statistics","Type the code that shows the mode of the <code>city</code> column.","df[\"city\"].mode()"],
+ ["Statistics","Type the code that shows the variance of every number column (use <code>num</code>).","num.var()"],
+ ["Statistics","Type the code that shows the standard deviation of every number column (use <code>num</code>).","num.std()"],
+ ["Statistics","Type the code that shows the range (max minus min) of every number column (use <code>num</code>).","num.max() - num.min()"],
+ ["Statistics","Type the code that stores Q1, Q3 and the IQR of <code>attendance</code> in <code>q1</code>, <code>q3</code> and <code>iqr</code>.","q1 = df[\"attendance\"].quantile(0.25)\nq3 = df[\"attendance\"].quantile(0.75)\niqr = q3 - q1"],
+ ["Statistics","<code>q1</code>, <code>q3</code> and <code>iqr</code> of attendance exist. Type the code that shows the outlier rows using the 1.5 × IQR rule.","df[(df[\"attendance\"] < q1 - 1.5 * iqr) | (df[\"attendance\"] > q3 + 1.5 * iqr)]"],
+ ["Statistics","Type the code that shows the correlation matrix of the number columns (use <code>num</code>).","num.corr()"],
+ ["Statistics","Type the code that shows the Pearson correlation between <code>study_hours</code> and <code>marks</code>.","df[\"study_hours\"].corr(df[\"marks\"])"],
+ ["Statistics","Type the code that shows the Spearman correlation between <code>study_hours</code> and <code>marks</code>.","df[\"study_hours\"].corr(df[\"marks\"], method=\"spearman\")"],
+ ["Statistics","Type the code that shows the skewness of <code>marks</code>.","df[\"marks\"].skew()"],
+ ["Plots","Type the code that draws a scatter plot of study_hours (x) vs marks (y), coloured by <code>passed</code>, and shows it.","sns.scatterplot(data=df, x=\"study_hours\", y=\"marks\", hue=\"passed\")\nplt.show()"],
+ ["Plots","Type the code that draws a box plot of marks for each city and shows it.","sns.boxplot(data=df, x=\"city\", y=\"marks\")\nplt.show()"],
+ ["Plots","Type the code that draws a bar plot of average marks per city and shows it.","sns.barplot(data=df, x=\"city\", y=\"marks\")\nplt.show()"],
+ ["Plots","Type the code that draws a bar for how many students are in each city and shows it.","sns.countplot(data=df, x=\"city\")\nplt.show()"],
+ ["Plots","Type the code that draws a histogram of marks with 10 bins and a smooth curve on top, and shows it.","sns.histplot(df[\"marks\"], bins=10, kde=True)\nplt.show()"],
+ ["Plots","Type the code that draws a violin plot of study_hours for each value of <code>passed</code>, and shows it.","sns.violinplot(data=df, x=\"passed\", y=\"study_hours\")\nplt.show()"],
+ ["Plots","Type the code that draws a heatmap of the correlation matrix of <code>num</code> with the numbers written in each square, and shows it.","sns.heatmap(num.corr(), annot=True, cmap=\"coolwarm\")\nplt.show()"],
+ ["Plots","Type the code that draws study_hours vs marks as a scatter with a regression line, and shows it.","sns.regplot(data=df, x=\"study_hours\", y=\"marks\")\nplt.show()"],
+ ["Plots","Type the code that draws a pair plot of <code>df</code> coloured by <code>passed</code>, and shows it.","sns.pairplot(df, hue=\"passed\")\nplt.show()"],
+ ["Plots","Type the three lines that give the current plot the title 'Marks', the x label 'Student' and the y label 'Score'.","plt.title(\"Marks\")\nplt.xlabel(\"Student\")\nplt.ylabel(\"Score\")"],
+].map(([topic,q,a],i)=>({id:"b"+i,topic,q,a,src:"bank"}));
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const plain = html => { const d=document.createElement("div"); d.innerHTML=html; return d.textContent; };
+
+/* ---------- state (per visitor, stored in this browser) ---------- */
+const BLANK = () => ({ topics:{}, slips:[], generated:[], answered:0, correct:0, streak:0, recent:[] });
+let state = BLANK();
+let cur = null, hintUsed = false, checked = false, focusTopic = null;
+let docRef = null, sample = null;
+
+function blankTopic(){ return {seen:0, ok:0, almost:0}; }
+function acc(t){ const s=state.topics[t]; if(!s||!s.seen) return null; return (s.ok + .5*s.almost)/s.seen; }
+
+let writing=false, again=false;
+function save(){
+  try{ localStorage.setItem("pandrill", JSON.stringify(state)); }catch(e){}
+  if(!docRef) return;
+  if(writing){ again=true; return; }
+  writing=true;
+  docRef.set(JSON.parse(JSON.stringify(state)))
+    .catch(()=>{ docRef=null; })
+    .finally(()=>{ writing=false; if(again){ again=false; save(); } });
+}
+function merge(s){
+  if(!s || typeof s!=="object") return;
+  state = Object.assign(BLANK(), s);
+}
+
+/* ---------- picking questions ---------- */
+function pool(){ return BANK.concat(state.generated||[]); }
+function pick(){
+  const all = pool().filter(q => !focusTopic || q.topic===focusTopic);
+  const recent = new Set(state.recent.slice(-8));
+  const cands = all.filter(q=>!recent.has(q.id));
+  const list = cands.length ? cands : all;
+  const weights = list.map(q=>{
+    const a = acc(q.topic);
+    let w = a===null ? 2.5 : 1 + 3*(1-a);
+    if(q.src==="gen" && !q.done) w += 2;
+    return w;
+  });
+  let r = Math.random()*weights.reduce((x,y)=>x+y,0);
+  for(let i=0;i<list.length;i++){ r-=weights[i]; if(r<=0) return list[i]; }
+  return list[list.length-1];
+}
+function next(){
+  cur = pick(); hintUsed=false; checked=false;
+  $("qTopic").textContent = cur.topic;
+  $("qSource").hidden = cur.src!=="gen";
+  $("qText").innerHTML = cur.q;
+  $("answer").value = "";
+  $("hint").hidden = true;
+  $("result").innerHTML = "";
+  $("status").textContent = "";
+  $("btnCheck").disabled = false;
+  $("answer").focus({preventScroll:true});
+}
+
+/* ---------- hint: the functions, methods and arguments, in order ---------- */
+function skeleton(a){
+  const noStr = a.replace(/"[^"]*"|'[^']*'/g," ");
+  const toks = noStr.match(/\.[A-Za-z_]\w*|[A-Za-z_]\w*(?=\s*[(=\[])|&|\||\[::-1\]|\[0\]/g)||[];
+  const out=[];
+  for(const t of toks){ if(!/^(df|num|temps|grid|q1|q3|iqr|s|a|b|arr|table|new|p\d|hour|t)$/.test(t)) out.push(t); }
+  return out;
+}
+
+/* ---------- offline grader ---------- */
+function norm(s){
+  return s.replace(/'/g,'"').replace(/[ \t]+/g,"").replace(/\n+/g,"\n").replace(/^print\((.*)\)$/gm,"$1").trim();
+}
+function offlineGrade(ans){
+  if(!ans.trim()) return {verdict:"wrong",summary:"Nothing typed.",slips:[],corrected:cur.a,memorize:[],tag:"blank"};
+  if(norm(ans)===norm(cur.a)) return {verdict:"correct",summary:"Matches the reference answer.",slips:[],corrected:"",memorize:[],tag:""};
+  const have = new Set(skeleton(ans.replace(/'/g,'"')));
+  const missing = [...new Set(skeleton(cur.a).filter(k=>!have.has(k)))];
+  const slips = missing.map(k=>({typed:"(missing)",should_be:k,why:"part of the reference answer"}));
+  return {verdict: missing.length<=1 ? "almost":"wrong",
+          summary: missing.length ? "Missing: "+missing.join(", ")+"." : "Different from the reference answer; compare carefully.",
+          slips, corrected:cur.a, memorize:[], tag: missing[0] ? missing[0] : "different form", offline:true};
+}
+
+/* ---------- Claude grader (only when opened on claude.ai) ---------- */
+function gradePrompt(ans){
+  return `You are grading a student's answer in a Python / pandas / NumPy lab-exam drill. The exam is in a Jupyter notebook tomorrow and the student is a beginner memorising exact syntax, so be strict about things that would crash and fair about style.
+
+QUESTION: ${plain(cur.q)}
+REFERENCE ANSWER (one valid answer; others can be valid):
+${cur.a}
+
+DATA AND NAMES IN SCOPE:
+${SCHEMA}
+
+STUDENT ANSWER (one Jupyter cell):
+<<<
+${ans}
+>>>
+
+Rules:
+- "correct": it would run in Jupyter and give exactly what was asked. Accept equivalent valid forms: single or double quotes, df.col instead of df["col"], wrapping in print() or not (Jupyter shows the last line), isna instead of isnull, keyword vs positional arguments, extra spaces, an extra harmless variable, inplace=True instead of reassigning, any other correct pandas/NumPy/seaborn/matplotlib call that produces the same result. A missing plt.show() is fine in Jupyter, but mention it in summary.
+- "almost": the idea is right but it would crash or give the wrong thing because of a small slip: missing () on a method (df.info, df.describe), () on a property (df.shape(), df.columns()), single brackets where a list of columns needs double [[ ]], = instead of ==, "and"/"or" instead of & / |, missing brackets around each condition, ascending="False" as a string, missing [0] after mode() inside fillna, wrong capital letter (Sort_values, DataFrame spelled dataframe), a missing quote or bracket, axis 0/1 swapped, stop index off by one in a slice, forgot to assign the result back when the question says keep it.
+- "wrong": wrong approach, wrong column, wrong function, or blank.
+- slips: every concrete mistake, smallest span. "typed" is the exact text the student wrote (or "(missing)"), "should_be" the fix, "why" at most 12 words.
+- corrected: the student's own answer with only the slips fixed, keeping their style. Empty string if correct.
+- memorize: 2 to 5 key pieces of this answer in order, like ["df.groupby(\\"city\\")","[\\"marks\\"]",".mean()"].
+- tag: if not correct, a 2 to 4 word name of the thing missed, like "() on shape" or "& with brackets"; otherwise "".
+- summary: one short sentence to the student.
+
+Reply with only JSON:
+{"verdict":"correct|almost|wrong","summary":"","slips":[{"typed":"","should_be":"","why":""}],"corrected":"","memorize":[""],"tag":""}`;
+}
+
+async function check(){
+  if(checked || !cur) return;
+  const ans = $("answer").value;
+  if(!ans.trim()){ $("status").textContent="Type your code first."; return; }
+  $("btnCheck").disabled = true;
+  let g = null;
+  try{
+    if(sample){
+      $("status").textContent = "Checking…";
+      try{
+        g = await Promise.race([
+          sample.json(gradePrompt(ans), {modelTier:"quick"}),
+          new Promise((_,rej)=>setTimeout(()=>rej({code:"timeout"}),20000))
+        ]);
+        if(!g || !["correct","almost","wrong"].includes(g.verdict)) throw {code:"invalid_json"};
+      }catch(e){
+        if(e && (e.code==="not_granted"||e.code==="sampling_disabled"||e.code==="not_declared")) sample=null;
+        g = offlineGrade(ans);
+        g.offline = true;
+      }
+    } else g = offlineGrade(ans);
+    $("status").textContent = "";
+    checked = true;
+    record(g);
+    render(g);
+  }catch(err){
+    checked = false;
+    $("btnCheck").disabled = false;
+    $("status").textContent = "Check failed: " + (err && err.message || err) + " (press Check again)";
+  }
+}
+
+function record(g){
+  const t = cur.topic;
+  state.topics[t] = state.topics[t] || blankTopic();
+  const s = state.topics[t];
+  s.seen++;
+  let v = g.verdict;
+  if(hintUsed && v==="correct") v="almost";
+  if(v==="correct") s.ok++; else if(v==="almost") s.almost++;
+  state.answered++;
+  if(v==="correct"){ state.correct++; state.streak++; } else state.streak=0;
+  if(v!=="correct"){
+    const sl = (g.slips||[]).slice(0,3).map(x=>({typed:String(x.typed||""),should:String(x.should_be||"")}));
+    state.slips.push({tag:String(g.tag||"mistake"), topic:t, q:plain(cur.q).slice(0,160), slips:sl, at:Date.now()});
+    state.slips = state.slips.slice(-40);
+  }
+  if(cur.src==="gen"){ const gq=state.generated.find(x=>x.id===cur.id); if(gq) gq.done=true; }
+  state.recent.push(cur.id); state.recent = state.recent.slice(-12);
+  save(); paintSide();
+}
+
+function render(g){
+  const v = (hintUsed && g.verdict==="correct") ? "almost" : g.verdict;
+  const label = {correct:"Correct",almost:"Almost",wrong:"Not yet"}[v];
+  let h = `<div class="verdict ${v}"><div class="vhead"><span class="pill">${label}</span><span>${esc(g.summary||"")}${hintUsed&&g.verdict==="correct"?" (counted as almost because you used the hint)":""}</span></div>`;
+  const slips = (g.slips||[]).filter(s=>s && (s.typed||s.should_be));
+  if(slips.length){
+    h += `<ul class="slips">` + slips.map(s=>`<li>${s.typed&&s.typed!=="(missing)"?`<del>${esc(s.typed)}</del> → `:`missing → `}<ins>${esc(s.should_be||"")}</ins>${s.why?` <span class="why">${esc(s.why)}</span>`:""}</li>`).join("") + `</ul>`;
+  }
+  if(g.corrected && v!=="correct"){ h += `<div class="label">Your code, fixed</div><pre>${esc(g.corrected)}</pre>`; }
+  h += `<div class="label">Reference answer</div><pre>${esc(cur.a)}</pre>`;
+  if(g.memorize && g.memorize.length){ h += `<div class="label">Memorise</div><div class="mem">${g.memorize.map(m=>`<span>${esc(m)}</span>`).join("")}</div>`; }
+  if(g.offline) h += `<p class="note" style="margin:0">Checked by matching against the reference, so a different but valid answer can be marked wrong. Compare with the reference.</p>`;
+  h += `</div>`;
+  $("result").innerHTML = h;
+  $("btnNext").focus({preventScroll:true});
+}
+
+function showAnswer(){
+  if(!cur) return;
+  if(!checked){ checked=true; record({verdict:"wrong",slips:[],tag:"looked up answer"}); }
+  $("result").innerHTML = `<div class="verdict wrong"><div class="vhead"><span class="pill">Answer</span><span>Type it out once yourself before moving on.</span></div><pre>${esc(cur.a)}</pre><div class="label">Pieces in order</div><div class="mem">${skeleton(cur.a).map(k=>`<span>${esc(k)}</span>`).join("")}</div></div>`;
+  $("btnCheck").disabled = true;
+}
+
+/* ---------- generate questions on weak spots (claude.ai only) ---------- */
+async function generate(){
+  if(!sample){ $("genNote").textContent = "Claude isn't available on this page right now, so only the built-in questions can be used."; return; }
+  const btn=$("btnGen"); btn.disabled=true; $("genNote").textContent="Writing questions… this takes up to a minute.";
+  const ranked = TOPICS.map(t=>({t,a:acc(t)})).sort((x,y)=>(x.a??.6)-(y.a??.6)).slice(0,4).map(x=>x.t+(x.a===null?" (not practised yet)":` (${Math.round(x.a*100)}%)`));
+  const slips = state.slips.slice(-12).map(s=>`- [${s.topic}] ${s.tag}: `+s.slips.map(x=>`typed "${x.typed}" should be "${x.should}"`).join("; "));
+  const avoid = pool().slice(-25).map(q=>"- "+plain(q.q).slice(0,120));
+  const prompt = `Write 6 new practice questions for a Python pandas / NumPy / seaborn lab-exam drill (Jupyter notebook). The student is a beginner memorising exact syntax.
+
+Weakest topics: ${ranked.join(", ")}
+Recent slips:
+${slips.join("\n")||"(none yet)"}
+
+Make most questions hit the slips and weak topics above, phrased differently from before, so the student must type the same pieces in a new context (other columns, other numbers).
+Allowed topic names (use exactly one per question): ${TOPICS.join(" | ")}
+Data and names in scope:
+${SCHEMA}
+
+Each question:
+- starts with "Type the" and names the exact columns, values and variable names, so there is one clear answer;
+- asks for 1 to 4 lines of code for one Jupyter cell;
+- "a" is a correct answer using double quotes, the way the reference answers are written.
+Do not repeat these:
+${avoid.join("\n")}
+
+Reply with only a JSON array: [{"topic":"","q":"","a":""}]`;
+  try{
+    const arr = await sample.json(prompt, {cache:false});
+    const fresh = (Array.isArray(arr)?arr:[]).filter(x=>x&&x.q&&x.a).slice(0,8).map((x,i)=>({
+      id:"g"+Date.now().toString(36)+i, topic: TOPICS.includes(x.topic)?x.topic:"Select & filter",
+      q: esc(String(x.q)), a: String(x.a), src:"gen"
+    }));
+    if(!fresh.length) throw {code:"empty"};
+    state.generated = (state.generated||[]).concat(fresh).slice(-80);
+    save();
+    $("genNote").textContent = `Added ${fresh.length} questions. They come up first.`;
+    cur = null; next();
+  }catch(e){
+    $("genNote").textContent = e && e.code==="rate_limited" ? "Too many requests just now. Try again in a minute." : e && e.code==="not_granted" ? "Claude wasn't allowed for this page, so new questions can't be made." : "Couldn't make questions this time. Try again.";
+    if(e && e.code==="not_granted") sample=null;
+  }finally{ btn.disabled=false; }
+}
+
+/* ---------- side rail ---------- */
+function paintSide(){
+  $("sAns").textContent = state.answered; $("sOk").textContent = state.correct; $("sStreak").textContent = state.streak;
+  $("topics").innerHTML = TOPICS.map(t=>{
+    const a = acc(t), s = state.topics[t];
+    const pct = a===null ? "–" : Math.round(a*100)+"%";
+    const cls = a===null ? "" : a<.5 ? "lo" : a<.8 ? "mid" : "";
+    return `<button class="topic${focusTopic===t?" on":""}" data-t="${esc(t)}" aria-pressed="${focusTopic===t}"><span class="tname">${esc(t)}</span><span class="tpct">${pct}${s&&s.seen?` · ${s.seen}`:""}</span><span class="bar"><i class="${cls}" style="width:${a===null?0:Math.round(a*100)}%"></i></span></button>`;
+  }).join("");
+  const log = state.slips.slice(-6).reverse();
+  $("slipLog").innerHTML = log.length ? log.map(s=>`<li><span class="t">${esc(s.tag)}</span><br>${s.slips.slice(0,2).map(x=>`<code>${esc(x.typed||"(missing)")}</code> → <code>${esc(x.should)}</code>`).join("<br>")||`<span class="note">${esc(s.topic)}</span>`}</li>`).join("") : `<li class="note">No slips yet. Every mistake you make lands here.</li>`;
+}
+
+/* ---------- wiring ---------- */
+$("schemaBox").textContent = SCHEMA;
+$("btnCheck").onclick = check;
+$("btnNext").onclick = next;
+$("btnShow").onclick = showAnswer;
+$("btnGen").onclick = generate;
+$("btnReset").onclick = ()=>{ if(confirm("Reset your pandas drill progress in this browser?")){ state = BLANK(); save(); paintSide(); next(); } };
+$("btnHint").onclick = ()=>{ if(!cur) return; hintUsed=true; const h=$("hint"); h.hidden=false; h.textContent="Pieces in order:  "+skeleton(cur.a).join("   "); };
+$("topics").addEventListener("click", e=>{ const b=e.target.closest(".topic"); if(!b) return; const t=b.dataset.t; focusTopic = focusTopic===t?null:t; paintSide(); next(); });
+$("answer").addEventListener("keydown", e=>{
+  if((e.ctrlKey||e.metaKey) && e.key==="Enter"){ e.preventDefault(); checked ? next() : check(); }
+  else if((e.ctrlKey||e.metaKey) && e.key==="ArrowRight"){ e.preventDefault(); next(); }
+  else if(e.key==="Tab" && !e.shiftKey){ e.preventDefault(); const t=e.target, s=t.selectionStart; t.setRangeText("    ", s, t.selectionEnd, "end"); }
+});
+document.addEventListener("keydown", e=>{ if(e.target.id!=="answer" && (e.ctrlKey||e.metaKey) && e.key==="Enter" && checked){ e.preventDefault(); next(); } });
+
+try{ const s = JSON.parse(localStorage.getItem("pandrill")||"null"); if(s) merge(s); }catch(e){}
+paintSide(); next();
+
+/* Claude feedback + cloud sync only exist when this page runs as a claude.ai artifact. */
+(async()=>{
+  const use = window.claude && window.claude.use ? window.claude.use.bind(window.claude) : null;
+  if(!use) return;
+  const [s, d] = await Promise.all([use("sample").catch(()=>null), use("db").catch(()=>null)]);
+  sample = s;
+  if(sample) $("genCard").hidden = false;
+  if(d){
+    const ref = d.doc("progress/main");
+    try{
+      const snap = await ref.get();
+      if(snap.exists){
+        const remote = snap.data();
+        if((remote.answered||0) >= (state.answered||0)) merge(remote);
+      }
+      docRef = ref; paintSide(); save();
+    }catch(e){}
+  }
+})();
+</script>
+</body>
+</html>
