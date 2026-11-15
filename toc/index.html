@@ -173,6 +173,7 @@ table.cyk td.cc .cs{font-weight:600;color:var(--accent)} table.cyk td.cc .cl{fon
 table.cyk td.cc.top{background:var(--ok-soft);border-color:var(--ok)}
 table.cyk td.base{text-align:center;font-weight:600;color:var(--term);font-size:1.05rem;padding-top:4px}
 table.cyk td.pad{padding:0}
+.paper{border:1.5px solid var(--line);border-radius:8px;padding:6px 16px;background:var(--surface);margin:8px 0}.paper p{margin:9px 0;line-height:1.6}.paper .box{display:inline-block;border:1.5px solid var(--ink);border-radius:3px;padding:1px 9px;margin:2px 0}.paper .pn{color:var(--muted);font-size:.88rem}
 .qimg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px}
 .pyq{border-left:3px solid var(--term);background:var(--warn-soft);border-radius:6px;padding:8px 12px;margin:6px 0 10px;font-size:.95rem;white-space:pre-line}
 .steps>li,.practice>li{min-width:0;overflow-wrap:anywhere}
@@ -574,7 +575,7 @@ function faSVG(spec,cur){
     if(e.f===e.t){
       var sg=down.indexOf(e.f)>=0?1:-1,by=a.y+sg*(Ra+36);
       o+='<path class="fa-e" marker-end="url(#ah)" d="M'+(a.x-12)+' '+(a.y+sg*Ra*.95)+' C'+(a.x-40)+' '+(a.y+sg*(Ra+44))+' '+(a.x+40)+' '+(a.y+sg*(Ra+44))+' '+(a.x+12)+' '+(a.y+sg*Ra*.95)+'"/>';
-      for(i=0;i<n;i++){var ty=sg<0?by-(n-1-i)*15-4:by+i*15+12;o+='<text class="fa-l" x="'+a.x+'" y="'+ty+'" text-anchor="middle">'+esc(txt[i])+'</text>';ext(a.x-30,ty-14);ext(a.x+30,ty+4)}
+      for(i=0;i<n;i++){var ty=sg<0?by-(n-1-i)*15-4:by+i*15+12;o+='<text class="fa-l" x="'+a.x+'" y="'+ty+'" text-anchor="middle">'+esc(txt[i])+'</text>';var hw2=Math.max(30,String(txt[i]).length*3.6);ext(a.x-hw2,ty-14);ext(a.x+hw2,ty+4)}
       ext(a.x-44,a.y+sg*(Ra+50));return;
     }
     var mx=(a.x+b.x)/2,my=(a.y+b.y)/2,dx=b.x-a.x,dy=b.y-a.y,len=Math.sqrt(dx*dx+dy*dy)||1,px=-dy/len,py=dx/len,bend=e.bend;
@@ -583,6 +584,12 @@ function faSVG(spec,cur){
       else if(L.depth){var d=L.depth[e.t]-L.depth[e.f];bend=d<=0?42+14*Math.abs(d):(d>=2?36:0)}
       else bend=0;
     }
+    if(!bend&&e.bend===undefined){ /* a straight edge must not pass through another state: bow it out */
+      var blocked=0;
+      spec.states.forEach(function(st){if(st.id===e.f||st.id===e.t)return;var q=P[st.id],t=((q.x-a.x)*dx+(q.y-a.y)*dy)/(len*len);
+        if(t>0.05&&t<0.95){var qx=a.x+t*dx,qy=a.y+t*dy;if(Math.sqrt((q.x-qx)*(q.x-qx)+(q.y-qy)*(q.y-qy))<RR[st.id]+8)blocked++}});
+      if(blocked)bend=96+16*(blocked-1);
+    }
     var cx=mx+px*bend*2,cy=my+py*bend*2;
     function trim(sx,sy,r){var ux=cx-sx,uy=cy-sy,l=Math.sqrt(ux*ux+uy*uy)||1;return[sx+ux/l*r,sy+uy/l*r]}
     var p0=trim(a.x,a.y,Ra),p1=trim(b.x,b.y,Rb);
@@ -590,7 +597,7 @@ function faSVG(spec,cur){
     var lx=.25*p0[0]+.5*cx+.25*p1[0],ly=.25*p0[1]+.5*cy+.25*p1[1],sgn=bend>=0?1:-1,off=11+7*(n-1);
     if(bend===0&&Math.abs(dy)<2)sgn=-1;
     var bx=lx+px*sgn*off,by2=ly+py*sgn*off;
-    for(i=0;i<n;i++){var yy=by2+5+(i-(n-1)/2)*15;o+='<text class="fa-l" x="'+bx+'" y="'+yy+'" text-anchor="middle">'+esc(txt[i])+'</text>';ext(bx-26,yy-14);ext(bx+26,yy+4)}
+    for(i=0;i<n;i++){var yy=by2+5+(i-(n-1)/2)*15;o+='<text class="fa-l" x="'+bx+'" y="'+yy+'" text-anchor="middle">'+esc(txt[i])+'</text>';var hw=Math.max(26,String(txt[i]).length*3.6);ext(bx-hw,yy-14);ext(bx+hw,yy+4)}
     ext(p0[0],p0[1]);ext(p1[0],p1[1]);ext(lx,ly);
   });
   spec.states.forEach(function(s){
@@ -988,24 +995,49 @@ function stateElim(spec,order){
   var final0=fin[0];
   if(needF){fin.forEach(function(f){set(f,'qf',RX.eps)});final0='qf';notes.push((fin.length>1?'There are several final states':'The final state '+fin[0]+' has an outgoing edge')+', so a new single final state <b>qf</b> is added, with ε-arrows from '+fin.join(', ')+'.')}
   var all=ids.slice();if(inc)all.push('qi');if(needF)all.push('qf');
-  var mid=(order&&order.length?order:ids).filter(function(q){return q!==start0&&q!==final0});
+  function gtgPos(sp){ /* lay the graph out, then widen the gaps between columns to fit the labels */
+    var es=faNorm(sp),L=faLayout(sp,es),cols={},xs=[],colOf={},i;
+    sp.states.forEach(function(st){var q=L.pos[st.id],k=Math.round(q.x);cols[k]=cols[k]||[];cols[k].push(st.id);if(xs.indexOf(k)<0)xs.push(k)});
+    xs.sort(function(x,y){return x-y});
+    xs.forEach(function(k,j){cols[k].forEach(function(id){colOf[id]=j})});
+    function lw(t){return String(t).length*6.9+16}
+    var gap=[],loopW=xs.map(function(){return 0});
+    for(i=0;i<xs.length-1;i++)gap[i]=xs[i+1]-xs[i];
+    es.forEach(function(e){var w=lw(e.ls.join(',')),ca=colOf[e.f],cb=colOf[e.t];
+      if(ca===cb)loopW[ca]=Math.max(loopW[ca],w);
+      else if(Math.abs(ca-cb)===1){var m=Math.min(ca,cb);gap[m]=Math.max(gap[m],w+64)}});
+    for(i=0;i<gap.length;i++)gap[i]=Math.max(gap[i],(loopW[i]+loopW[i+1])/2+40);
+    var nx=[xs[0]];for(i=0;i<gap.length;i++)nx[i+1]=nx[i]+gap[i];
+    sp.states.forEach(function(st){var q=L.pos[st.id];st.x=nx[colOf[st.id]];st.y=q.y});
+    return sp;
+  }
+  var gone={};
+  function snap(){ /* the graph as it stands now: remaining states and the regular-expression label on every edge */
+    var sts=all.filter(function(q){return !gone[q]}),
+        od=[start0].concat(sts.filter(function(q){return q!==start0&&q!==final0})).concat(start0===final0?[]:[final0]),ed=[];
+    all.forEach(function(p){if(gone[p])return;all.forEach(function(t){if(gone[t])return;var v=get(p,t);if(v)ed.push({f:p,t:t,l:[v.s]})})});
+    return gtgPos({states:od.map(function(id){var o={id:id};if(id===start0)o.start=1;if(id===final0)o.accept=1;return o}),edges:ed});
+  }
+  var snap0=snap();
+  var mid=(order&&order.length?order:ids).filter(function(q){return q!==start0&&q!==final0&&all.indexOf(q)>=0});
+  all.forEach(function(q){if(q!==start0&&q!==final0&&mid.indexOf(q)<0)mid.push(q)}); /* a state missing from the given order is still eliminated */
   mid.forEach(function(s){
     var preds=all.filter(function(p){return p!==s&&get(p,s)}),succs=all.filter(function(t){return t!==s&&get(s,t)}),loop=get(s,s),lp=loop?rxS(loop):null,log=[];
     preds.forEach(function(p){succs.forEach(function(t){
       var path=rxC(rxC(get(p,s),lp||RX.eps),get(s,t)),old=get(p,t),nw=rxU(old,path);
       log.push({p:p,t:t,via:path.s,old:old?old.s:null,now:nw.s});set(p,t,nw);
     })});
-    all.forEach(function(p){if(p!==s){set(p,s,null);set(s,p,null)}});set(s,s,null);
-    steps.push({s:s,loop:loop?loop.s:null,preds:preds,succs:succs,log:log});
+    all.forEach(function(p){if(p!==s){set(p,s,null);set(s,p,null)}});set(s,s,null);gone[s]=1;
+    steps.push({s:s,loop:loop?loop.s:null,preds:preds,succs:succs,log:log,snap:snap()});
   });
   var res=get(start0,final0);
-  return {start:start0,fin:final0,notes:notes,steps:steps,re:res?res.s:'Ø',mid:mid};
+  return {start:start0,fin:final0,notes:notes,steps:steps,re:res?res.s:'Ø',mid:mid,snap0:snap0};
 }
 function stateElimHTML(spec,order){
-  var R=stateElim(spec,order),h='<div class="card"><h3>Step 1. Make sure the start and final states are clean</h3>'+(R.notes.length?'<ul>'+R.notes.map(function(n){return '<li>'+n+'</li>'}).join('')+'</ul>':'<p>The start state has no incoming edge and there is a single final state with no outgoing edge, so nothing is added.</p>')+'</div>';
-  h+='<div class="card"><h3>Step 2. Eliminate the intermediate states one by one (any order works)</h3><p>Rule: to remove a state s, every path <b>p → s → t</b> becomes a direct edge p → t labelled <code>(p→s) (loop on s)* (s→t)</code>, joined by + to any edge that was already there.</p><ol class="steps">';
+  var R=stateElim(spec,order),h='<div class="card"><h3>Step 1. Make sure the start and final states are clean</h3>'+(R.notes.length?'<ul>'+R.notes.map(function(n){return '<li>'+n+'</li>'}).join('')+'</ul>'+FAS('The graph after adding '+(R.start==='qi'?'qi':'')+(R.start==='qi'&&R.fin==='qf'?' and ':'')+(R.fin==='qf'?'qf':''),R.snap0,{sim:false}):'<p>The start state has no incoming edge and there is a single final state with no outgoing edge, so nothing is added.</p>')+'</div>';
+  h+='<div class="card"><h3>Step 2. Eliminate the intermediate states one by one (any order works)</h3><p>Rule: to remove a state s, every path <b>p → s → t</b> becomes a direct edge p → t labelled <code>(p→s) (loop on s)* (s→t)</code>, joined by + to any edge that was already there. Order used here: <b>'+R.mid.map(esc).join(', ')+'</b>. After every removal the graph is redrawn, with a regular expression on each edge.</p><ol class="steps">';
   R.steps.forEach(function(st){
-    h+='<li><b>Eliminate '+esc(st.s)+'.</b> '+(st.loop?'It has a loop <code>'+esc(st.loop)+'</code>. ':'It has no loop. ')+(st.log.length?st.log.map(function(l){return 'Path '+esc(l.p)+' → '+esc(st.s)+' → '+esc(l.t)+' gives <code>'+esc(l.via)+'</code>'+(l.old?' (added to the existing <code>'+esc(l.old)+'</code>, giving <code>'+esc(l.now)+'</code>)':'')}).join('. ')+'.':'No path goes through it.')+'</li>';
+    h+='<li><b>Eliminate '+esc(st.s)+'.</b> '+(st.loop?'It has a loop <code>'+esc(st.loop)+'</code>. ':'It has no loop. ')+(st.log.length?st.log.map(function(l){return 'Path '+esc(l.p)+' → '+esc(st.s)+' → '+esc(l.t)+' gives <code>'+esc(l.via)+'</code>'+(l.old?' (added to the existing <code>'+esc(l.old)+'</code>, giving <code>'+esc(l.now)+'</code>)':'')}).join('. ')+'.':'No path goes through it.')+FAS('After eliminating '+esc(st.s),st.snap,{sim:false})+'</li>';
   });
   h+='</ol></div><div class="callout ok"><b>Required regular expression:</b> <code style="font-size:1.05rem">'+esc(R.re)+'</code> (the label on the edge '+esc(R.start)+' → '+esc(R.fin)+')</div>';
   return h;
@@ -1013,6 +1045,8 @@ function stateElimHTML(spec,order){
 function mkStateElim(el){
   var spec=JSON.parse(el.dataset.fa),ord=el.dataset.order?el.dataset.order.split(' '):null;
   el.innerHTML='<div class="split"><div class="scroll" style="flex:1 1 300px">'+faSVG(spec)+'</div><div>'+faTable(spec)+'</div></div>'+stateElimHTML(spec,ord);
+
+  $$('.fa',el).forEach(function(f){f.dataset.hyd=1;mkFA(f)});
 }
 WIDGETS['.elim']=mkStateElim;
 function ELIM(cap,key,order){var m=MACH[key];return '<div class="w"><div class="cap">'+cap+'</div><div class="elim" data-fa=\''+FAJ(m.sts,m.start,m.fin,m.tr,m.pos,m.down?{down:m.down}:undefined)+'\''+(order?' data-order="'+order+'"':'')+'></div></div>'}
@@ -2923,6 +2957,22 @@ P('<span class="src">Part A style</span> Name three operations under which the r
 ].join('');
 CONTENT['2.9']={h:C29,exam:['Nov25 Q22a','QB Q11','teacher QB Q10']};
 
+/* ---------- pumping lemma answers, laid out exactly as the teacher writes them on paper ---------- */
+function PLSOL(o){
+  var rom=['i','ii','iii','iv','v','vi'],cf=!!o.cfl,h='<div class="paper">';
+  function sp(i){var e=i==='0'?'⁰':i==='2'?'²':'ⁱ';return cf?'uv'+e+'wx'+e+'y':'uv'+e+'w'}
+  h+='<p><b>Show that '+o.L+' is not '+(cf?'context-free':'regular')+'.</b></p>';
+  h+='<p>Assume that L is '+(cf?'context-free. Then there exists a pumping length n.':'regular. Then there exists a constant n, which is the number of states in the finite automaton accepting L.')+'</p>';
+  h+='<p>Let z = '+o.z+', &nbsp;|z| = '+o.zl+' ≥ n.</p>';
+  h+='<p>By the pumping lemma, '+(cf?'z = uvwxy with |vwx| ≤ n and |vx| ≥ 1.':'z = uvw with |uv| ≤ n and |v| ≥ 1.')+'</p>';
+  if(o.note)h+='<p class="pn">'+o.note+'</p>';
+  h+='<p><b>To find '+(cf?'uvⁱwxⁱy':'uvⁱw')+'</b></p>';
+  o.cases.forEach(function(c,i){
+    h+='<p><b>Case ('+rom[i]+')</b> '+c[0]+'<br>'+(cf?'uvⁱwxⁱy':'uvⁱw')+', i = '+c[1]+' ⇒ '+c[2]+'<br><span class="box">'+c[3]+'</span> ⇒ <b>contradiction</b>'+(c[4]?'<br><span class="pn">'+c[4]+'</span>':'')+'</p>';
+  });
+  h+='<p>Since we get a contradiction in every case, <span class="box">'+o.L+' is not '+(cf?'context-free':'regular')+'.</span></p>';
+  return h+'</div>';
+}
 /* ---------------- 2.10 pumping lemma ---------------- */
 var C210=[
 '<p>The <b>pumping lemma</b> is how you prove a language is <b>not</b> regular. It is asked as "State and prove the pumping lemma for regular languages" (Nov 2025 Q18b, 6 marks; IA2 1c for 2 marks), and the question bank adds using it on {aⁿ²}, {0ⁿ1ᵐ | n &gt; m}, and equal numbers of a\'s and b\'s.</p>',
@@ -2944,15 +2994,51 @@ var C210=[
 '<h2>Try it</h2><p>Pick a language, then choose the split yourself and watch the pumped string. Then press "Try every legal split" to see that all of them fail.</p>',
 PUMP('Interactive pumping lemma','anbn',4),
 
-'<h2>Solved models</h2>',
-MODEL('1. L = { 0ⁿ1ⁿ : n ≥ 1 } is not regular <span class="src">teacher Example 1</span>','<p>Assume L is regular with constant n. Take z = 0ⁿ1ⁿ, so |z| = 2n ≥ n. Write z = uvw with |uv| ≤ n and |v| ≥ 1. Since |uv| ≤ n, v is inside the block of 0s: v = 0ᵏ with k ≥ 1.</p><p>Take i = 0: uv⁰w = uw = 0ⁿ⁻ᵏ1ⁿ, which has fewer 0s than 1s, so uw ∉ L. This contradicts the lemma. Hence L is not regular. ∎</p>'),
-MODEL('2. L = { aⁿ² : n ≥ 1 } <span class="src">QB Q12(i)</span>','<p>Assume regular with constant n. Take z = a^(n²), |z| ≥ n. Then v = aᵏ with 1 ≤ k ≤ n. Take i = 2: |uv²w| = n² + k, and n² &lt; n² + k ≤ n² + n &lt; (n+1)². A number strictly between two consecutive squares is not a square, so uv²w ∉ L. Contradiction. ∎</p>'),
-PUMP('Try it: aⁿ²','sq',3),
-MODEL('3. L = { 0ⁿ1ᵐ : n > m ≥ 0 } <span class="src">QB Q12(ii)</span>','<p>Assume regular with constant n. Take z = 0ⁿ⁺¹1ⁿ ∈ L (n + 1 &gt; n). Because |uv| ≤ n, v = 0ᵏ with k ≥ 1. Take i = 0: uw = 0ⁿ⁺¹⁻ᵏ1ⁿ. Now n + 1 − k ≤ n, so the number of 0s is not greater than the number of 1s, and uw ∉ L. Contradiction. ∎</p><p><b>Note:</b> here i = 2 would not work (extra 0s keep n &gt; m). You must pump <b>down</b>.</p>'),
-PUMP('Try it: 0ⁿ1ᵐ with n > m','gt',3),
-MODEL('4. L = { w : equal numbers of a\'s and b\'s } <span class="src">QB Q12(iii)</span>','<p>Assume regular with constant n. Take z = aⁿbⁿ ∈ L. Then v = aᵏ, k ≥ 1. Take i = 2: uv²w = aⁿ⁺ᵏbⁿ has more a\'s than b\'s, so it is not in L. Contradiction. ∎</p>'),
-MODEL('5. More models','<p><b>{ ww : w ∈ {a,b}* }.</b> Take z = aⁿbaⁿb. v = aᵏ lies in the first block. Pumping to i = 2 gives aⁿ⁺ᵏbaⁿb, which is not of the form ww (the halves would be unequal). Not regular.</p><p><b>Palindromes over {0,1}.</b> Take z = 0ⁿ10ⁿ. v = 0ᵏ in the first block. i = 2 gives 0ⁿ⁺ᵏ10ⁿ, not a palindrome. Not regular.</p><p><b>{ aᵖ : p prime }.</b> Take z = aᵖ with p ≥ n + 2 prime. v = aᵏ. Choose i = p + 1: |uvⁱw| = p + pk = p(1 + k), which is composite (both factors are at least 2). Not regular.</p>'),
+'<h2>Solved models (written the way you must write them on paper)</h2>',
+'<div class="callout"><b>Every line below is a mark.</b> Your teacher\'s layout is always the same: (1) Assume L is regular, constant n. (2) Let z = …, |z| ≥ n. (3) By the pumping lemma z = uvw, |uv| ≤ n, |v| ≥ 1. (4) "To find uvⁱw", then <b>Case (i), (ii), (iii)</b> by what v contains, each with its pumped string and "∉ L ⇒ contradiction" in a box. (5) "Since we get a contradiction, L is not regular." Copy this skeleton for any question.</div>',
+
+MODEL('0. State and prove the pumping lemma for regular languages <span class="src">Nov25 Q18b</span>','<div class="paper"><p><b>Statement.</b> Let L be a regular language. Then there exists a constant n such that if z is any word in L with |z| ≥ n, then z can be written z = uvw with</p><p>(i) |uv| ≤ n &nbsp;&nbsp; (ii) |v| ≥ 1 &nbsp;&nbsp; (iii) uvⁱw ∈ L for all i ≥ 0.</p><p><b>Proof.</b></p><p>1. L is regular, so there is a DFA M = (Q, Σ, δ, q₀, F) with <b>n states</b> that accepts L.</p><p>2. Let z = a₁a₂…aₘ ∈ L with m ≥ n. Let the states visited on reading z be q₀, q₁, …, qₘ, where qᵢ = δ̂(q₀, a₁a₂…aᵢ). The last one, qₘ, is a final state.</p><p>3. Look at the first n + 1 states q₀, q₁, …, qₙ. M has only n states, so by the <b>pigeonhole principle</b> two of them are equal: qᵢ = qⱼ with 0 ≤ i &lt; j ≤ n.</p><p>4. Split z: <b>u</b> = a₁…aᵢ (takes q₀ to qᵢ), <b>v</b> = aᵢ₊₁…aⱼ (a loop from qᵢ back to qᵢ), <b>w</b> = aⱼ₊₁…aₘ (takes qⱼ = qᵢ to qₘ).</p><p>5. Then |uv| = j ≤ n, and |v| = j − i ≥ 1. So (i) and (ii) hold.</p><p>6. Going round the loop v zero times (i = 0) or any number i of times ends in the same state qᵢ, and then w leads to the final state qₘ. So <span class="box">uvⁱw ∈ L for all i ≥ 0</span>. ∎</p><p class="pn">Draw this picture: q₀ —u→ qᵢ (loop v on qᵢ) —w→ qₘ. A picture with the loop on v earns the marks for the idea.</p></div>'),
+
+MODEL('1. L = { 0ⁿ1ⁿ | n ≥ 1 } <span class="src">teacher Example 1</span>',PLSOL({L:'L = { 0ⁿ1ⁿ | n ≥ 1 }',z:'0ⁿ1ⁿ',zl:'2n',
+ note:'Since |uv| ≤ n, v lies inside the first n symbols, which are all 0s. Your teacher still writes the three cases below, so copy her layout.',
+ cases:[['v has only 0s, i.e. v = 0ᵏ for some k ≥ 1','0','uv⁰w = uw = 0ⁿ⁻ᵏ1ⁿ','0ⁿ⁻ᵏ1ⁿ ∉ L'],
+        ['v has only 1s, i.e. v = 1ᵏ for some k ≥ 1','0','uw = 0ⁿ1ⁿ⁻ᵏ','0ⁿ1ⁿ⁻ᵏ ∉ L'],
+        ['v has both 0s and 1s, i.e. v = 0ᵏ1ˡ with k, l ≥ 1','2','uv²w = 0ⁿ⁻ᵏ(0ᵏ1ˡ)(0ᵏ1ˡ)1ⁿ⁻ˡ = 0ⁿ1ˡ0ᵏ1ⁿ','0ⁿ1ˡ0ᵏ1ⁿ ∉ L (a 0 comes after a 1)','Your teacher uses i = 0 here: uw = 0ⁿ⁻ᵏ1ⁿ⁻ˡ, which is not in L unless k = l. If k = l it IS in L, so i = 0 fails. Use i = 2 as above and it works for every k, l.']]})),
+
+MODEL('2. L = { aⁿb²aⁿ | n ≥ 1 } <span class="src">teacher Example 2</span>',PLSOL({L:'L = { aⁿb²aⁿ | n ≥ 1 }',z:'aⁿb²aⁿ',zl:'2n + 2',
+ cases:[['v has only a\'s, i.e. v = aᵏ for some k ≥ 1','0','uv⁰w = uw = aⁿ⁻ᵏb²aⁿ','aⁿ⁻ᵏb²aⁿ ∉ L (the two blocks of a\'s are different)'],
+        ['v has only b\'s, i.e. v = bᵏ, k = 1 or 2','0','uw = aⁿb²⁻ᵏaⁿ','aⁿb²⁻ᵏaⁿ ∉ L (it has fewer than two b\'s)'],
+        ['v has some a\'s and a b, i.e. v = aᵏb','0','uw = aⁿ⁻ᵏbaⁿ','aⁿ⁻ᵏbaⁿ ∉ L']]})),
+
+MODEL('3. L = { wwᴿ | w ∈ {a,b}* } <span class="src">teacher Example 3</span>',PLSOL({L:'L = { wwᴿ | w ∈ {a,b}* }',z:'aⁿbᵐbᵐaⁿ  (= wwᴿ with w = aⁿbᵐ)',zl:'2n + 2m',
+ note:'Since |uv| ≤ n, v lies in the first n symbols, which are all a\'s.',
+ cases:[['v has only a\'s, i.e. v = aᵏ for some k ≥ 1','0','uv⁰w = uw = aⁿ⁻ᵏbᵐbᵐaⁿ = aⁿ⁻ᵏb²ᵐaⁿ','aⁿ⁻ᵏb²ᵐaⁿ ∉ L (it is not a palindrome: n − k a\'s in front, n a\'s at the end)','Your teacher also lists v = bᵏ and v = aᵏbˡ as cases. With this z they cannot happen (the first n symbols are all a\'s). Be careful if you write v = bᵏ: aⁿb²ᵐ⁻ᵏaⁿ IS a palindrome when k is even, so that case does not give a contradiction.']]})),
+
+MODEL('4. L = { aⁿ² | n ≥ 1 } <span class="src">QB Q12(i)</span>',PLSOL({L:'L = { aⁿ² | n ≥ 1 }',z:'aⁿ²',zl:'n²',
+ note:'Since |uv| ≤ n, v lies inside the a\'s: v = aᵏ with 1 ≤ k ≤ n.',
+ cases:[['v = aᵏ, 1 ≤ k ≤ n','2','uv²w = aⁿ²⁺ᵏ, so |uv²w| = n² + k. Now n² &lt; n² + k ≤ n² + n &lt; n² + 2n + 1 = (n+1)²','n² + k lies strictly between two consecutive squares, so it is not a perfect square: uv²w ∉ L']]})),
+
+MODEL('5. L = { 0ⁿ1ᵐ | n &gt; m ≥ 0 } <span class="src">QB Q12(ii)</span>',PLSOL({L:'L = { 0ⁿ1ᵐ | n > m ≥ 0 }',z:'0ⁿ⁺¹1ⁿ  (in L since n + 1 > n)',zl:'2n + 1',
+ note:'Since |uv| ≤ n, v lies inside the 0s: v = 0ᵏ with k ≥ 1. Here you must pump <b>down</b>: i = 2 only adds 0s, and then n &gt; m still holds, so no contradiction.',
+ cases:[['v = 0ᵏ for some k ≥ 1','0','uv⁰w = uw = 0ⁿ⁺¹⁻ᵏ1ⁿ. Now n + 1 − k ≤ n','0ⁿ⁺¹⁻ᵏ1ⁿ ∉ L (number of 0s is not greater than the number of 1s)']]})),
+
+MODEL('6. L = { w ∈ {a,b}* : equal numbers of a\'s and b\'s } <span class="src">QB Q12(iii)</span>',PLSOL({L:'L = { w | w has equal numbers of a\'s and b\'s }',z:'aⁿbⁿ',zl:'2n',
+ note:'Since |uv| ≤ n, v lies inside the a\'s: v = aᵏ with k ≥ 1.',
+ cases:[['v = aᵏ for some k ≥ 1','2','uv²w = aⁿ⁺ᵏbⁿ','aⁿ⁺ᵏbⁿ ∉ L (more a\'s than b\'s)']]})),
+
+MODEL('7. L = { ww | w ∈ {a,b}* }',PLSOL({L:'L = { ww | w ∈ {a,b}* }',z:'aⁿbaⁿb  (= ww with w = aⁿb)',zl:'2n + 2',
+ note:'Since |uv| ≤ n, v lies inside the first block of a\'s: v = aᵏ with k ≥ 1.',
+ cases:[['v = aᵏ for some k ≥ 1','2','uv²w = aⁿ⁺ᵏbaⁿb','aⁿ⁺ᵏbaⁿb ∉ L (a string tt with two b\'s that ends in b has the form aᵖbaᵖb, but here n + k ≠ n)']]})),
+
+MODEL('8. L = { palindromes over {0,1} }',PLSOL({L:'L = { w ∈ {0,1}* : w = wᴿ }',z:'0ⁿ10ⁿ',zl:'2n + 1',
+ note:'Since |uv| ≤ n, v lies inside the first block of 0s: v = 0ᵏ with k ≥ 1.',
+ cases:[['v = 0ᵏ for some k ≥ 1','2','uv²w = 0ⁿ⁺ᵏ10ⁿ','0ⁿ⁺ᵏ10ⁿ ∉ L (its reverse is 0ⁿ10ⁿ⁺ᵏ, which is different)']]})),
+
+MODEL('9. L = { aᵖ | p is prime }',PLSOL({L:'L = { aᵖ | p is prime }',z:'aᵖ for a prime p ≥ n + 2',zl:'p',
+ note:'v = aᵏ with 1 ≤ k ≤ n. Here pump with i = p + 1.',
+ cases:[['v = aᵏ for some k ≥ 1','p + 1','|uvᵖ⁺¹w| = p + pk = p(1 + k)','p(1 + k) is a product of two numbers ≥ 2, so it is not prime: uvᵖ⁺¹w ∉ L']]})),
 PUMP('Try it: { ww }','ww',3),
+PUMP('Try it: aⁿ²','sq',3),
 
 '<h2>Practice</h2><ol class="practice">',
 P('<span class="src">Nov25 Q18b</span> State and prove the pumping lemma for regular languages.','Statement: for regular L there is n such that every z ∈ L with |z| ≥ n can be written z = uvw with |uv| ≤ n, |v| ≥ 1 and uvⁱw ∈ L for all i ≥ 0. Proof: take a DFA with n states, look at the n + 1 states visited on the first n symbols, two coincide by the pigeonhole principle, and the part of the string between the two visits is the loop v; repeating or deleting the loop leads to the same final state.'),
@@ -3269,12 +3355,32 @@ var C36=[
 '<h2>Try it</h2><p>Choose the five parts yourself (the rule |vwx| ≤ n, |vx| ≥ 1 is checked for you), or let the page check every legal split.</p>',
 PUMPCW('Interactive: { aⁿbⁿcⁿ }','anbncn',3),
 
-'<h2>Solved models</h2>',
-MODEL('1. L = { aⁿbⁿcⁿ : n ≥ 1 } is not context-free <span class="src">teacher example, QB Q17</span>','<p>Assume context-free with pumping length n. Take z = aⁿbⁿcⁿ, |z| = 3n ≥ n. Write z = uvwxy with |vwx| ≤ n and |vx| ≥ 1.</p><p>Since |vwx| ≤ n, the window vwx cannot contain both an a and a c (the last a and the first c are n + 1 positions apart). So there are two cases:</p><ul><li><b>vwx has no c:</b> pumping to i = 2 adds a\'s and/or b\'s but no c\'s, so the counts are no longer equal.</li><li><b>vwx has no a:</b> pumping adds b\'s and/or c\'s but no a\'s, so again unequal.</li></ul><p>Either way uv²wx²y ∉ L. Contradiction. ∎</p>'),
-MODEL('2. L = { ww : w ∈ {a,b}* } <span class="src">QB Q17</span>','<p>Take z = aⁿbⁿaⁿbⁿ ∈ L, which has four blocks of length n. Since |vwx| ≤ n, the window lies inside one block or straddles two <b>neighbouring</b> blocks, so pumping changes the length of only those blocks. Every string of L has the form tt, so the matching blocks must stay equal: block 1 = block 3 and block 2 = block 4. Pumping enlarges (i = 2) or shrinks (i = 0) only the blocks the window touches, so block 1 ≠ block 3 or block 2 ≠ block 4, and the string is no longer of the form tt. Contradiction. ∎ (The widget below checks every legal split.)</p>'),
+'<h2>Solved models (written in full, the way you would write them on paper)</h2>',
+'<div class="callout"><b>Skeleton:</b> (1) Assume L is context-free, pumping length n. (2) Let z = …, |z| ≥ n. (3) By the lemma z = uvwxy, |vwx| ≤ n, |vx| ≥ 1. (4) Say where the window vwx can sit, then <b>Case (i), (ii), …</b> each with its pumped string uvⁱwxⁱy and "∉ L ⇒ contradiction". (5) "Hence L is not context-free." Your teacher\'s own worked example stops after the window argument; writing the cases out is what earns full marks.</div>',
+
+MODEL('1. L = { aⁿbⁿcⁿ | n ≥ 1 } <span class="src">teacher example, QB Q17</span>',PLSOL({cfl:1,L:'L = { aⁿbⁿcⁿ | n ≥ 1 }',z:'aⁿbⁿcⁿ',zl:'3n',
+ note:'|vwx| ≤ n, so vwx cannot contain both an a and a c (the last a and the first c are n + 1 positions apart). So vwx lies inside one block, or across two neighbouring blocks. (Your teacher then takes n = 3, z = 0³1³2³ to illustrate.)',
+ cases:[['vx has only a\'s (vx = aᵏ, k ≥ 1)','2','uv²wx²y = aⁿ⁺ᵏbⁿcⁿ','aⁿ⁺ᵏbⁿcⁿ ∉ L'],
+        ['vx has only b\'s','2','uv²wx²y = aⁿbⁿ⁺ᵏcⁿ','aⁿbⁿ⁺ᵏcⁿ ∉ L'],
+        ['vx has only c\'s','2','uv²wx²y = aⁿbⁿcⁿ⁺ᵏ','aⁿbⁿcⁿ⁺ᵏ ∉ L'],
+        ['vx has a\'s and b\'s (the window sits across the a-block and b-block)','2','uv²wx²y = aⁿ⁺ᵖbⁿ⁺ʳcⁿ with p + r ≥ 1','aⁿ⁺ᵖbⁿ⁺ʳcⁿ ∉ L (the c\'s are still n, but a\'s or b\'s increased)'],
+        ['vx has b\'s and c\'s (the window sits across the b-block and c-block)','2','uv²wx²y = aⁿbⁿ⁺ᵖcⁿ⁺ʳ with p + r ≥ 1','aⁿbⁿ⁺ᵖcⁿ⁺ʳ ∉ L (the a\'s are still n, but b\'s or c\'s increased)']]})),
+
+MODEL('2. L = { ww | w ∈ {a,b}* } <span class="src">QB Q17</span>',PLSOL({cfl:1,L:'L = { ww | w ∈ {a,b}* }',z:'aⁿbⁿaⁿbⁿ  (= ww with w = aⁿbⁿ)',zl:'4n',
+ note:'z has four blocks of length n: block 1 = aⁿ, block 2 = bⁿ, block 3 = aⁿ, block 4 = bⁿ. A string a^p b^q a^r b^s with all four blocks non-empty is of the form tt only if p = r and q = s. |vwx| ≤ n, so the window lies inside one block or across two neighbouring blocks.',
+ cases:[['vwx lies inside one block, so vx is made of one letter (vx has k ≥ 1 symbols)','2','uv²wx²y: that one block has grown by k, the other three blocks are unchanged','Block j ≠ its partner (block j ± 2), so the string is not of the form tt: uv²wx²y ∉ L'],
+        ['vwx lies across two neighbouring blocks (j and j + 1)','2','uv²wx²y: at least one of these two blocks has grown, and neither partner (block j ± 2) has changed','p ≠ r or q ≠ s, so uv²wx²y ∉ L']]})),
 PUMPCW('Try it: { ww }','ww',3),
-MODEL('3. L = { aⁿ² : n ≥ 1 }','<p>Take z = a^(n²). Then vx = aᵏ with 1 ≤ k ≤ |vwx| ≤ n. For i = 2 the length is n² + k, and n² &lt; n² + k ≤ n² + n &lt; (n+1)², so it is not a perfect square. ∎</p>'),
-MODEL('4. L = { aⁿbᵐcᵏ : n &lt; m &lt; k }','<p>Take z = aⁿbⁿ⁺¹cⁿ⁺². Since |vwx| ≤ n it cannot reach from an a to a c (the b-block has n + 1 symbols). If vx contains an a, pump up (i = 2): there are now at least n + 1 a\'s, which is not less than the n + 1 b\'s (or the b\'s grew too, so b is no longer less than c). If vx contains no a then it has b\'s and/or c\'s; pumping down (i = 0) leaves b ≤ n = a, or c ≤ n + 1 = b, so the inequalities fail. ∎</p>'),
+
+MODEL('3. L = { aⁿ² | n ≥ 1 }',PLSOL({cfl:1,L:'L = { aⁿ² | n ≥ 1 }',z:'aⁿ²',zl:'n²',
+ note:'Every symbol is an a, so vx = aᵏ with 1 ≤ k ≤ |vwx| ≤ n.',
+ cases:[['vx = aᵏ, 1 ≤ k ≤ n','2','uv²wx²y = aⁿ²⁺ᵏ. Now n² &lt; n² + k ≤ n² + n &lt; (n+1)²','n² + k is strictly between two consecutive squares, so uv²wx²y ∉ L']]})),
+
+MODEL('4. L = { aⁿbᵐcᵏ | n &lt; m &lt; k }',PLSOL({cfl:1,L:'L = { aⁿbᵐcᵏ | n < m < k }',z:'aⁿbⁿ⁺¹cⁿ⁺²',zl:'3n + 3',
+ note:'The b-block has n + 1 symbols and |vwx| ≤ n, so the window cannot reach from an a to a c.',
+ cases:[['vx contains an a (no c)','2','uv²wx²y has at least n + 1 a\'s; the c\'s are still n + 2','If the b\'s did not grow: a = n + 1 = b, so a &lt; b fails. If the b\'s grew too: b ≥ n + 2 = c, so b &lt; c fails. Hence uv²wx²y ∉ L'],
+        ['vx contains b\'s but no a (it may also contain c\'s)','0','uv⁰wx⁰y has at most n b\'s, and the a\'s are still n','a = n ≥ b, so a &lt; b fails: uwy ∉ L'],
+        ['vx contains only c\'s','0','uv⁰wx⁰y has at most n + 1 c\'s, and the b\'s are still n + 1','b = n + 1 ≥ c, so b &lt; c fails: uwy ∉ L']]})),
 PUMPCW('Try it: { aⁿbᵐcᵏ : n &lt; m &lt; k }','abc',2),
 
 '<h2>Practice</h2><ol class="practice">',
@@ -3302,7 +3408,7 @@ MACH.anbnF={pda:1,demo:'aabb',spec:PD('q0 q1 q2','q0','Z','q2','final','q0 a Z q
 MACH.an2bnF={pda:1,demo:'aabbbb',spec:PD('q0 q1 q2','q0','Z','q2','final','q0 a Z q0 AAZ; q0 a A q0 AAA; q0 b A q1 ε; q1 b A q1 ε; q1 ε Z q2 Z','q0:70,90;q1:260,90;q2:450,90')};
 MACH.an2bnE={pda:1,demo:'aabbbb',spec:PD('q0 q1 q2','q0','Z','','empty','q0 a Z q0 AAZ; q0 a A q0 AAA; q0 b A q1 ε; q1 b A q1 ε; q1 ε Z q2 ε','q0:70,90;q1:260,90;q2:450,90')};
 MACH.wcwr={pda:1,demo:'abcba',spec:PD('q0 q1 q2','q0','Z','q2','final','q0 a Z q0 aZ; q0 b Z q0 bZ; q0 a a q0 aa; q0 a b q0 ab; q0 b a q0 ba; q0 b b q0 bb; q0 c Z q1 Z; q0 c a q1 a; q0 c b q1 b; q1 a a q1 ε; q1 b b q1 ε; q1 ε Z q2 Z','q0:70,90;q1:300,90;q2:500,90')};
-MACH.wwr={pda:1,demo:'abba',spec:PD('q0 q1 q2','q0','Z','q2','final','q0 a Z q0 aZ; q0 b Z q0 bZ; q0 a a q0 aa; q0 a b q0 ab; q0 b a q0 ba; q0 b b q0 bb; q0 ε Z q1 Z; q0 ε a q1 a; q0 ε b q1 b; q1 a a q1 ε; q1 b b q1 ε; q1 ε Z q2 Z','q0:70,90;q1:300,90;q2:500,90')};
+MACH.wwr={pda:1,demo:'abba',spec:PD('q0 q1 q2','q0','Z','q2','final','q0 a Z q0 aZ; q0 b Z q0 bZ; q0 a a q0 aa; q0 a b q0 ab; q0 b a q0 ba; q0 b b q0 bb; q0 a a q1 ε; q0 b b q1 ε; q1 a a q1 ε; q1 b b q1 ε; q1 ε Z q2 Z','q0:70,90;q1:300,90;q2:500,90')};
 MACH.anbmcn={pda:1,demo:'aabcc',spec:PD('q0 q1 q2 q3','q0','Z','q3','final','q0 a Z q0 aZ; q0 a a q0 aa; q0 b a q1 a; q1 b a q1 a; q1 c a q2 ε; q2 c a q2 ε; q2 ε Z q3 Z','q0:60,90;q1:230,90;q2:400,90;q3:560,90')};
 MACH.anbmcmdn={pda:1,demo:'aabcdd',spec:PD('q0 q1 q2 q3 q4','q0','Z','q4','final','q0 a Z q0 aZ; q0 a a q0 aa; q0 b a q1 ba; q1 b b q1 bb; q1 c b q2 ε; q2 c b q2 ε; q2 d a q3 ε; q3 d a q3 ε; q3 ε Z q4 Z','q0:50,90;q1:200,90;q2:350,90;q3:500,90;q4:650,90')};
 MACH.anbmcnm={pda:1,demo:'aabccc',spec:PD('q0 q1 q2 q3','q0','Z','q3','final','q0 a Z q0 aZ; q0 a a q0 aa; q0 b a q1 ba; q1 b b q1 bb; q1 c b q2 ε; q2 c b q2 ε; q2 c a q2 ε; q2 ε Z q3 Z','q0:60,90;q1:230,90;q2:400,90;q3:560,90')};
@@ -3396,10 +3502,10 @@ MODEL('2. L = { aⁿb²ⁿ : n ≥ 1 }, both ways <span class="src">QB Q18</span
 PDAW('(i) by final state, run aabbbb','an2bnF',{input:'aabbbb'}),
 PDAW('(ii) by empty stack, run aabbb (it should be rejected)','an2bnE',{input:'aabbb'}),
 
-MODEL('3. L = { w c wᴿ : w ∈ {a,b}* } <span class="src">QB Q19</span>','<p>Push w in state q₀, change state on c, then pop and match wᴿ in q₁. Because c marks the middle, <b>no guessing is needed</b>: this PDA is deterministic. Trace abcba (QB Q19) and abca (IA3).</p>'),
+MODEL('3. QB Q19, first part: L = { w c wᴿ : w ∈ {a,b}* } <span class="src">QB Q19</span>','<p><b>This answers the first half of QB Q19</b> (the language with the marker c). The second half, without the marker, is the next model.</p><p>Push w in state q₀, change state on c, then pop and match wᴿ in q₁. Because c marks the middle, <b>no guessing is needed</b>: this PDA is deterministic. Trace abcba (QB Q19) and abca (IA3).</p>'),
 PDAW('wcwᴿ by final state','wcwr',{input:'abcba'}),
 
-MODEL('4. L = { w wᴿ } is non-deterministic <span class="src">QB Q19</span>','<p>There is no marker for the middle, so the PDA <b>guesses</b> with an ε-move: at any moment q₀ may switch to q₁ without reading. If it switches at the true middle, popping works; at any other point it fails. Some computation accepts, so the string is accepted. (Why no deterministic PDA can do this is in 4.5.)</p>'),
+MODEL('4. QB Q19, second part: L = { w wᴿ } is non-deterministic <span class="src">QB Q19</span>','<p><b>This answers the second half of QB Q19</b>: "now explain why { w wᴿ } cannot be accepted by a deterministic PDA, and give an NPDA for it". This language has <b>no marker c</b>, which is exactly the difference from the previous model.</p><p>Here w ∈ {a,b}⁺, exactly as your teacher sets it. There is no marker for the middle, so the PDA <b>guesses</b>. In q₀ it pushes every symbol (δ(q₀,a,Z) = (q₀,aZ), δ(q₀,a,a) = (q₀,aa), δ(q₀,a,b) = (q₀,ab) and the same for b). <b>To start popping</b> it also has δ(q₀,a,a) = (q₁,ε) and δ(q₀,b,b) = (q₁,ε): the symbol read matches the top, so it pops it and moves to q₁. That is the second half of wᴿ beginning. In q₁ it pops a,a and b,b, and on Z₀ it goes to the final state. So δ(q₀,a,a) has two choices (push or pop), which makes it non-deterministic. At the true middle the pop choice works; anywhere else it fails. Some computation accepts, so the string is accepted. (Why no deterministic PDA can do this is in 4.5.)</p>'),
 PDAW('wwᴿ (NPDA)','wwr',{input:'abba'}),
 
 MODEL('5. L = { aⁿbᵐcⁿ : n, m ≥ 1 } <span class="src">teacher assignment Q1(a)</span>','<p>Push a\'s, then <b>read the b\'s without changing the stack</b> (δ(q₁, b, a) = (q₁, a)), then pop an a for each c.</p>'),
@@ -3427,7 +3533,7 @@ CONTENT['4.2']={h:C42,exam:['Nov25 Q20a','Supp Q22','IA3 e(i)','QB Q18-Q20','tea
 
 /* ---------------- 4.3 CFG to PDA ---------------- */
 var C43=[
-'<p>Every context-free grammar has an equivalent PDA. The conversion is short and mechanical, and it is asked in every paper: Nov 2025 Q14 (3 marks), Supp Q20a (6 marks), IA3 2e(ii) (7 marks), the CFG→PDA assignment, QB Q21 (with a stack trace) and the remedial classes.</p>',
+'<p>Every context-free grammar has an equivalent PDA. The conversion is short and mechanical, and it is asked in every paper: Nov 2025 Q14 (3 marks), Supp Q20a (6 marks), the CFG→PDA assignment, QB Q21 (with a stack trace) and the remedial classes.</p>',
 
 '<h2>The idea</h2>',
 '<p>A PDA can <b>replay a leftmost derivation</b>. The stack holds what is still to be derived (the sentential form with the already-matched prefix removed). If the top of the stack is a <b>variable</b>, the PDA guesses a production and replaces the variable by its right side (without reading input). If the top is a <b>terminal</b>, it must equal the next input symbol: read it and pop it. When everything is matched, the stack is empty.</p>',
@@ -3440,8 +3546,8 @@ var C43=[
 
 '<h2>Solved models (every widget lists the transitions and traces the string)</h2>',
 
-MODEL('1. S → aSb | ab, string aabb <span class="src">IA3 2e(ii) (7 marks)</span>','<p>Three productions give three type-1 transitions: S → aSb, S → ab. The terminals a and b give two type-2 transitions.</p>'),
-C2P('IA3 2e(ii): S → aSb | ab',GR.anbn1,'aabb'),
+MODEL('1. S → aSb | ab, string aabb (worked example)','<p>Three productions give three type-1 transitions: S → aSb, S → ab. The terminals a and b give two type-2 transitions.</p>'),
+C2P('S → aSb | ab, string aabb',GR.anbn1,'aabb'),
 
 MODEL('2. S → aSb | ε, string aabb <span class="src">remedial class IA3 Q2</span>','<p>The ε-production gives δ(q, ε, S) = (q, ε), which pops S at the end.</p>'),
 C2P('S → aSb | ε',GR.anbnE,'aabb'),
@@ -3467,7 +3573,7 @@ P('<span class="src">Supp Q20a style</span> Construct a PDA for S → aAB | b, A
 P('<span class="src">Part A style</span> State the two kinds of transition in the CFG → PDA construction.','(1) For each production A → β: δ(q, ε, A) = (q, β). (2) For each terminal a: δ(q, a, a) = (q, ε). The PDA has one state, starts with S on the stack, and accepts by empty stack.'),
 '</ol>'
 ].join('');
-CONTENT['4.3']={h:C43,exam:['Nov25 Q14','Supp Q20a','IA3 2e(ii)','QB Q21','CFG-PDA assignment']};
+CONTENT['4.3']={h:C43,exam:['Nov25 Q14','Supp Q20a','QB Q21','CFG-PDA assignment']};
 
 /* ---------------- 4.4 PDA to CFG ---------------- */
 var C44=[
@@ -3980,7 +4086,7 @@ PCPW('QB Q34(b): the search finds nothing, and the reason is shown','0/00, 1/11'
 '<p>In the <b>modified PCP</b> a match must <b>start with the first tile</b>: w₁w<sub>i</sub>…w<sub>k</sub> = v₁v<sub>i</sub>…v<sub>k</sub>. To show PCP is undecidable the proof goes in two steps:</p>',
 '<ol class="steps"><li><b>L<sub>u</sub> reduces to MPCP.</b> Given a TM M and an input w, build an MPCP instance whose matches correspond to <b>accepting computations</b> of M on w. The first tile is (#, #q₀w#) (the start ID); for every transition there are tiles that copy the tape and carry out the move (a tile like (qX, Yp) for a right move); there are copy tiles (a, a) and (#, #); and when the final state is reached, extra tiles let the top string "catch up" with the bottom, so the two strings can become equal only after an accepting state appears. The bottom string runs one ID ahead of the top, and a match exists exactly when M accepts w.</li><li><b>MPCP reduces to PCP.</b> The tiles are rewritten with a new symbol * so that the first tile is forced to be used first.</li></ol>',
 '<p><b>The MPCP → PCP rule (your teacher\'s slides).</b> Use two new symbols * and $. For the first string of each pair, add * <b>after</b> every character. For the second string, add * <b>before</b> every character. Add the pair ($, *$). Make another copy of the first pair, with an extra * in front of the first string; that copy is now the only tile that can start a match.</p>',
-MODEL('Example: MPCP to PCP <span class="src">class slides</span>','<p>MPCP instance (in order): (110, 10), (0, 01), (100, 001). The first string of each pair gets * after every character and the second gets * before every character: (1*1*0*, *1*0), (0*, *0*1), (1*0*0*, *0*0*1); add the copy of the first pair with an extra * on the first string, (*1*1*0*, *1*0), and the end pair ($, *$).</p>'+TBL(['MPCP pair','PCP pair'],mpcp2pcp(pcpParse('110/10, 0/01, 100/001')).map(function(t,i,a){return [i===0?'(first pair, copy with extra *)':i===a.length-1?'(end pair)':'tile '+i,'<code>('+esc(t[0])+', '+esc(t[1])+')</code>']}),'c')),
+MODEL('Example: MPCP to PCP <span class="src">teacher PCP notes</span>','<p>MPCP instance (in order): (110, 10), (0, 01), (100, 001). The first string of each pair gets * after every character and the second gets * before every character: (1*1*0*, *1*0), (0*, *0*1), (1*0*0*, *0*0*1); add the copy of the first pair with an extra * on the first string, (*1*1*0*, *1*0), and the end pair ($, *$).</p>'+TBL(['MPCP pair','PCP pair'],mpcp2pcp(pcpParse('110/10, 0/01, 100/001')).map(function(t,i,a){return [i===0?'(first pair, copy with extra *)':i===a.length-1?'(end pair)':'tile '+i,'<code>('+esc(t[0])+', '+esc(t[1])+')</code>']}),'c')),
 
 '<h2>Practice</h2><ol class="practice">',
 P('<span class="src">Supp Q24b</span> Illustrate the Post correspondence problem with a suitable example.','Take the two lists A = (aa, bb, abb) and B = (aab, ba, b), i.e. tiles aa/aab, bb/ba, abb/b. The sequence 1, 2, 1, 3 gives the top string aa·bb·aa·abb = aabbaaabb and the bottom string aab·ba·aab·b = aabbaaabb. They are equal, so the PCP instance has the solution 1 2 1 3. PCP asks whether such a sequence exists for a given pair of lists; it is undecidable in general.'),
