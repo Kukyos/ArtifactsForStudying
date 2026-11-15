@@ -815,29 +815,47 @@ function RET(cap,re,alpha,max){return '<div class="w"><div class="cap">'+cap+'</
 
 /* ---------- Thompson construction (teacher version with explicit epsilon links) ---------- */
 function thompsonTree(tree){
-  var n=0,edges=[],nodes=[];
+  /* The teacher's version: union and star add new states; CONCATENATION MERGES the final state of R1 with the start state of R2
+     (no ε-arrow between them). States are lettered A, B, C, ... left to right: new start, upper branch, lower branch, new final. */
+  var n=0,edges=[],nodes=[],gone={};
   function ns(){return n++}
-  function build(t){var e0=edges.length,r=core(t);nodes.push({x:t,s:r.s,f:r.f,e0:e0,e1:edges.length});return r}
+  function build(t){var e0=edges.length,r=core(t);r.t=t;r.e0=e0;r.e1=edges.length;nodes.push(r);return r}
   function core(t){
-    var s,f,a,b;
-    if(t.t==='sym'){s=ns();f=ns();edges.push([s,t.v,f]);return {s:s,f:f}}
-    if(t.t==='eps'){s=ns();f=ns();edges.push([s,'ε',f]);return {s:s,f:f}}
-    if(t.t==='empty'){s=ns();f=ns();return {s:s,f:f}}
-    if(t.t==='alt'){a=build(t.a);b=build(t.b);s=ns();f=ns();edges.push([s,'ε',a.s],[s,'ε',b.s],[a.f,'ε',f],[b.f,'ε',f]);return {s:s,f:f}}
-    if(t.t==='cat'){a=build(t.a);b=build(t.b);edges.push([a.f,'ε',b.s]);return {s:a.s,f:b.f}}
-    a=build(t.a);s=ns();f=ns();edges.push([s,'ε',a.s],[a.f,'ε',f],[a.f,'ε',a.s],[s,'ε',f]);return {s:s,f:f};
+    var s,f,a,b,i;
+    if(t.t==='sym'){s=ns();f=ns();edges.push([s,t.v,f]);return {s:s,f:f,k:[]}}
+    if(t.t==='eps'){s=ns();f=ns();edges.push([s,'ε',f]);return {s:s,f:f,k:[]}}
+    if(t.t==='empty'){s=ns();f=ns();return {s:s,f:f,k:[]}}
+    if(t.t==='alt'){a=build(t.a);b=build(t.b);s=ns();f=ns();edges.push([s,'ε',a.s],[s,'ε',b.s],[a.f,'ε',f],[b.f,'ε',f]);return {s:s,f:f,k:[a,b]}}
+    if(t.t==='cat'){
+      a=build(t.a);b=build(t.b);
+      /* merge: every use of b's start becomes a's final state */
+      var old=b.s;
+      for(i=b.e0;i<edges.length;i++){if(edges[i][0]===old)edges[i][0]=a.f;if(edges[i][2]===old)edges[i][2]=a.f}
+      nodes.forEach(function(x){if(x.e0>=b.e0){if(x.s===old)x.s=a.f;if(x.f===old)x.f=a.f}});
+      gone[old]=1;
+      return {s:a.s,f:b.f,k:[a,b]};
+    }
+    a=build(t.a);s=ns();f=ns();edges.push([s,'ε',a.s],[a.f,'ε',f],[a.f,'ε',a.s],[s,'ε',f]);return {s:s,f:f,k:[a]};
   }
-  var fr=build(tree),name={},order=[fr.s],k;
-  name[fr.s]='q0';
-  for(k=0;k<order.length;k++){edges.forEach(function(e){if(e[0]===order[k]&&name[e[2]]===undefined){name[e[2]]='q'+order.length;order.push(e[2])}})}
-  for(k=0;k<n;k++)if(name[k]===undefined){name[k]='q'+order.length;order.push(k)}
+  var fr=build(tree),name={},order=[],seen={};
+  function seq(x,own){ /* states in reading order; own = the node's own new states */
+    function add(id){if(!seen[id]&&!gone[id]){seen[id]=1;order.push(id)}}
+    var t=x.t.t;
+    if(t==='sym'||t==='eps'||t==='empty'){add(x.s);add(x.f)}
+    else if(t==='cat'){seq(x.k[0]);seq(x.k[1])}
+    else if(t==='alt'){add(x.s);seq(x.k[0]);seq(x.k[1]);add(x.f)}
+    else{add(x.s);seq(x.k[0]);add(x.f)}
+  }
+  seq(fr);
+  function letter(k){return String.fromCharCode(65+k%26)+(k>=26?Math.floor(k/26):'')}
+  order.forEach(function(id,k){name[id]=letter(k)});
   var spec={states:order.map(function(id){var o={id:name[id]};if(id===fr.s)o.start=1;if(id===fr.f)o.accept=1;return o}),edges:[]};
   edges.forEach(function(e){spec.edges.push({f:name[e[0]],l:[e[1]],t:name[e[2]]})});
   /* every sub-expression as its own small machine, using the SAME state names as the finished machine */
   Object.defineProperty(spec,'parts',{enumerable:false,value:nodes.map(function(nd){
     var ids={};ids[nd.s]=1;ids[nd.f]=1;
     edges.slice(nd.e0,nd.e1).forEach(function(e){ids[e[0]]=1;ids[e[2]]=1});
-    return {x:nd.x,spec:{
+    return {x:nd.t,spec:{
       states:order.filter(function(id){return ids[id]}).map(function(id){var o={id:name[id]};if(id===nd.s)o.start=1;if(id===nd.f)o.accept=1;return o}),
       edges:edges.slice(nd.e0,nd.e1).map(function(e){return {f:name[e[0]],l:[e[1]],t:name[e[2]]}})
     }};
@@ -847,13 +865,13 @@ function thompsonTree(tree){
 function thompsonRE(src){return thompsonTree(reParse(src))}
 function thompsonHTML(src,o){
   o=o||{};var t=reParse(src),h='',full=thompsonTree(t);
-  h+='<div class="card"><h3>Step 1. Break the expression into its parts</h3><p>Build the machine for every sub-expression, smallest first. Each piece has <b>one start state and one final state</b>. <b>The state names never change:</b> q3 in a small piece is the same q3 in the finished machine of Step 2, so you can follow each piece into the final picture.</p><ol class="steps">';
+  h+='<div class="card"><h3>Step 1. Break the expression into its parts</h3><p>Build the machine for every sub-expression, smallest first. Each piece has <b>one start state and one final state</b>. <b>The state names never change:</b> state E in a small piece is the same state E in the finished machine of Step 2, so you can follow each piece into the final picture.</p><ol class="steps">';
   full.parts.forEach(function(pt){
     var x=pt.x,kind=x.t==='sym'?'basis: one symbol':x.t==='eps'?'basis: ε':x.t==='alt'?'union (+)':x.t==='cat'?'concatenation':'Kleene star (*)';
     h+='<li><code>'+esc(reStr(x))+'</code> <span class="log">('+kind+')</span>'+FAS('',pt.spec,{sim:false}).replace('<div class="cap"></div>','')+'</li>';
   });
   h+='</ol></div>';
-  h+='<div class="card"><h3>Step 2. The finished ε-NFA for <code>'+esc(reStr(t))+'</code> ('+full.states.length+' states)</h3><p>Join the pieces with the rules: <b>union</b> adds a new start and a new final state with ε-arrows to and from both branches; <b>concatenation</b> joins the first final state to the second start state with an ε-arrow; <b>star</b> adds a new start and final state, an ε-arrow back from the end of the loop to its start, and an ε-arrow that skips the loop.</p>'+FAS('ε-NFA',full,{table:true,input:o.input})+'</div>';
+  h+='<div class="card"><h3>Step 2. The finished ε-NFA for <code>'+esc(reStr(t))+'</code> ('+full.states.length+' states)</h3><p>Join the pieces with the rules: <b>union</b> adds a new start and a new final state with ε-arrows to and from both branches; <b>concatenation</b> makes the final state of the first piece the start state of the second (the two pieces share that state, no ε-arrow); <b>star</b> adds a new start and final state, an ε-arrow back from the end of the loop to its start, and an ε-arrow that skips the loop.</p>'+FAS('ε-NFA',full,{table:true,input:o.input})+'</div>';
   return h;
 }
 function mkThompson(el){el.innerHTML=thompsonHTML(el.dataset.re,{input:el.dataset.input});$$('.fa',el).forEach(function(f){f.dataset.hyd=1;mkFA(f)})}
@@ -2679,11 +2697,11 @@ var C26=[
 '<h2>The rules (your teacher\'s version)</h2>',
 '<p>Every piece has <b>exactly one start state and one final state</b>. Let R₁ and R₂ be expressions whose machines are already built.</p>',
 '<div class="split"><div style="flex:1 1 260px">'+FAS('Basis: the symbol a',thompsonRE('a'),{sim:false})+'</div><div style="flex:1 1 260px">'+FAS('Basis: ε',thompsonRE('ε'),{sim:false})+'</div></div>',
-'<div class="split"><div style="flex:1 1 300px">'+FAS('Union R₁ + R₂ (here a+b): a new start and a new final state, ε-arrows into and out of both branches',thompsonRE('a+b'),{sim:false})+'</div><div style="flex:1 1 300px">'+FAS('Concatenation R₁R₂ (here ab): join the first final state to the second start with an ε-arrow',thompsonRE('ab'),{sim:false})+'</div></div>',
+'<div class="split"><div style="flex:1 1 300px">'+FAS('Union R₁ + R₂ (here a+b): a new start and a new final state, ε-arrows into and out of both branches',thompsonRE('a+b'),{sim:false})+'</div><div style="flex:1 1 300px">'+FAS('Concatenation R₁R₂ (here ab): the final state of R₁ and the start state of R₂ are the same state (no ε-arrow)',thompsonRE('ab'),{sim:false})+'</div></div>',
 FAS('Kleene star R₁* (here a*): a new start and final state; an ε-arrow back from the end of R₁ to its start (repeat); an ε-arrow from the new start to the new final state (skip, zero times)',thompsonRE('a*'),{sim:false}),
 
 '<h2>The method</h2>',
-'<ol class="steps"><li>Read the expression and decide the order: brackets first, then <code>*</code>, then concatenation, then <code>+</code>.</li><li>Draw the machine for each symbol, then combine them with the rule for each operator, working from the inside out.</li><li>Number the states q₀, q₁, … from the left.</li><li>Read the finished diagram: ε-arrows are free moves. (If the question wants an NFA without ε, remove the ε-moves with the method of chunk 2.3, or draw a smaller NFA directly, as in the shortcut models below.)</li></ol>',
+'<ol class="steps"><li>Read the expression and decide the order: brackets first, then <code>*</code>, then concatenation, then <code>+</code>.</li><li>Draw the machine for each symbol, then combine them with the rule for each operator, working from the inside out.</li><li>Label the states A, B, C, … in the finished diagram, left to right: for a union the new start, then the upper branch, then the lower branch, then the new final state. The start state gets the incoming arrow and the final state a double circle.</li><li>Read the finished diagram: ε-arrows are free moves. (If the question wants an NFA without ε, remove the ε-moves with the method of chunk 2.3, or draw a smaller NFA directly, as in the shortcut models below.)</li></ol>',
 
 '<h2>Solved models</h2><p>The widgets build each machine from smallest piece to largest and show the ε-NFA table. Press Step on the final machine to test a string.</p>',
 
@@ -2707,7 +2725,7 @@ THO('0(01+1)*(11+0)','0(01+1)*(11+0)','0011'),
 
 '<h2>Shortcut: a smaller NFA drawn directly</h2>',
 '<p>Thompson\'s construction always works, but it makes many states. For a short expression you may draw an NFA straight from the meaning (the question only asks for "an NFA"). Both are correct.</p>',
-MW('nfaAB','(a+b)*ab drawn directly: loop on a,b, then guess the final ab (3 states instead of 12)'),
+MW('nfaAB','(a+b)*ab drawn directly: loop on a,b, then guess the final ab (3 states instead of '+thompsonRE('(a+b)*ab').states.length+')'),
 MW('dfaBC','bc(ab+c)* drawn directly: b, then c, then the loop "ab or c" on the final state'),
 MW('dfaABBA','((ab)*ab)+(ba*) drawn directly. (ab)*ab is the same as (ab)⁺: q₂ is final and goes back to q₁ on a. The other case b a* ends in q₃.'),
 
