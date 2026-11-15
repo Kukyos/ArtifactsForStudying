@@ -815,9 +815,10 @@ function RET(cap,re,alpha,max){return '<div class="w"><div class="cap">'+cap+'</
 
 /* ---------- Thompson construction (teacher version with explicit epsilon links) ---------- */
 function thompsonTree(tree){
-  var n=0,edges=[];
+  var n=0,edges=[],nodes=[];
   function ns(){return n++}
-  function build(t){
+  function build(t){var e0=edges.length,r=core(t);nodes.push({x:t,s:r.s,f:r.f,e0:e0,e1:edges.length});return r}
+  function core(t){
     var s,f,a,b;
     if(t.t==='sym'){s=ns();f=ns();edges.push([s,t.v,f]);return {s:s,f:f}}
     if(t.t==='eps'){s=ns();f=ns();edges.push([s,'ε',f]);return {s:s,f:f}}
@@ -832,22 +833,26 @@ function thompsonTree(tree){
   for(k=0;k<n;k++)if(name[k]===undefined){name[k]='q'+order.length;order.push(k)}
   var spec={states:order.map(function(id){var o={id:name[id]};if(id===fr.s)o.start=1;if(id===fr.f)o.accept=1;return o}),edges:[]};
   edges.forEach(function(e){spec.edges.push({f:name[e[0]],l:[e[1]],t:name[e[2]]})});
+  /* every sub-expression as its own small machine, using the SAME state names as the finished machine */
+  Object.defineProperty(spec,'parts',{enumerable:false,value:nodes.map(function(nd){
+    var ids={};ids[nd.s]=1;ids[nd.f]=1;
+    edges.slice(nd.e0,nd.e1).forEach(function(e){ids[e[0]]=1;ids[e[2]]=1});
+    return {x:nd.x,spec:{
+      states:order.filter(function(id){return ids[id]}).map(function(id){var o={id:name[id]};if(id===nd.s)o.start=1;if(id===nd.f)o.accept=1;return o}),
+      edges:edges.slice(nd.e0,nd.e1).map(function(e){return {f:name[e[0]],l:[e[1]],t:name[e[2]]}})
+    }};
+  })});
   return spec;
 }
 function thompsonRE(src){return thompsonTree(reParse(src))}
 function thompsonHTML(src,o){
-  o=o||{};var t=reParse(src),seen={},list=[],h='';
-  (function walk(x){
-    if(x.t==='alt'||x.t==='cat'){walk(x.a);walk(x.b)}else if(x.t==='star'){walk(x.a)}
-    var k=reStr(x);if(!seen[k]){seen[k]=1;list.push(x)}
-  })(t);
-  h+='<div class="card"><h3>Step 1. Break the expression into its parts</h3><p>Build the machine for every sub-expression, smallest first. Each piece has <b>one start state and one final state</b>.</p><ol class="steps">';
-  list.forEach(function(x){
-    var kind=x.t==='sym'?'basis: one symbol':x.t==='eps'?'basis: ε':x.t==='alt'?'union (+)':x.t==='cat'?'concatenation':'Kleene star (*)';
-    h+='<li><code>'+esc(reStr(x))+'</code> <span class="log">('+kind+')</span>'+FAS('',thompsonTree(x),{sim:false}).replace('<div class="cap"></div>','')+'</li>';
+  o=o||{};var t=reParse(src),h='',full=thompsonTree(t);
+  h+='<div class="card"><h3>Step 1. Break the expression into its parts</h3><p>Build the machine for every sub-expression, smallest first. Each piece has <b>one start state and one final state</b>. <b>The state names never change:</b> q3 in a small piece is the same q3 in the finished machine of Step 2, so you can follow each piece into the final picture.</p><ol class="steps">';
+  full.parts.forEach(function(pt){
+    var x=pt.x,kind=x.t==='sym'?'basis: one symbol':x.t==='eps'?'basis: ε':x.t==='alt'?'union (+)':x.t==='cat'?'concatenation':'Kleene star (*)';
+    h+='<li><code>'+esc(reStr(x))+'</code> <span class="log">('+kind+')</span>'+FAS('',pt.spec,{sim:false}).replace('<div class="cap"></div>','')+'</li>';
   });
   h+='</ol></div>';
-  var full=thompsonTree(t);
   h+='<div class="card"><h3>Step 2. The finished ε-NFA for <code>'+esc(reStr(t))+'</code> ('+full.states.length+' states)</h3><p>Join the pieces with the rules: <b>union</b> adds a new start and a new final state with ε-arrows to and from both branches; <b>concatenation</b> joins the first final state to the second start state with an ε-arrow; <b>star</b> adds a new start and final state, an ε-arrow back from the end of the loop to its start, and an ε-arrow that skips the loop.</p>'+FAS('ε-NFA',full,{table:true,input:o.input})+'</div>';
   return h;
 }
