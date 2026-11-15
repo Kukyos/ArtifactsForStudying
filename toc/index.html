@@ -45,6 +45,18 @@ code{background:var(--code);padding:.08em .35em;border-radius:4px}
 #side a:hover{background:var(--accent-soft)} #side a.on{background:var(--accent-soft);font-weight:600}
 #side a .no{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:2.2rem;flex:none}
 #side a.home{margin-top:12px}
+#side .srch{position:relative;margin:10px 0 2px;padding:0 6px}
+#side .srch input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem}
+#side .sres{margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);max-height:62vh;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+#side .sres h5{margin:0;padding:9px 10px 3px;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side .sres a{display:block;padding:6px 10px;font-size:.86rem;line-height:1.3;border-radius:0}
+#side .sres a.sel,#side .sres a:hover{background:var(--accent-soft)}
+#side .sres a .sn{font-family:var(--mono);font-size:.76rem;color:var(--muted);margin-right:6px}
+#side .sres a small{display:block;color:var(--muted);font-size:.76rem;margin-top:1px;overflow-wrap:anywhere}
+#side .sres .none{padding:10px;color:var(--muted);font-size:.85rem}
+#side .sres .more{padding:4px 10px 8px;color:var(--muted);font-size:.76rem}
+.hit{animation:hit 2.4s ease-out}@keyframes hit{0%{outline:3px solid var(--term);outline-offset:3px}100%{outline:3px solid transparent;outline-offset:3px}}
+
 .nav .btn{text-decoration:none}
 .prog{padding:6px 10px 0;font-size:.8rem;color:var(--muted)}
 .scrim{display:none}
@@ -161,6 +173,7 @@ table.cyk td.cc .cs{font-weight:600;color:var(--accent)} table.cyk td.cc .cl{fon
 table.cyk td.cc.top{background:var(--ok-soft);border-color:var(--ok)}
 table.cyk td.base{text-align:center;font-weight:600;color:var(--term);font-size:1.05rem;padding-top:4px}
 table.cyk td.pad{padding:0}
+.qimg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px}
 .pyq{border-left:3px solid var(--term);background:var(--warn-soft);border-radius:6px;padding:8px 12px;margin:6px 0 10px;font-size:.95rem;white-space:pre-line}
 .steps>li,.practice>li{min-width:0;overflow-wrap:anywhere}
 .steps>li .scroll,.card .scroll{max-width:100%}
@@ -476,14 +489,20 @@ var PYQ=[
 ['teacher assignment Q6','A billing counter stores two item counts in unary, separated by a single 0, as 1ᵐ01ⁿ. Design a Turing Machine that halts with 1^(m+n) on the tape. (i) Give the formal definition (Q, Σ, Γ, δ, q0, B, F) and the transition table of the machine. (ii) Trace the machine for the input 11011 using instantaneous descriptions. (iii) State what happens if the input contains no 0.'],
 ['class slides','Write a regular expression and give the corresponding automata for each of the following sets of binary strings. Use only the basic operations: 0 or 11 or 101; only 0s; all binary strings; all binary strings except empty string; begins with 1, ends with 1; ends with 00; contains at least three 1s; contains at least three consecutive 1s; contains the substring 110.']
 ];
+/* question images: the exact snip of each question (with its diagram) from the original paper or assignment */
+var QIMG={"Nov25 Q1":"q/nov-q1.png","Nov25 Q2":"q/nov-q2.png","Nov25 Q3":"q/nov-q3.png","Nov25 Q4":"q/nov-q4.png","Nov25 Q5":"q/nov-q5.png","Nov25 Q6":"q/nov-q6.png","Nov25 Q7":"q/nov-q7.png","Nov25 Q8":"q/nov-q8.png","Nov25 Q9":"q/nov-q9.png","Nov25 Q10":"q/nov-q10.png","Nov25 Q11":"q/nov-q11.png","Nov25 Q12":"q/nov-q12.png","Nov25 Q13":"q/nov-q13.png","Nov25 Q14":"q/nov-q14.png","Nov25 Q15":"q/nov-q15.png","Nov25 Q16":"q/nov-q16.png","Nov25 Q17a":"q/nov-q17a.png","Nov25 Q17b":"q/nov-q17b.png","Nov25 Q18a":"q/nov-q18a.png","Nov25 Q18b":"q/nov-q18b.png","Nov25 Q19":"q/nov-q19.png","Nov25 Q20a":"q/nov-q20a.png","Nov25 Q20b":"q/nov-q20b.png","Nov25 Q21a":"q/nov-q21a.png","Nov25 Q21b":"q/nov-q21b.png","Nov25 Q22a":"q/nov-q22a.png","Nov25 Q22b":"q/nov-q22b.png","Nov25 Q23":"q/nov-q23.png","Nov25 Q24a":"q/nov-q24a.png","Nov25 Q24b":"q/nov-q24b.png","Supp Q2":"q/supp-q2.png","Supp Q3":"q/supp-q3.png","Supp Q12":"q/supp-q12.png","Supp Q17b":"q/supp-q17b.png","Supp Q19":"q/supp-q19.png","Supp Q20a":"q/supp-q20a.png","Supp Q21":"q/supp-q21.png","Supp Q22":"q/supp-q22.png","Supp Q23b":"q/supp-q23b.png","Supp Q24a":"q/supp-q24a.png","Supp Q24b":"q/supp-q24b.png","QA2 Q1":"q/qa2-q1.png","QA2 Q2":"q/qa2-q2.png","QA2 Q3":"q/qa2-q3.png","QA2 Q4":"q/qa2-q4.png","QA2 Q5":"q/qa2-q5.png","teacher QB Q1":"q/fa-q1.png","teacher QB Q2":"q/fa-q2.png","teacher QB Q4":"q/fa-q4.png","QA1 Q14":"q/qa1-q14.png","QB Q6":"q/qb-q6.png","QB Q6a":"q/qb-q6.png","QB Q6b":"q/qb-q6.png","QB Q7":"q/qb-q7.png","QB Q8":"q/qb-q8.png","QB Q9":"q/qb-q9.png","QB Q10":"q/qb-q10.png","QB Q11":"q/qb-q11.png","QB Q12":"q/qb-q12.png","QB Q12(i)":"q/qb-q12.png","QB Q12(ii)":"q/qb-q12.png","QB Q12(iii)":"q/qb-q12.png","QB Q13":"q/qb-q13.png","QB Q14":"q/qb-q14.png","QB Q15":"q/qb-q15.png","QB Q16":"q/qb-q16.png","QB Q17":"q/qb-q17.png","QB Q18":"q/qb-q18.png","QB Q19":"q/qb-q19.png","QB Q20":"q/qb-q20.png","QB Q21":"q/qb-q21.png","QB Q22":"q/qb-q22.png","QB Q23":"q/qb-q23.png","QB Q24":"q/qb-q24.png","QB Q25":"q/qb-q25.png","QB Q26":"q/qb-q26.png","QB Q27":"q/qb-q27.png","QB Q28":"q/qb-q28.png","QB Q29":"q/qb-q29.png","QB Q30":"q/qb-q30.png","QB Q31":"q/qb-q31.png","QB Q32":"q/qb-q32.png","QB Q33":"q/qb-q33.png","QB Q34":"q/qb-q34.png","Supp Q5":"q/supp-q5.png","Supp Q11":"q/supp-q11.png","Supp Q13":"q/supp-q13.png","QB Q1":"q/qb-q1.png","QB Q2":"q/qb-q2.png","QB Q3":"q/qb-q3.png","QB Q4":"q/qb-q4.png","QB Q4b":"q/qb-q4.png","QB Q5":"q/qb-q5.png","teacher question bank Q3":"q/fa-q3.png","Supp Q10":"q/supp-q10.png","Supp Q16":"q/supp-q16.png","Supp Q20b":"q/supp-q20b.png","QA1 Q1":"q/qa1-q1.png","QA1 Q2":"q/qa1-q2.png","QA1 Q3":"q/qa1-q3.png","QA1 Q4":"q/qa1-q4.png","QA1 Q5":"q/qa1-q5.png","QA1 Q6":"q/qa1-q6.png","QA1 Q7":"q/qa1-q7.png","QA1 Q8":"q/qa1-q8.png","QA1 Q9":"q/qa1-q9.png","QA1 Q10":"q/qa1-q10.png","QA1 Q11":"q/qa1-q11.png","QA1 Q12":"q/qa1-q12.png","QA1 Q13":"q/qa1-q13.png","QA1 Q15":"q/qa1-q15.png","teacher QB Q3":"q/fa-q3.png","teacher QB Q5":"q/fa-q5.png","teacher QB Q6":"q/fa-q6.png","teacher QB Q7":"q/fa-q7.png","Teacher QB Q7":"q/fa-q7.png","teacher QB Q8":"q/fa-q8.png","teacher QB Q10":"q/fa-q10.png","teacher QB Q9":"q/fa-q9.png","teacher assignment Q1(a)":"q/pda-q1.png","teacher assignment Q1(b)":"q/pda-q1.png","teacher assignment Q2":"q/pda-q2.png","teacher assignment Q3":"q/pda-q3.png","PDA assignment Q4":"q/pda-q4.png","teacher assignment Q5":"q/pda-q5.png","teacher assignment Q6":"q/pda-q6.png"};
 var PYQ_NOTE={exact:'The paper gives a diagram. The machine drawn above is transcribed from it.',rebuilt:'The paper gives a diagram that is not reproduced here. The machine above is a rebuilt one of the same kind, solved the same way.'};
 function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+/* a source tag matches as a whole tag: 'QB Q1' must not match inside 'teacher QB Q1' */
+function keyRe(k){return new RegExp('(?<![\\w])'+(/^QB /.test(k)?'(?<!teacher )(?<!Teacher )':'')+escRe(k)+'(?![\\w])')}
 function pyqBlock(tagText){
   var out='',done={};
   PYQ.forEach(function(q){
-    var re=new RegExp('(^|[^\\w])'+escRe(q[0])+'(?![\\w])');
+    var re=keyRe(q[0]);
     if(re.test(tagText)&&!done[q[1]]){
       done[q[1]]=1;
+      var im=QIMG[q[0]];
+      if(im){if(done['img:'+im])return;done['img:'+im]=1;out+='<div class="pyq"><div class="log" style="margin:0 0 6px"><b>The question as set</b> · '+esc(q[0])+(q[2]?' · '+esc(q[2]):'')+'</div><img class="qimg" src="'+im+'" alt="'+esc(q[1])+'" loading="lazy"></div>';return}
       out+='<div class="pyq"'+(q[3]?' data-dia="'+q[3]+'"':'')+'><div class="log" style="margin:0 0 4px"><b>The question as set</b> · '+esc(q[0])+(q[2]?' · '+esc(q[2]):'')+'</div>'+esc(q[1])+(q[3]?'<div class="pdia log" style="margin:6px 0 0">'+PYQ_NOTE[q[3]]+'</div>':'')+'</div>';
     }
   });
@@ -4065,7 +4084,7 @@ function srcMap(){
   return SRCMAP;
 }
 function solvedIn(keys){
-  var res=keys.map(function(k){return new RegExp('(^|[^\\w])'+escRe(k)+'(?![\\w])')}),map=srcMap(),out=[];
+  var res=keys.map(keyRe),map=srcMap(),out=[];
   ALL.forEach(function(c,i){if(map[i].some(function(x){return res.some(function(re){return re.test(x)})}))out.push('<a href="#'+c.id+'">'+c.no+' '+esc(c.t)+'</a>')});
   return out;
 }
@@ -4075,13 +4094,118 @@ function srcPage(S){
   var h='<button class="menu" aria-label="Open chunk list">\u2630 Chunks</button><div class="kicker" style="margin-top:12px">PAPERS AND ASSIGNMENTS</div><h1 style="font-size:1.8rem;margin-top:6px">'+esc(S.t)+'</h1><p>'+esc(S.d)+'</p><p class="log">'+uniq.length+' question'+(uniq.length===1?'':'s')+', each shown as set, with the chunks that solve it.</p>';
   uniq.forEach(function(u){
     var q=u.q,where=solvedIn(u.keys);
-    h+='<div class="pyq" id="q-'+esc(q[0].replace(/\W+/g,'-'))+'"><div class="log" style="margin:0 0 4px"><b>'+esc(q[0])+'</b>'+(q[2]?' \u00b7 '+esc(q[2]):'')+'</div>'+esc(q[1])+(q[3]?'<div class="log" style="margin:6px 0 0">This question comes with a diagram, shown in the solved model.</div>':'')+'<div class="log" style="margin:6px 0 0">'+(where.length?'Solved in: '+where.join(' \u00b7 '):'Not yet linked to a chunk.')+'</div></div>';
+    h+='<div class="pyq" id="q-'+esc(q[0].replace(/\W+/g,'-'))+'"><div class="log" style="margin:0 0 4px"><b>'+esc(q[0])+'</b>'+(q[2]?' \u00b7 '+esc(q[2]):'')+'</div>'+(QIMG[u.keys[0]]||QIMG[q[0]]?'<img class="qimg" src="'+(QIMG[u.keys[0]]||QIMG[q[0]])+'" alt="'+esc(q[1])+'" loading="lazy">':esc(q[1])+(q[3]?'<div class="log" style="margin:6px 0 0">This question comes with a diagram, shown in the solved model.</div>':''))+'<div class="log" style="margin:6px 0 0">'+(where.length?'Solved in: '+where.join(' \u00b7 '):'Not yet linked to a chunk.')+'</div></div>';
   });
   return h;
+}
+/* ---------- search: chunks (title, exam chips, full text), papers, and every question ---------- */
+var SIDX=null,LASTQ='',PEND=null;
+function sstem(t){return t.length>4?t.replace(/(ing|ed|es|s|e|y)$/,''):t}
+function stoks(q){return q.toLowerCase().split(/[\s,;:.()\[\]{}"'“”‘’?!]+/).filter(function(x){return x}).map(sstem)}
+var SRX={};
+function srx(t){return SRX[t]||(SRX[t]=new RegExp('(^|[^a-z0-9])'+escRe(t)))}
+function sall(text,toks){for(var i=0;i<toks.length;i++)if(!srx(toks[i]).test(text))return false;return true}
+function sidx(){
+  if(SIDX)return SIDX;
+  SIDX={chunks:ALL.map(function(c){
+    var t=(c.h||'').replace(/<(script|style|svg)[\s\S]*?<\/\1>/g,' ').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/g,' ').replace(/\s+/g,' ');
+    return {c:c,head:(c.no+' '+c.t+' '+(c.exam||[]).join(' ')).toLowerCase(),body:t,low:t.toLowerCase()}
+  })};
+  return SIDX;
+}
+function ssnip(x,toks){
+  var best=-1;for(var i=0;i<toks.length;i++){var m=srx(toks[i]).exec(x.low);if(m&&(best<0||m.index<best))best=m.index+m[1].length}
+  if(best<0)return '';
+  var a=Math.max(0,best-50),b=Math.min(x.body.length,best+90);
+  return (a>0?'… ':'')+x.body.slice(a,b)+(b<x.body.length?' …':'');
+}
+function runSearch(q){
+  var toks=stoks(q);if(!toks.length)return null;
+  var X=sidx(),tier1=[],tier2=[],part=[],papers=[],qs=[];
+  X.chunks.forEach(function(x){
+    if(sall(x.head,toks))tier1.push({x:x});
+    else if(toks.length>1&&toks.some(function(t){return srx(t).test(x.head)}))part.push({x:x});
+    else if(sall(x.head+' '+x.low,toks))tier2.push({x:x,sn:ssnip(x,toks)});
+  });
+  SECS.forEach(function(S,i){
+    if(sall((S.t+' '+S.d).toLowerCase(),toks))papers.push(S);
+    S.q.forEach(function(qq){
+      if(sall((qq[0]+' '+qq[1]).toLowerCase(),toks))qs.push({S:S,q:qq});
+    });
+  });
+  return {toks:toks,tier1:tier1,part:part,tier2:tier2,papers:papers,qs:qs};
+}
+function sline(href,no,title,sn,pend){return '<a href="'+href+'" data-pend="'+encodeURIComponent(JSON.stringify(pend||{}))+'">'+(no?'<span class="sn">'+esc(no)+'</span>':'')+esc(title)+(sn?'<small>'+esc(sn)+'</small>':'')+'</a>'}
+function renderRes(){
+  var box=$('#qres');if(!box)return;
+  var q=LASTQ.trim();
+  if(q.length<2){box.hidden=true;box.innerHTML='';return}
+  var R=runSearch(q),h='';
+  if(!R.tier1.length&&!R.part.length&&!R.tier2.length&&!R.papers.length&&!R.qs.length){box.innerHTML='<div class="none">Nothing found for \u201c'+esc(q)+'\u201d. Try a shorter word, e.g. \u201cclos\u201d.</div>';box.hidden=false;return}
+  if(R.tier1.length){
+    h+='<h5>Topics (in module order)</h5>';
+    R.tier1.forEach(function(r){h+=sline('#'+r.x.c.id,r.x.c.no,r.x.c.t,'Module '+r.x.c.mod.n,{})});
+  }
+  if(R.part.length){
+    h+='<h5>Related topics</h5>';
+    R.part.forEach(function(r){h+=sline('#'+r.x.c.id,r.x.c.no,r.x.c.t,'Module '+r.x.c.mod.n,{})});
+  }
+  if(R.papers.length){
+    h+='<h5>Papers and assignments</h5>';
+    R.papers.forEach(function(S){h+=sline('#'+S.id,'',S.t,S.q.length+' questions',{})});
+  }
+  if(R.tier2.length){
+    h+='<h5>Also mentioned in</h5>';
+    R.tier2.slice(0,10).forEach(function(r){h+=sline('#'+r.x.c.id,r.x.c.no,r.x.c.t,r.sn,{t:R.toks})});
+    if(R.tier2.length>10)h+='<div class="more">and '+(R.tier2.length-10)+' more chunks. Add another word to narrow it down.</div>';
+  }
+  if(R.qs.length){
+    h+='<h5>Questions ('+R.qs.length+')</h5>';
+    R.qs.slice(0,12).forEach(function(r){h+=sline('#'+r.S.id,r.q[0],r.q[1].replace(/\s+/g,' ').slice(0,90),r.S.t,{id:'q-'+r.q[0].replace(/\W+/g,'-')})});
+    if(R.qs.length>12)h+='<div class="more">and '+(R.qs.length-12)+' more questions. Add another word to narrow it down.</div>';
+  }
+  box.innerHTML=h;box.hidden=false;
+}
+function pend(P){
+  var m=$('#main'),el=null;
+  if(P.id){el=document.getElementById(P.id)}
+  else if(P.t){
+    var cand=$$('h2,h3,h4,p,li,td,.pyq,.callout',m);
+    for(var i=0;i<cand.length&&!el;i++)if(sall(cand[i].textContent.toLowerCase(),P.t))el=cand[i];
+    for(var j=0;j<cand.length&&!el;j++)if(srx(P.t[0]).test(cand[j].textContent.toLowerCase()))el=cand[j];
+  }
+  if(el){el.scrollIntoView({block:'center'});el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}
+}
+if(typeof document!=='undefined'&&document.getElementById('side')){
+  var sd=document.getElementById('side');
+  sd.addEventListener('input',function(e){if(e.target.id==='qs'){LASTQ=e.target.value;renderRes()}});
+  sd.addEventListener('focusin',function(e){if(e.target.id==='qs')renderRes()});
+  sd.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('.sres a');if(!a)return;
+    try{PEND=JSON.parse(decodeURIComponent(a.getAttribute('data-pend')))}catch(x){PEND=null}
+    if(PEND&&!PEND.id&&!PEND.t)PEND=null;
+    if(location.hash===a.getAttribute('href')){e.preventDefault();route()}
+  });
+  sd.addEventListener('keydown',function(e){
+    if(e.target.id!=='qs')return;
+    var box=$('#qres'),links=box?$$('a',box):[],cur=links.findIndex(function(a){return a.classList.contains('sel')});
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      if(!links.length)return;e.preventDefault();
+      if(cur>=0)links[cur].classList.remove('sel');
+      cur=e.key==='ArrowDown'?Math.min(links.length-1,cur+1):Math.max(0,cur-1);
+      links[cur].classList.add('sel');links[cur].scrollIntoView({block:'nearest'});
+    }else if(e.key==='Enter'){var t=links[cur>=0?cur:0];if(t){e.preventDefault();t.click()}}
+    else if(e.key==='Escape'){LASTQ='';e.target.value='';renderRes()}
+  });
+  document.addEventListener('click',function(e){if(!e.target.closest||!e.target.closest('.srch')){var b=$('#qres');if(b)b.hidden=true}});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))){var i=$('#qs');if(i){e.preventDefault();document.body.classList.add('open');i.focus()}}
+  });
 }
 function side(cur){
   var h='<div class="brand"><span>TOC Tutor</span><small>23CS2046</small></div><div class="bar" aria-label="progress"><i style="width:'+PCT+'%"></i></div><div class="prog">'+DONE+' of '+TOTAL+' chunks done ('+PCT+'%)'+(BUILT<TOTAL?'<br>'+BUILT+' of '+TOTAL+' chunks built':'')+'</div>';
   h+='<a href="#home" class="home'+(cur==='home'?' on':'')+'">Overview</a>';
+  h+='<div class="srch"><input id="qs" type="search" placeholder="Search topics, questions…  ( / )" autocomplete="off" spellcheck="false" aria-label="Search the whole site" value="'+esc(LASTQ)+'"><div id="qres" class="sres" hidden></div></div>';
   MODS.forEach(function(m){
     h+='<h4>Module '+m.n+'</h4>';
     m.chunks.forEach(function(c){h+='<a href="#'+c.id+'" class="'+(cur===c.id?'on':'')+'"><span class="dot '+(c.s==='done'?'done':c.s==='now'?'now':c.s==='ready'?'ready':'')+'"></span><span class="no">'+c.no+'</span><span>'+esc(c.t)+'</span></a>'});
@@ -4147,6 +4271,7 @@ function route(){
   var mb=$('.menu',main);if(mb)mb.onclick=function(){document.body.classList.toggle('open')};
   var a=$('#side a.on');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest'});
   window.scrollTo(0,0);
+  if(PEND){var PP=PEND;PEND=null;setTimeout(function(){pend(PP)},80)}
 }
 if(typeof document!=='undefined'&&document.getElementById('main')){window.addEventListener('hashchange',route);route()}
 
