@@ -43,12 +43,14 @@ a.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 <script>
 var DESC={
   toc:'Interactive Theory of Computation course: parse trees, state diagrams, derivation steppers and solved previous-year questions.',
+  dbms:'Interactive DBMS course (23CS2013): relational algebra, SQL, ER design, normalization, B+ trees, transactions and NoSQL, with every revision and question-bank question linked to its answer.',
   pandas:'Type-the-code drill for the DSE lab exam: NumPy, pandas, statistics and plots.',
   sql:'Type-the-query drill for the Oracle SQL*Plus lab: DDL, DML, joins, views, PL/SQL and triggers.'
 };
 function read(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
 function progress(id){
   if(id==='toc'){var p=read('toc-progress-v1')||{},n=Object.keys(p).length;return {pct:Math.round(n/39*100),txt:n+' of 39 chunks done'}}
+  if(id==='dbms'){var d=read('dbms-progress-v1')||{},k=Object.keys(d).length;return {pct:Math.round(k/40*100),txt:k+' of 40 chunks done'}}
   var s=read(id==='pandas'?'pandrill':'sqldrill');
   if(!s||!s.answered)return {pct:0,txt:'not started'};
   return {pct:Math.round(s.correct/s.answered*100),txt:s.answered+' answered · '+Math.round(s.correct/s.answered*100)+'% correct'};

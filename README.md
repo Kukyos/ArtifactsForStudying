@@ -6,6 +6,7 @@ Static study site. No build step: Vercel serves the files as they are.
 |---|---|
 | `/` | Subject picker |
 | `/toc/` | TOC Tutor (Theory of Computation, 23CS2046) |
+| `/dbms/` | DBMS Tutor (Database Management Systems, 23CS2013) |
 | `/pandas/` | Pandas drill (DSE lab) |
 | `/sql/` | SQL*Plus drill (DBMS lab) |
 | `shared/study.js` | Theme toggle + subject selector used by every page |

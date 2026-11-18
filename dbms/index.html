@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en" data-subject="dbms">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script src="../shared/study.js"></script>
+<meta charset="utf-8">
+<title>DBMS Tutor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: fixed left rail of chunks + one reading column. Accent teal = navigation/state,
+   violet = grammar variables, amber = terminals (same colours in text, trees and steppers). */
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --ink:#111c26; --muted:#566775; --line:#d8e0e6;
+  --accent:#0a6f8f; --accent-soft:#dff0f5; --accent-ink:#ffffff;
+  --var:#6d2fb0; --var-bg:#efe6fa; --term:#a8480a; --term-bg:#fdeedd;
+  --ok:#1b7f45; --ok-soft:#e0f3e8; --warn:#a8480a; --warn-soft:#fdeedd; --code:#eaf0f4;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;padding:0}
+h1,h2,h3{line-height:1.25;text-wrap:balance;margin:0}
+h2{font-size:1.25rem;margin-top:2rem} h3{font-size:1.05rem;margin-top:1.4rem}
+p{margin:.6rem 0} a{color:var(--accent)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+code{background:var(--code);padding:.08em .35em;border-radius:4px}
+.v{color:var(--var);font-weight:600} .t{color:var(--term);font-weight:600}
+.shell{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100vh}
+#side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:20px 12px 30px max(12px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);background:var(--surface)}
+#side h4{margin:20px 0 6px;padding:0 10px;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side a{display:flex;gap:10px;align-items:baseline;padding:5px 10px;text-align:left;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.92rem}
+#side a:hover{background:var(--accent-soft)} #side a.on{background:var(--accent-soft);font-weight:600}
+#side a .no{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:2.2rem;flex:none}
+#side a.home{margin-top:12px}
+#side .srch{position:relative;margin:10px 0 2px;padding:0 6px}
+#side .srch input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem}
+#side .sres{margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);max-height:62vh;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+#side .sres h5{margin:0;padding:9px 10px 3px;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side .sres a{display:block;padding:6px 10px;font-size:.86rem;line-height:1.3;border-radius:0}
+#side .sres a.sel,#side .sres a:hover{background:var(--accent-soft)}
+#side .sres a .sn{font-family:var(--mono);font-size:.76rem;color:var(--muted);margin-right:6px}
+#side .sres a small{display:block;color:var(--muted);font-size:.76rem;margin-top:1px;overflow-wrap:anywhere}
+#side .sres .none{padding:10px;color:var(--muted);font-size:.85rem}
+#side .sres .more{padding:4px 10px 8px;color:var(--muted);font-size:.76rem}
+.hit{animation:hit 2.4s ease-out}@keyframes hit{0%{outline:3px solid var(--term);outline-offset:3px}100%{outline:3px solid transparent;outline-offset:3px}}
+
+.nav .btn{text-decoration:none}
+.prog{padding:6px 10px 0;font-size:.8rem;color:var(--muted)}
+.scrim{display:none}
+.dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--muted);flex:none;transform:translateY(1px)}
+.dot.done{background:var(--ok);border-color:var(--ok)} .dot.now{border-color:var(--accent);background:var(--accent-soft)}
+.brand{display:flex;align-items:baseline;gap:10px;font-weight:600;padding:0 10px;font-size:1.05rem}
+.brand small{color:var(--muted);font-weight:400}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 8px 0}
+.bar i{display:block;height:100%;background:var(--ok)}
+main{padding:24px clamp(20px,4vw,56px) 80px;min-width:0;max-width:1060px;width:100%}
+.menu{display:none}
+.kicker{font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.04em}
+.pill{display:inline-block;font-size:.74rem;padding:1px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-left:8px;vertical-align:middle}
+.pill.done{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.now{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.chip{font-size:.78rem;font-family:var(--mono);padding:2px 8px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+.card.model{border-left:4px solid var(--accent)}
+.card h3:first-child{margin-top:0}
+.callout{background:var(--warn-soft);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:.95rem}
+.callout.ok{background:var(--ok-soft)}
+.tbl{border-collapse:collapse;width:100%;font-size:.93rem}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.tbl th{background:var(--code);font-weight:600}
+.scroll{overflow-x:auto;max-width:100%}
+.g{font-family:var(--mono);font-size:.95rem;white-space:pre-wrap}
+.gbox{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;white-space:pre;overflow-x:auto;margin:10px 0}
+ol.practice{padding-left:0;list-style:none;counter-reset:q;display:grid;gap:12px}
+ol.practice>li{counter-increment:q;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+ol.practice>li::before{content:"Q" counter(q);font-family:var(--mono);font-weight:600;color:var(--accent);margin-right:8px}
+.src{font-family:var(--mono);font-size:.74rem;background:var(--code);padding:1px 7px;border-radius:4px;color:var(--muted);margin-right:6px}
+details.ans{margin-top:8px} details.ans summary{cursor:pointer;color:var(--accent);font-size:.9rem;font-weight:500}
+details.ans>div{margin-top:8px;padding:10px 14px;background:var(--ok-soft);border-radius:8px;font-size:.95rem}
+button,.btn{font:inherit;font-size:.9rem;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:7px}
+button:hover{border-color:var(--accent)} button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=number]{font:inherit;font-family:var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:5px 9px;max-width:100%}
+.w{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.w .cap{font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.form{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0;font-family:var(--mono);font-size:1.1rem}
+.tok{padding:2px 8px;border-radius:6px;border:1px solid var(--line);min-width:1.9rem;text-align:center}
+.tok.var{background:var(--var-bg);color:var(--var);border-color:transparent;font-weight:600}
+.tok.term{background:var(--term-bg);color:var(--term);font-weight:600;border-color:transparent}
+button.tok.var{cursor:pointer;font:inherit;font-family:var(--mono);font-size:1.1rem;font-weight:600}
+.tok.var.sel{outline:2px solid var(--var);outline-offset:1px}
+.tok.dis{opacity:.4;cursor:default}
+.log{font-family:var(--mono);font-size:.88rem;color:var(--muted);margin:8px 0}
+.log b{color:var(--ink);font-weight:500}
+.split{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.split>*{min-width:0}
+.msg{margin-top:8px;font-size:.93rem}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--warn)}
+svg text{font-family:var(--mono)}
+.tn-v{fill:var(--var-bg);stroke:var(--var);stroke-width:1.5}
+.tn-v.pend{stroke-dasharray:3 3;fill:var(--surface)}
+.tn-t{fill:var(--term);font-weight:600;font-size:14px}
+.tn-vt{fill:var(--var);font-weight:600;font-size:14px}
+.tn-e{fill:var(--muted);font-style:italic;font-size:14px}
+.tn-l{stroke:var(--muted);stroke-width:1.3;fill:none}
+.fa-c{fill:var(--surface);stroke:var(--ink);stroke-width:1.6}
+.fa-c.cur{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.4}
+.fa-e{stroke:var(--ink);stroke-width:1.5;fill:none}
+.fa-a{fill:var(--ink)}
+.fa-t{fill:var(--ink);font-size:14px}
+.fa-l{fill:var(--accent);font-size:14px;font-weight:600}
+.ring{fill:var(--surface);stroke:var(--ink);stroke-width:1.4}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:38px;flex-wrap:wrap}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.big{font-size:2.6rem;font-weight:600;line-height:1;font-family:var(--mono)}
+@media (max-width:820px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:0}
+  #side{position:fixed;inset:0 auto 0 0;width:min(86vw,300px);z-index:30;box-shadow:0 0 24px rgba(0,0,0,.25);transform:translateX(-105%);transition:transform .2s;padding:18px 14px 30px max(16px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);height:100%}
+  body.open #side{transform:none}
+  body.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+  main{padding:56px 16px 80px}
+  .menu{display:inline-block}
+}
+@media (prefers-reduced-motion:reduce){#side{transition:none}}
+.dot.ready{border-color:var(--accent)}
+.pill.ready{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.tbl.c td,.tbl.c th{text-align:center}
+.tbl .hl{background:var(--accent-soft)}
+.tbl td.ok{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.tbl td.x{background:var(--warn-soft);color:var(--warn);font-weight:600}
+.tt td:first-child,.tt th:first-child{font-family:var(--mono);font-weight:600;text-align:left;white-space:nowrap}
+.tt td{font-family:var(--mono)}
+.mx{border-collapse:collapse;font-family:var(--mono);font-size:.9rem}
+.mx td,.mx th{border:1px solid var(--line);padding:4px 9px;text-align:center;min-width:2.4rem}
+.mx th{background:var(--code);font-weight:600}
+.mx td.mark{background:var(--warn-soft);color:var(--warn);font-weight:600}
+.mx td.same{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.mx td.blank{background:transparent;border-color:transparent}
+.steps{counter-reset:s;padding-left:0;list-style:none;display:grid;gap:10px;margin:10px 0}
+.steps>li{counter-increment:s;padding-left:36px;position:relative}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:.8rem;font-weight:600}
+.stack{display:flex;flex-direction:column-reverse;gap:2px;min-height:34px;border:2px solid var(--ink);border-top:none;padding:4px;width:70px;border-radius:0 0 8px 8px}
+.stack b{display:block;text-align:center;background:var(--accent-soft);color:var(--accent);font-family:var(--mono);padding:1px 4px;border-radius:3px}
+.tape{display:flex;overflow-x:auto;padding:4px 2px 8px}
+.tape span{min-width:36px;height:38px;border:1px solid var(--ink);display:grid;place-items:center;font-family:var(--mono);font-size:1.05rem;margin-left:-1px;background:var(--surface)}
+.tape span.hd{background:var(--accent-soft);outline:2px solid var(--accent);z-index:1}
+.fa-e.hot{stroke:var(--accent);stroke-width:2.6}
+.fa-l{font-size:13px}
+.idl{font-family:var(--mono);font-size:.92rem;line-height:1.9}
+.idl .cur{background:var(--accent-soft);padding:1px 6px;border-radius:5px;font-weight:600}
+.okc{color:var(--ok)} .badc{color:var(--warn)}
+table.cyk{border-collapse:separate;border-spacing:3px;font-family:var(--mono);font-size:.92rem;margin:6px 0}
+table.cyk th.lab{font-weight:600;color:var(--muted);padding:0 8px;text-align:right}
+table.cyk td.cc{border:1.5px solid var(--ink);border-radius:6px;text-align:center;padding:4px 8px;min-width:78px;background:var(--surface);vertical-align:top}
+table.cyk td.cc .cs{font-weight:600;color:var(--accent)} table.cyk td.cc .cl{font-size:.72rem;color:var(--muted);margin-top:2px}
+table.cyk td.cc.top{background:var(--ok-soft);border-color:var(--ok)}
+table.cyk td.base{text-align:center;font-weight:600;color:var(--term);font-size:1.05rem;padding-top:4px}
+table.cyk td.pad{padding:0}
+.paper{border:1.5px solid var(--line);border-radius:8px;padding:6px 16px;background:var(--surface);margin:8px 0}.paper p{margin:9px 0;line-height:1.6}.paper .box{display:inline-block;border:1.5px solid var(--ink);border-radius:3px;padding:1px 9px;margin:2px 0}.paper .pn{color:var(--muted);font-size:.88rem}
+.qimg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px}
+.pyq{border-left:3px solid var(--term);background:var(--warn-soft);border-radius:6px;padding:8px 12px;margin:6px 0 10px;font-size:.95rem;white-space:pre-line}
+.steps>li,.practice>li{min-width:0;overflow-wrap:anywhere}
+.steps>li .scroll,.card .scroll{max-width:100%}
+.card,.w,.callout{min-width:0;max-width:100%}
+code{overflow-wrap:anywhere}
+pre.sql{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:.88rem;line-height:1.5;white-space:pre;max-width:100%}
+.mcq.ok{border-color:var(--ok)} .mcq.bad{border-color:var(--warn)} .mcq .row button{text-align:left}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav id="side" aria-label="Chunks"></nav>
+  <main id="main"></main>
+</div>
+<div class="scrim" onclick="document.body.classList.remove('open')"></div>
+
+<script>
+
+/* ---------- helpers ---------- */
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+var NS='http://www.w3.org/2000/svg';
+
+/* ===== the questions exactly as set (verbatim from the Classroom question banks, assignments and revision sheets) =====
+   key = the source tag used in the model titles.  Generated from the Classroom files; edit wording only against the original. */
+var PYQ=[
+["IA2QB M1 A1", "Define a database.", "Module 1 · Section A"],
+["IA2QB M1 A2", "What is a DBMS?", "Module 1 · Section A"],
+["IA2QB M1 A3", "List the three views/levels of data in a database system.", "Module 1 · Section A"],
+["IA2QB M1 A4", "What is data abstraction?", "Module 1 · Section A"],
+["IA2QB M1 A5", "Define a data model.", "Module 1 · Section A"],
+["IA2QB M1 A6", "Name any two types of data models.", "Module 1 · Section A"],
+["IA2QB M1 A7", "What is the physical level in database architecture?", "Module 1 · Section A"],
+["IA2QB M1 A8", "What is the logical level of data abstraction?", "Module 1 · Section A"],
+["IA2QB M1 A9", "What is the view level in DBMS?", "Module 1 · Section A"],
+["IA2QB M1 A10", "Define schema.", "Module 1 · Section A"],
+["IA2QB M1 A11", "What is an instance of a database?", "Module 1 · Section A"],
+["IA2QB M1 A12", "What is a relational database?", "Module 1 · Section A"],
+["IA2QB M1 A13", "Define a relation in the relational model.", "Module 1 · Section A"],
+["IA2QB M1 A14", "What is a tuple?", "Module 1 · Section A"],
+["IA2QB M1 A15", "What is an attribute domain?", "Module 1 · Section A"],
+["IA2QB M1 A16", "Define primary key.", "Module 1 · Section A"],
+["IA2QB M1 A17", "What is a candidate key?", "Module 1 · Section A"],
+["IA2QB M1 A18", "What is a foreign key?", "Module 1 · Section A"],
+["IA2QB M1 A19", "Name any two operators of relational algebra.", "Module 1 · Section A"],
+["IA2QB M1 A20", "What is a super key?", "Module 1 · Section A"],
+["IA2QB M1 B1", "Differentiate between DDL and DML.", "Module 1 · Section B"],
+["IA2QB M1 B2", "Explain the three levels of database architecture briefly.", "Module 1 · Section B"],
+["IA2QB M1 B3", "What is data independence? Name its types.", "Module 1 · Section B"],
+["IA2QB M1 B4", "Distinguish between physical and logical data independence.", "Module 1 · Section B"],
+["IA2QB M1 B5", "Define database design and explain its importance.", "Module 1 · Section B"],
+["IA2QB M1 B6", "What are the components of the relational model?", "Module 1 · Section B"],
+["IA2QB M1 B7", "Explain the concept of a super key with an example.", "Module 1 · Section B"],
+["IA2QB M1 B8", "Differentiate between candidate key and primary key.", "Module 1 · Section B"],
+["IA2QB M1 B9", "What is a foreign key? Give an example using two tables.", "Module 1 · Section B"],
+["IA2QB M1 B10", "Explain the SELECT (σ) operation of relational algebra with syntax.", "Module 1 · Section B"],
+["IA2QB M1 B11", "Explain the PROJECT (π) operation of relational algebra with an example.", "Module 1 · Section B"],
+["IA2QB M1 B12", "Write a relational algebra expression to find employees with salary > 50000 from EMPLOYEE(EmpID, Name, Salary).", "Module 1 · Section B"],
+["IA2QB M1 B13", "Explain the UNION operation in relational algebra and the conditions required for it.", "Module 1 · Section B"],
+["IA2QB M1 B14", "What is the SET DIFFERENCE operation? Give an example.", "Module 1 · Section B"],
+["IA2QB M1 B15", "Explain the Cartesian product operation with an example.", "Module 1 · Section B"],
+["IA2QB M1 B16", "What is a JOIN operation in relational algebra?", "Module 1 · Section B"],
+["IA2QB M1 B17", "Differentiate between theta join and equi join.", "Module 1 · Section B"],
+["IA2QB M1 B18", "What is a natural join? Give an example.", "Module 1 · Section B"],
+["IA2QB M1 B19", "Explain the DIVISION operation in relational algebra with a use case.", "Module 1 · Section B"],
+["IA2QB M1 B20", "Write a relational algebra query to find names of students who scored above 90 from STUDENT(RollNo, Name, Marks).", "Module 1 · Section B"],
+["IA2QB M1 C1", "Explain the three-schema architecture of DBMS with a neat diagram.", "Module 1 · Section C"],
+["IA2QB M1 C2", "Discuss the different data models used in database systems with examples.", "Module 1 · Section C"],
+["IA2QB M1 C3", "Explain the purpose of a database system and discuss the disadvantages of file-processing systems.", "Module 1 · Section C"],
+["IA2QB M1 C4", "Describe the structure of a relational database with a suitable example table.", "Module 1 · Section C"],
+["IA2QB M1 C5", "Explain the different types of keys in the relational model (primary, candidate, foreign, super, composite) with suitable examples.", "Module 1 · Section C"],
+["IA2QB M1 C6", "Given relations STUDENT(RollNo, Name, DeptID) and DEPT(DeptID, DeptName), write and explain relational algebra expressions for: (a) students in the \"CSE\" department, (b) names of all students, (c) student and department details combined using a join.", "Module 1 · Section C"],
+["IA2QB M1 C7", "Explain the fundamental operations of relational algebra with syntax and an example for each: Select, Project, Union, Set Difference, Cartesian Product.", "Module 1 · Section C"],
+["IA2QB M1 C8", "Explain additional relational algebra operations — Intersection, Assignment, and Rename — with suitable examples.", "Module 1 · Section C"],
+["IA2QB M1 C9", "Design a relational schema for a \"Library Management System\" identifying entities, attributes, and keys, and explain how relational model concepts apply to it.", "Module 1 · Section C"],
+["IA2QB M1 C10", "Explain database system architecture (centralized, client-server, distributed) and discuss the role of a Database Administrator (DBA).", "Module 1 · Section C"],
+["IA2QB M2 A1", "What is SQL? Expand the term.", "Module 2 · Section A"],
+["IA2QB M2 A2", "Expand DDL.", "Module 2 · Section A"],
+["IA2QB M2 A3", "Expand DML.", "Module 2 · Section A"],
+["IA2QB M2 A4", "Name any two DDL commands.", "Module 2 · Section A"],
+["IA2QB M2 A5", "Name any two DML commands.", "Module 2 · Section A"],
+["IA2QB M2 A6", "What is the use of the WHERE clause?", "Module 2 · Section A"],
+["IA2QB M2 A7", "What is a NULL value in SQL?", "Module 2 · Section A"],
+["IA2QB M2 A8", "Name any two aggregate functions in SQL.", "Module 2 · Section A"],
+["IA2QB M2 A9", "What is the purpose of the GROUP BY clause?", "Module 2 · Section A"],
+["IA2QB M2 A10", "What is the HAVING clause used for?", "Module 2 · Section A"],
+["IA2QB M2 A11", "What is a nested query?", "Module 2 · Section A"],
+["IA2QB M2 A12", "Define a view in SQL.", "Module 2 · Section A"],
+["IA2QB M2 A13", "What is a transaction in a DBMS?", "Module 2 · Section A"],
+["IA2QB M2 A14", "What is meant by an integrity constraint?", "Module 2 · Section A"],
+["IA2QB M2 A15", "What is a foreign key constraint used for?", "Module 2 · Section A"],
+["IA2QB M2 A16", "What is embedded SQL?", "Module 2 · Section A"],
+["IA2QB M2 A17", "What is dynamic SQL?", "Module 2 · Section A"],
+["IA2QB M2 A18", "Define a trigger in SQL.", "Module 2 · Section A"],
+["IA2QB M2 A19", "What is a stored procedure?", "Module 2 · Section A"],
+["IA2QB M2 A20", "What is the purpose of the GRANT command?", "Module 2 · Section A"],
+["IA2QB M2 B1", "Write the basic syntax structure of an SQL SELECT query.", "Module 2 · Section B"],
+["IA2QB M2 B2", "Write an SQL query to create a table STUDENT(RollNo int, Name varchar(20), Marks int).", "Module 2 · Section B"],
+["IA2QB M2 B3", "Write an SQL query to insert a record into the STUDENT table.", "Module 2 · Section B"],
+["IA2QB M2 B4", "Write an SQL query to display all students with Marks greater than 75.", "Module 2 · Section B"],
+["IA2QB M2 B5", "Differentiate between the WHERE clause and the HAVING clause.", "Module 2 · Section B"],
+["IA2QB M2 B6", "Write an SQL query using UNION to combine results of two tables with identical structure.", "Module 2 · Section B"],
+["IA2QB M2 B7", "Explain NULL values and how they are handled in SQL, with an example.", "Module 2 · Section B"],
+["IA2QB M2 B8", "Write an SQL query to find the average marks of students using an aggregate function.", "Module 2 · Section B"],
+["IA2QB M2 B9", "Explain nested queries with a simple example.", "Module 2 · Section B"],
+["IA2QB M2 B10", "Write an SQL query to update the marks of a student with RollNo = 5.", "Module 2 · Section B"],
+["IA2QB M2 B11", "Write an SQL query to delete a student record with RollNo = 10.", "Module 2 · Section B"],
+["IA2QB M2 B12", "Explain the difference between INNER JOIN and OUTER JOIN.", "Module 2 · Section B"],
+["IA2QB M2 B13", "Write an SQL query to create a view showing student names with Marks > 80.", "Module 2 · Section B"],
+["IA2QB M2 B14", "Explain integrity constraints in SQL with a suitable example.", "Module 2 · Section B"],
+["IA2QB M2 B15", "What is authorization in SQL? Name two types of privileges.", "Module 2 · Section B"],
+["IA2QB M2 B16", "Explain the difference between the DELETE and DROP commands.", "Module 2 · Section B"],
+["IA2QB M2 B17", "Write an SQL query using GROUP BY and COUNT to count students per department.", "Module 2 · Section B"],
+["IA2QB M2 B18", "What is embedded SQL? Give a brief example scenario.", "Module 2 · Section B"],
+["IA2QB M2 B19", "Explain a trigger with a simple example (syntax outline only).", "Module 2 · Section B"],
+["IA2QB M2 B20", "Write an SQL query to create a stored procedure that returns student details for a given RollNo.", "Module 2 · Section B"],
+["IA2QB M2 C1", "Explain the basic structure of SQL queries (SELECT–FROM–WHERE) with suitable examples covering all clauses (ORDER BY, DISTINCT, etc.).", "Module 2 · Section C"],
+["IA2QB M2 C2", "Given tables EMPLOYEE(EmpID, Name, DeptID, Salary) and DEPARTMENT(DeptID, DeptName), write SQL queries for: (a) employees with salary > 50000, (b) employee names with department name using a join, (c) total salary department-wise using GROUP BY, (d) employees earning more than the average salary using a nested query.", "Module 2 · Section C"],
+["IA2QB M2 C3", "Explain the set operations in SQL — UNION, INTERSECT, and EXCEPT — with syntax and examples.", "Module 2 · Section C"],
+["IA2QB M2 C4", "Explain the various aggregate functions in SQL (COUNT, SUM, AVG, MAX, MIN) with an example query for each.", "Module 2 · Section C"],
+["IA2QB M2 C5", "Discuss views in SQL — creation, updating, and dropping a view — with advantages and suitable examples.", "Module 2 · Section C"],
+["IA2QB M2 C6", "Explain the concept of transactions in SQL, including COMMIT, ROLLBACK, and the ACID properties.", "Module 2 · Section C"],
+["IA2QB M2 C7", "Explain the various types of integrity constraints in SQL (Primary Key, Foreign Key, Unique, Check, Not Null) with example CREATE TABLE statements.", "Module 2 · Section C"],
+["IA2QB M2 C8", "Explain embedded SQL and dynamic SQL, their differences, and typical use cases.", "Module 2 · Section C"],
+["IA2QB M2 C9", "Explain triggers in SQL with syntax, types (BEFORE/AFTER, ROW/STATEMENT level), and a suitable example.", "Module 2 · Section C"],
+["IA2QB M2 C10", "Explain authorization and privileges in SQL — the GRANT and REVOKE commands — with suitable examples.", "Module 2 · Section C"],
+["IA2QB M3 A1", "What is an entity?", "Module 3 · Section A"],
+["IA2QB M3 A2", "What is an entity set?", "Module 3 · Section A"],
+["IA2QB M3 A3", "Define attribute in the ER model.", "Module 3 · Section A"],
+["IA2QB M3 A4", "What is a relationship in the ER model?", "Module 3 · Section A"],
+["IA2QB M3 A5", "Name the types of attributes in the ER model.", "Module 3 · Section A"],
+["IA2QB M3 A6", "What is a weak entity?", "Module 3 · Section A"],
+["IA2QB M3 A7", "What is a strong entity?", "Module 3 · Section A"],
+["IA2QB M3 A8", "Define cardinality ratio.", "Module 3 · Section A"],
+["IA2QB M3 A9", "Name the types of cardinality ratios.", "Module 3 · Section A"],
+["IA2QB M3 A10", "What is a participation constraint?", "Module 3 · Section A"],
+["IA2QB M3 A11", "What is meant by redundancy in ER modelling?", "Module 3 · Section A"],
+["IA2QB M3 A12", "What is a functional dependency?", "Module 3 · Section A"],
+["IA2QB M3 A13", "Name Armstrong's Axioms.", "Module 3 · Section A"],
+["IA2QB M3 A14", "Define normalization.", "Module 3 · Section A"],
+["IA2QB M3 A15", "What is 1NF?", "Module 3 · Section A"],
+["IA2QB M3 A16", "What is 2NF?", "Module 3 · Section A"],
+["IA2QB M3 A17", "What is 3NF?", "Module 3 · Section A"],
+["IA2QB M3 A18", "What is BCNF?", "Module 3 · Section A"],
+["IA2QB M3 A19", "Define multivalued dependency.", "Module 3 · Section A"],
+["IA2QB M3 A20", "What is 4NF?", "Module 3 · Section A"],
+["IA2QB M3 B1", "Differentiate between an entity and an entity set.", "Module 3 · Section B"],
+["IA2QB M3 B2", "Explain simple and composite attributes with an example.", "Module 3 · Section B"],
+["IA2QB M3 B3", "Explain single-valued and multi-valued attributes with an example.", "Module 3 · Section B"],
+["IA2QB M3 B4", "What is a derived attribute? Give an example.", "Module 3 · Section B"],
+["IA2QB M3 B5", "Differentiate between a strong entity and a weak entity with an example.", "Module 3 · Section B"],
+["IA2QB M3 B6", "Explain the concept of a discriminator (partial key) in a weak entity.", "Module 3 · Section B"],
+["IA2QB M3 B7", "Explain one-to-many cardinality with an example.", "Module 3 · Section B"],
+["IA2QB M3 B8", "Explain many-to-many cardinality with an example.", "Module 3 · Section B"],
+["IA2QB M3 B9", "What is total participation and partial participation? Give examples of each.", "Module 3 · Section B"],
+["IA2QB M3 B10", "Explain generalization and specialization with an example.", "Module 3 · Section B"],
+["IA2QB M3 B11", "Explain aggregation in the ER model with an example.", "Module 3 · Section B"],
+["IA2QB M3 B12", "Explain the rule for converting a strong entity set into a relational table.", "Module 3 · Section B"],
+["IA2QB M3 B13", "Explain the rule for converting a weak entity set into a relational table.", "Module 3 · Section B"],
+["IA2QB M3 B14", "Explain how a 1:1 relationship is mapped into relational tables.", "Module 3 · Section B"],
+["IA2QB M3 B15", "Explain how a many-to-many (M:N) relationship is converted into a relational table.", "Module 3 · Section B"],
+["IA2QB M3 B16", "Explain functional dependency with an example: StudentID → Name.", "Module 3 · Section B"],
+["IA2QB M3 B17", "State Armstrong's Axioms (Reflexivity, Augmentation, Transitivity) briefly.", "Module 3 · Section B"],
+["IA2QB M3 B18", "What is the role of a candidate key in normalization?", "Module 3 · Section B"],
+["IA2QB M3 B19", "Differentiate between partial and full functional dependency.", "Module 3 · Section B"],
+["IA2QB M3 B20", "Explain lossless join decomposition and why it is important.", "Module 3 · Section B"],
+["IA2QB M3 C1", "Draw an ER diagram for a \"College Management System\" with entities STUDENT, COURSE, and DEPARTMENT, appropriate relationships, cardinalities and participation constraints, and convert the ER diagram into a relational schema (tables with primary/foreign keys).", "Module 3 · Section C"],
+["IA2QB M3 C2", "Explain the rules for converting an ER diagram to relational tables, covering strong entities, weak entities, 1:1, 1:N, and M:N relationships, with suitable examples.", "Module 3 · Section C"],
+["IA2QB M3 C3", "Explain the Extended ER features — Generalization, Specialization, and Aggregation — with suitable diagrams and examples.", "Module 3 · Section C"],
+["IA2QB M3 C4", "Explain functional dependency theory including Armstrong's Axioms and their use in computing the closure of a set of attributes, with an example.", "Module 3 · Section C"],
+["IA2QB M3 C5", "Explain the process of normalization up to BCNF with a suitable un-normalized relation as an example, showing the schema at each normal form.", "Module 3 · Section C"],
+["IA2QB M3 C6", "What is a multivalued dependency? Explain Fourth Normal Form (4NF) with a suitable example relation.", "Module 3 · Section C"],
+["IA2QB M3 C7", "Explain join dependency and Fifth Normal Form (5NF) with an example.", "Module 3 · Section C"],
+["IA2QB M3 C8", "Explain the concept of dependency preservation in normalization, illustrating with an example a decomposition that is and one that is not dependency-preserving.", "Module 3 · Section C"],
+["IA2QB M3 C9", "Design an ER diagram for an \"Online Banking System\" with entities such as CUSTOMER, ACCOUNT, BRANCH, and TRANSACTION, showing relationships and constraints, and convert it into a normalized relational schema.", "Module 3 · Section C"],
+["IA2QB M3 C10", "Explain the removal of redundant attributes in entity sets and the reduction of an ER diagram to a relational schema, with an example covering composite and multivalued attributes.", "Module 3 · Section C"],
+["Rev1 Q1", "Write the SQL queries for the following questions.\nDatabase Schema:\nStudents (StudentID (Primary Key), FirstName, LastName, DateOfBirth, Gender, Email, Phone)\nCourses (CourseID (Primary Key), CourseName, Department, Credits)\nEnrollments (EnrollmentID (Primary Key), StudentID (Foreign Key), CourseID (Foreign Key), EnrollmentDate, Grade)\nTeachers (TeacherID (Primary Key), FirstName, LastName, Email, Department)\nQuestions:\ni. Retrieve the list of all students in the database.\nii. Find the student who has the highest StudentID.\niii. List all the students who have enrolled in at least one course.\niv. Calculate the total number of courses enrolled by each student.\nv. Find the student who has scored the highest grade.", "End-sem revision 1"],
+["Rev1 Q2", "Explain how BEFORE triggers and AFTER triggers differ in SQL. Describe their roles in handling data changes and how they influence transaction execution.", "End-sem revision 1"],
+["Rev1 Q3", "Construct a B+ Tree of order 4 using the following sequence of data:\n(15, 8, 3, 18, 6, 21, 10, 4, 16, 25, 7, 12, 20, 5)\nAnswer the following:\ni. Illustrate the step-by-step construction of the B+ Tree by inserting the given keys in the specified order.\nii. Draw the B+ Tree obtained after inserting a new key 13 into the constructed tree.\niii. Draw the B+ Tree obtained after deleting the key 18 from the original tree.", "End-sem revision 1"],
+["Rev1 Q4", "Write the relational algebra expressions for the following:\nDatabase Schema:\nPatient (patient_id, patient_name, patient_email, patient_birthdate, patient_gender)\nDoctor (doctor_id, doctor_name, doctor_specialization, doctor_email, department_id)\nAppointment (appointment_id, patient_id, doctor_id, appointment_date, appointment_time, diagnosis)\nDepartment (department_id, department_name, department_location)\nQuestions:\ni. Retrieve the names and IDs of all patients registered in the hospital.\nii. Find the total number of patients who have appointments with doctors in the \"Cardiology\" department.\niii. List all doctors along with their respective specializations.\niv. Find the doctor who has the highest number of appointments.\nv. List all patients who have appointments with doctors in the \"Neurology\" department and display their appointment dates.\nvi. Retrieve the date of birth of a specific patient whose patient_id = 123.", "End-sem revision 1"],
+["Rev1 Q5", "Explain the basic operations of Relational Algebra with suitable examples and demonstrate how each operation is performed.\nProjection (π) | Union (∪) | Rename (ρ) | Selection (σ) | Set Difference (−) | Cartesian Product (×)", "End-sem revision 1"],
+["Rev1 Q6", "Explain functional dependency and transitive dependency in DBMS with suitable examples. Illustrate how these dependencies influence the process of database normalization.", "End-sem revision 1"],
+["Rev1 Q7", "An airline reservation system stores details of passengers, flights, bookings, payments, airports, and aircraft. Passengers can make multiple bookings, and each flight has departure, arrival, timing, and seating details.\nDraw an Entity-Relationship (ER) diagram for the airline reservation system, including all the above entities and their relationships.\nRepresent the attributes, primary keys, foreign keys, cardinality ratios, and participation constraints. Briefly explain each entity and relationship.", "End-sem revision 1"],
+["Rev1 Q8", "Consider the following database table:\nCustomer (Customer_ID (Primary Key), Customer_Name, Age, City, Membership_Type, Total_Purchase)\nWrite SQL queries for the following requirements using subqueries and nested queries.\n1. Retrieve the names of customers whose total purchases are higher than the average purchase amount of all customers.\n2. Display the cities that have more than two registered customers.\n3. Find the names of customers living in cities where the average purchase amount is higher than the average purchase amount in 'Chennai'.\n4. Retrieve the names of customers whose total purchases exceed the average purchase amount of customers with 'Gold' membership.\n5. List the names of customers belonging to membership types where more than one customer has made purchases above ₹60,000.\n6. Identify the cities where the average customer purchase amount is greater than the overall average purchase amount and the number of customers is more than three.", "End-sem revision 1"],
+["Rev1 Q9", "Explain the different types of keys used in relational database management systems. Describe their purpose and illustrate each type with suitable examples.", "End-sem revision 1"],
+["Rev1 Q10", "Explain the benefits and limitations of using B+ Trees as an indexing structure in database management systems. Discuss their efficiency in data retrieval, insertion, deletion, and storage management.", "End-sem revision 1"],
+["Rev1 Q11", "Consider the following database table:\nProject (Project_ID (Primary Key), Project_Name, Project_Manager, Department, Budget, Duration, Status)\nWrite SQL queries for the following requirements using subqueries and nested queries.\n1. Retrieve the names of projects whose budget is greater than the average budget of all projects.\n2. Display the departments managing more than two projects.\n3. Find the names of projects managed by departments whose average project budget is higher than the average budget of the 'Development' department.\n4. Retrieve the names of projects whose duration exceeds the average duration of projects managed by 'John'.\n5. List the names of project managers who manage more than one project with a budget exceeding ₹5,00,000.\n6. Identify the departments where the average project budget is greater than the overall average budget and the number of projects is more than three.", "End-sem revision 1"],
+["Rev1 Q12", "Explain the three major types of concurrency anomalies that may occur when multiple database transactions execute simultaneously. Discuss each anomaly in detail with appropriate examples.", "End-sem revision 1"],
+["Rev1 Q13", "Explain the architectural components of a database system, including storage, query processing, and transaction management.", "End-sem revision 1"],
+["Rev1 Q14", "Analyze the different database normalization levels (1NF, 2NF, 3NF, and BCNF) with suitable examples. Assess their benefits and limitations.", "End-sem revision 1"],
+["Rev1 Q15", "Describe the different types of functional dependencies in DBMS with suitable examples. Explain how they help in identifying relationships between attributes and improving database design.", "End-sem revision 1"],
+["Self Q1", "Consider the following schemas for a hospital management system:\na) Patients (Patient_ID (PK), Name, Age, Gender)\nb) Doctors (Doctor_ID (PK), Name, Specialization)\nc) Appointments (Appointment_ID (PK), Patient_ID (FK), Doctor_ID (FK), Appointment_Date, Consultation_Fee)\nFormulate SQL queries to accomplish the following:\nRetrieve patient names with their corresponding doctors and appointment dates.\nCompute the total consultation fees incurred by a specified patient.\nIdentify the doctor(s) charging the highest consultation fee.\nRetrieve patients who have never booked an appointment.\nDetermine the number of appointments handled by doctors in a specified specialization.\nCalculate the average consultation fee incurred by each patient.", "End-sem revision 2 (self-assessment)"],
+["Self Q2", "Consider the following schemas for a university examination system:\na) Students (Student_ID (PK), Name, Department)\nb) Courses (Course_ID (PK), Course_Name, Credits)\nc) Enrollments (Enrollment_ID (PK), Student_ID (FK), Course_ID (FK), Semester, Marks)\nFormulate SQL queries to accomplish the following:\nRetrieve student names with their enrolled courses and corresponding marks.\nCompute the total credits registered by a specified student.\nIdentify the course(s) with the highest marks.\nRetrieve students who have not enrolled in any course.\nDetermine the number of students enrolled in a specified department.\nCalculate the average marks obtained by students in each course.", "End-sem revision 2 (self-assessment)"],
+["Self Q3", "Analyse the architectural differences among Key-Value, Document, Column-Family, and Graph databases, highlighting their distinctive characteristics and data organization strategies.", "End-sem revision 2 (self-assessment)"],
+["Self Q4", "Evaluate the suitability of Key-Value, Document, Column-Family, and Graph databases for implementing a large-scale social networking application, considering their data models and operational characteristics.", "End-sem revision 2 (self-assessment)"],
+["Self Q5", "Identify and differentiate the three levels of data abstraction in DBMS, illustrating their implementation through an appropriate hospital management database.", "End-sem revision 2 (self-assessment)"],
+["Self Q6", "Examine the three-schema architecture of DBMS and demonstrate how each abstraction level represents data in an airline reservation management system.", "End-sem revision 2 (self-assessment)"],
+["Self Q7", "Develop a normalized database schema and evaluate its compliance with 1NF, 2NF, 3NF, and BCNF for the following scenario.\nYou're designing a database for an e-commerce inventory management system. It must maintain product, supplier, warehouse, and purchase information. Each product has a unique product ID, name, category, and price. Each supplier has a unique supplier ID, name, and contact details. Each warehouse has a unique warehouse ID, location, and capacity. Suppliers can supply multiple products, and warehouses can maintain multiple products.", "End-sem revision 2 (self-assessment)"],
+["Self Q8", "Construct a relational database schema and assess its normalization from 1NF through BCNF for the following scenario.\nA hotel reservation system maintains information about hotels, rooms, guests, and bookings. Each hotel has a unique hotel ID, name, and location. Each room has a unique room ID, type, and tariff. Each guest has a unique guest ID, name, and contact details. Guests can make multiple bookings, and each booking may include multiple rooms.", "End-sem revision 2 (self-assessment)"],
+["Self Q9", "Analyse the phases of Optimistic Concurrency Control and evaluate how transaction validation ensures database consistency in multi-user environments.", "End-sem revision 2 (self-assessment)"],
+["Self Q10", "Examine the implementation of Timestamp Ordering Protocol and analyse how transaction conflicts are detected and resolved while maintaining database consistency.", "End-sem revision 2 (self-assessment)"],
+["Self Q11", "i. Construct a comprehensive ER model representing the entities, attributes, and relationships in the following scenario. Identify the applicable ER notations.\nii. Transform the developed ER model into an equivalent relational database schema.\nA railway reservation system enables passengers to book tickets, make payments, cancel reservations, and manage their profiles. The relationships represent passengers, trains, bookings, payments, and cancellations, supporting efficient reservation management.", "End-sem revision 2 (self-assessment)"],
+["Self Q12", "i. Develop an ER diagram identifying all entities, attributes, cardinalities, and participation constraints in the following scenario. Specify the relevant ER notations.\nii. Map the resulting ER model into an appropriate relational database schema.\nAn online food delivery system allows customers to place orders, make payments, track deliveries, and provide restaurant reviews. The model must capture customers, restaurants, food items, orders, delivery personnel, and payments.", "End-sem revision 2 (self-assessment)"],
+["Self Q13", "Evaluate the capabilities, architectural features, and application suitability of:\ni. Distributed databases\nii. Spatial databases", "End-sem revision 2 (self-assessment)"],
+["Rem Q1", "List the applications of Database Management Systems (DBMS).", "Remedial assignment (IA2 QP)"],
+["Rem Q2", "Identify the different types of Set Operators in SQL.", "Remedial assignment (IA2 QP)"],
+["Rem Q3", "List the basic constraints that can be specified when a database table is created.", "Remedial assignment (IA2 QP)"],
+["Rem Q4", "List any four Integrity Constraints.", "Remedial assignment (IA2 QP)"],
+["Rem Q5", "List various users of DBMS and specify the roles.", "Remedial assignment (IA2 QP)"],
+["Rem Q6", "Differentiate between drop and truncate.", "Remedial assignment (IA2 QP)"],
+["Rem Q7", "Write the importance of Database Administrators.", "Remedial assignment (IA2 QP)"],
+["Rem Q8", "State the need for Triggers in SQL.", "Remedial assignment (IA2 QP)"],
+["Rem Q9", "Convert the following relational algebra into SQL query:\nσ dept_name = “Physics” (instructor)\nσ dept_name = “Physics” ∧ salary > 90000 (instructor)\nπ ID, name, salary (instructor)\nπ dept_name (σ salary > 80000 (instructor))\nπ course_id (σ semester = “Fall” ∧ year = 2009 (section)) ∪ π course_id (σ semester = “Spring” ∧ year = 2010 (section))", "Remedial assignment (IA2 QP)"],
+["Rem Q10", "Write a BEFORE INSERT trigger statement for the EMPLOYEE table to prevent the insertion of an employee record with a negative salary.", "Remedial assignment (IA2 QP)"],
+["Rem Q11", "Explain the architecture and working principles of database  management system with a neat sketch.", "Remedial assignment (IA2 QP)"],
+["Rem Q12", "Assume the following tables:\nSTUDENT (Student_ID, Name, Age, City, Dept_ID)\nDEPARTMENT (Dept_ID, Dept_Name, Location)\nWrite the SQL Query for the following:\nWrite an SQL query to display the students whose age is greater than 20.\nWrite an SQL query to display the students who belong to Chennai.\nWrite an SQL query to display the names of students whose age is between 18 and 22.", "Remedial assignment (IA2 QP)"],
+["Rem Q13", "Differentiate trivial and non-trivial functional dependencies.", "Remedial assignment (IA2 QP)"],
+["Rem Q14", "Identify the following ER Notation:", "Remedial assignment (IA2 QP)"],
+["Rem Q15", "Define an entity in the ER model and represent it using the appropriate ER diagram symbol.", "Remedial assignment (IA2 QP)"],
+["Rem Q16", "Define Functional Dependency.", "Remedial assignment (IA2 QP)"],
+["Rem Q17", "List any two primary Armstrong’s axioms with suitable example.", "Remedial assignment (IA2 QP)"],
+["Rem Q18", "Define Normalization.", "Remedial assignment (IA2 QP)"],
+["Rem Q19", "Differentiate strong and weak entity in ER model.", "Remedial assignment (IA2 QP)"],
+["Rem Q20", "Identify the different types of attributes in the following figure.", "Remedial assignment (IA2 QP)"],
+["Rem Q21", "A company wants to maintain an Employee Management System to store details of employees, departments, and projects. Each employee has an Employee ID, name, designation, salary, and contact details. Every employee works in one department, and each department can have many employees. Each department is managed by one employee. The company has several projects, and employees can work on one or more projects. Each project can have many employees. The system also stores the details of employees' dependents. Based on this scenario, sketch an ER diagram showing the entities, attributes, relationships, primary keys, and cardinalities.", "Remedial assignment (IA2 QP)"],
+["Rem Q22", "Examine the given table to determine whether it satisfies the rules of First Normal Form (1NF). If it does not, identify the violations and demonstrate how the table can be decomposed into 1NF. Provide a detailed analysis of the 1NF decomposition process.", "Remedial assignment (IA2 QP)"],
+["Rem Q23", "Convert the given E-R Diagram into tables.", "Remedial assignment (IA2 QP)"],
+["Rem Q24", "Write a PL/SQL block to illustrate functioning of IF_THEN_ELSIF by creating the equivalent of a four-function calculator. The program requires the user to enter two numbers and an operator. It then carries out the specified arithmetical operation: addition, subtraction, multiplication or division of the two numbers. Finally, it displays the result.", "Remedial assignment (IA2 QP)"],
+["ER Q1", "Library Management System:\nConstruct an ER diagram for a library containing Books, Authors, Members, and Librarians. A member can borrow multiple books, and a book can be borrowed by different members over time.", "IA2 revision · ER models"],
+["ER Q2", "Railway Reservation System:\nConstruct an ER diagram for Passengers, Trains, Stations, Tickets, and Routes. A passenger can book multiple tickets, and a train can travel through multiple stations.", "IA2 revision · ER models"],
+["ER Q3", "University Library System with Weak Entity:\nDesign an ER diagram for a library where Books have multiple Copies. Each copy is identified using a copy number along with the Book ID. Include a weak entity and show its identifying relationship.", "IA2 revision · ER models"],
+["ER Q4", "Construct an ER diagram that includes composite, multivalued, derived, and simple attributes for Online Food Delivery System.", "IA2 revision · ER models"],
+["ER Q5", "A company wants to maintain an Employee Management System to store details of employees, departments, and projects. Each employee has an Employee ID, name, designation, salary, and contact details. Every employee works in one department, and each department can have many employees. Each department is managed by one employee. The company has several projects, and employees can work on one or more projects. Each project can have many employees. The system also stores the details of employees' dependents. Based on this scenario, draw an ER diagram showing the entities, attributes, relationships, primary keys, and cardinalities.", "IA2 revision · ER models"],
+["ER Q6", "Design an ER diagram for a university database that includes generalization, specialization, weak entities, multivalued attributes, and M:N relationships.", "IA2 revision · ER models"],
+["ER Q7a", "Convert the following ER model into relational database table:", "IA2 revision · ER models"],
+["ER Q7b", "Convert the following ER model into relational database table:", "IA2 revision · ER models"],
+["ER Q7c", "Convert the following ER model into relational database table:", "IA2 revision · ER models"],
+["SQLA Q1", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the details of all students.", "IA2 revision · SQL queries"],
+["SQLA Q2", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the names and cities of all students.", "IA2 revision · SQL queries"],
+["SQLA Q3", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the students whose age is greater than 20.", "IA2 revision · SQL queries"],
+["SQLA Q4", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the students who belong to Chennai.", "IA2 revision · SQL queries"],
+["SQLA Q5", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the names of students whose age is between 18 and 22.", "IA2 revision · SQL queries"],
+["SQLA Q6", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the names of students who belong to Chennai or Coimbatore.", "IA2 revision · SQL queries"],
+["SQLA Q7", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the details of courses having 4 credits.", "IA2 revision · SQL queries"],
+["SQLA Q8", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the names of faculty members whose salary is greater than ₹50,000.", "IA2 revision · SQL queries"],
+["SQLA Q9", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the names of students whose age is greater than 20 and who live in Chennai.", "IA2 revision · SQL queries"],
+["SQLA Q10", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the names of students whose age is less than 20 or who live in Madurai.", "IA2 revision · SQL queries"],
+["SQLA Q11", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display courses having more than 3 credits and belonging to Department 10.", "IA2 revision · SQL queries"],
+["SQLA Q12", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display students who do not live in Chennai.", "IA2 revision · SQL queries"],
+["SQLA Q13", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the total number of students.", "IA2 revision · SQL queries"],
+["SQLA Q14", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the average age of students.", "IA2 revision · SQL queries"],
+["SQLA Q15", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the maximum salary of faculty members.", "IA2 revision · SQL queries"],
+["SQLA Q16", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the minimum salary of faculty members.", "IA2 revision · SQL queries"],
+["SQLA Q17", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the average marks obtained by students.", "IA2 revision · SQL queries"],
+["SQLA Q18", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the number of students in each department.", "IA2 revision · SQL queries"],
+["SQLA Q19", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the average marks for each course.", "IA2 revision · SQL queries"],
+["SQLA Q20", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display departments having more than 5 students.", "IA2 revision · SQL queries"],
+["SQLA Q21", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the student names along with their department names.", "IA2 revision · SQL queries"],
+["SQLA Q22", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the student names and course names in which they are enrolled.", "IA2 revision · SQL queries"],
+["SQLA Q23", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the faculty names and their department names.", "IA2 revision · SQL queries"],
+["SQLA Q24", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the student names and marks obtained by them.", "IA2 revision · SQL queries"],
+["SQLA Q25", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to display the student name, course name, and marks.", "IA2 revision · SQL queries"],
+["SQLA Q26", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the names of students who scored more than 80 marks.", "IA2 revision · SQL queries"],
+["SQLA Q27", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the names of students who are enrolled in Course_ID 101.", "IA2 revision · SQL queries"],
+["SQLA Q28", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the names of courses in which at least one student scored more than 90 marks.", "IA2 revision · SQL queries"],
+["SQLA Q29", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the students who have not enrolled in any course.", "IA2 revision · SQL queries"],
+["SQLA Q30", "Tables: STUDENT (Student_ID, Name, Age, City, Dept_ID), DEPARTMENT (Dept_ID, Dept_Name, Location), COURSE (Course_ID, Course_Name, Credits, Dept_ID), ENROLLMENT (Student_ID, Course_ID, Marks), FACULTY (Faculty_ID, Faculty_Name, Dept_ID, Salary).\nWrite an SQL query to find the students whose marks are greater than the average marks of all students.", "IA2 revision · SQL queries"],
+["FPT Q1", "Create a table EMPLOYEE with fields Emp_ID, Emp_Name, Department, Salary, and Join_Date. Write SQL queries using single-row functions to display employee names in uppercase and lowercase.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q2", "Write SQL queries using numeric functions to:\nRound the salary to the nearest 100.\nFind the ceiling and floor values of salary.\nCalculate the remainder of salary divided by 1000.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q3", "Create a user-defined function Calculate_Age() that accepts the date of birth and returns the employee/student's age.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q4", "Create a function to calculate the percentage of a student based on marks obtained in five subjects.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q5", "Create a procedure to update the salary of an employee based on Emp_ID.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q6", "Create a procedure to calculate the net salary of an employee using basic salary, HRA, allowances, and deductions.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q7", "Create a stored procedure for an Employee Management System that performs INSERT, UPDATE, and DELETE operations based on a user-specified operation.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q8", "Create a procedure for an Online Shopping System to calculate the total bill based on product price, quantity, discount, and tax.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q9", "Create an EMPLOYEE table and write a BEFORE INSERT trigger to prevent inserting an employee with a negative salary.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q10", "Create an AFTER UPDATE trigger to store the old and new salary whenever an employee's salary is changed.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q11", "Create a trigger to automatically calculate the total marks and percentage whenever student marks are inserted or updated.", "IA2 revision · functions, procedures, triggers"],
+["FPT Q12", "Create a trigger for a Library Management System to calculate the fine automatically when a book is returned after the due date.", "IA2 revision · functions, procedures, triggers"],
+["PLSQL Q1", "Write a PL/SQL program to accept marks obtained by a student in five subjects, calculate the total and average, and display the grade using appropriate conditional statements.", "IA2 revision · PL/SQL"],
+["PLSQL Q2", "Write a PL/SQL program to calculate the gross salary and net salary of an employee based on basic salary, HRA, DA, PF, and other deductions.", "IA2 revision · PL/SQL"],
+["PLSQL Q3", "Write a PL/SQL program to accept a number N and display all prime numbers from 1 to N.", "IA2 revision · PL/SQL"],
+["PLSQL Q4", "Create a STUDENT table containing student ID, name, and marks. Write a PL/SQL program using an explicit cursor to calculate and display the grade of each student.", "IA2 revision · PL/SQL"],
+["PLSQL Q5", "Develop a PL/SQL application that performs deposit, withdrawal, fund transfer, and balance enquiry. Use stored procedures and exception handling to ensure transaction validity.", "IA2 revision · PL/SQL"],
+["PLSQL Q6", "Design PL/SQL procedures and triggers for placing orders, updating product inventory, calculating order totals, and generating an invoice.", "IA2 revision · PL/SQL"],
+["PLSQL Q7", "Create a PL/SQL function to calculate an employee's bonus based on salary and years of service. Use the function in a SQL query to display employee details and bonus.", "IA2 revision · PL/SQL"],
+["PLSQL Q8", "Write a PL/SQL block using IF-THEN-ELSIF to perform addition, subtraction, multiplication, or division based on two numbers and an operator entered by the user.", "IA2 revision · PL/SQL"],
+["PLSQL Q9", "Develop a PL/SQL program for a hospital database that uses procedures, functions, cursors, and triggers to manage patient appointments, doctor details, billing, and medicine stock.", "IA2 revision · PL/SQL"],
+["PLSQL Q10", "Create a PL/SQL function to calculate the fine for a returned book based on the number of days overdue. Display the book ID, student ID, return date, overdue days, and fine.", "IA2 revision · PL/SQL"],
+["Asg1 Q1", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nCreate a query to display all the data from the EMPLOYEES table. Separate each column by a comma. Name the column THE_OUTPUT", "Assignment 1"],
+["Asg1 Q2", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nDisplay the last name and job title of all employees who do not have a manager.", "Assignment 1"],
+["Asg1 Q3", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nDisplay the last name and salary for all employees whose salary is not in the range of $5,000 and $12,000", "Assignment 1"],
+["Asg1 Q4", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nDisplay the last name and department number of all employees in departments 20 and 50 in alphabetical order by name.", "Assignment 1"],
+["Asg1 Q5", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nlist the last name and salary of employees who earn between $5,000 and $12,000, and are in department 20 or 50", "Assignment 1"],
+["Asg1 Q6", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nDisplay the last name and hire date of every employee who was hired in 1994.", "Assignment 1"],
+["Asg1 Q7", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nCreate a query to display the last name and salary for all employees. Format the salary to be 15 characters long, left-padded with $. Label the column SALARY.", "Assignment 1"],
+["Asg1 Q8", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nDisplay the highest, lowest, sum, and average salary of all employees for each job type Label the columns Maximum, Minimum, Sum, and Average, respectively.", "Assignment 1"],
+["Asg1 Q9", "Answer as an SQL query and a relational algebra expression (EMPLOYEES table).\nWrite a query that displays the difference between the highest and lowest salaries. Label the column DIFFERENCE.", "Assignment 1"],
+["IA1Asg A1", "Retrieve all details of customers.", "IA1 assignment · set A"],
+["IA1Asg A2", "List all products with their prices.", "IA1 assignment · set A"],
+["IA1Asg A3", "Show all orders with their total amount.", "IA1 assignment · set A"],
+["IA1Asg A4", "Display all suppliers' names and their contact emails.", "IA1 assignment · set A"],
+["IA1Asg A5", "Retrieve product names and their stock quantities.", "IA1 assignment · set A"],
+["IA1Asg A6", "List all orders placed by a specific customer (e.g., CustomerID = 1).", "IA1 assignment · set A"],
+["IA1Asg A7", "Show the details of a specific order (e.g., OrderID = 1).", "IA1 assignment · set A"],
+["IA1Asg A8", "List the products in a specific category (e.g., 'Electronics').", "IA1 assignment · set A"],
+["IA1Asg A9", "Retrieve the names and emails of customers from a specific city (e.g., 'New York').", "IA1 assignment · set A"],
+["IA1Asg A10", "Show all orders placed in the last month.", "IA1 assignment · set A"],
+["IA1Asg B1", "List all customer and supplier cities.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B2", "Retrieve the names of all products and suppliers.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B3", "Get all unique customer and supplier states.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B4", "Find all unique customer and supplier email addresses.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B5", "List all unique product categories and supplier countries.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B6", "Retrieve all customer and supplier zip codes.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B7", "Get all unique first names of customers and contact names of suppliers.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B8", "Find all unique phone numbers of customers and suppliers.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B9", "List all distinct order dates and registration dates.", "IA1 assignment · set B (combine two tables)"],
+["IA1Asg B10", "Retrieve all unique order IDs and product IDs.", "IA1 assignment · set B (combine two tables)"],
+["M4Asg Q1", "Write the difference between fixed length record and variable length record.", "Module 4 assignment"],
+["M4Asg Q2", "Indexing and its types", "Module 4 assignment"],
+["M4Asg Q3", "File organization and its types.", "Module 4 assignment"]
+];
+var MCQ=[
+[1, "Purpose of Database System", "What is the main purpose of a database system?", ["To store, organize, and manage data efficiently", "To design web pages", "To compile programs", "To manage hardware devices"], 0],
+[2, "Purpose of Database System", "Which of the following is a drawback of traditional file-processing systems that databases solve?", ["Data redundancy and inconsistency", "Faster data access", "Better graphics", "Lower storage cost"], 0],
+[3, "Purpose of Database System", "Which problem occurs when the same data is stored in multiple files in a file system?", ["Data redundancy", "Data normalization", "Data encryption", "Data compression"], 0],
+[4, "Purpose of Database System", "What does \"difficulty in accessing data\" refer to in traditional file systems?", ["Need for a new program for every new type of query", "Slow hardware", "Lack of internet access", "Absence of a monitor"], 0],
+[5, "Purpose of Database System", "Which of the following is NOT typically a purpose of a DBMS?", ["Rendering 3D graphics", "Ensuring data integrity", "Providing concurrent access", "Reducing data redundancy"], 0],
+[6, "Purpose of Database System", "What does \"atomicity\" ensure in a database transaction?", ["A transaction executes completely or not at all", "Data is stored in multiple copies", "Data is always encrypted", "Queries run faster"], 0],
+[7, "Purpose of Database System", "Which problem is caused by allowing multiple users to access data concurrently without proper control?", ["Concurrent-access anomalies", "Data compression", "Faster backups", "Reduced storage"], 0],
+[8, "Purpose of Database System", "What is \"data isolation\" in the context of file-processing systems?", ["Data is scattered in several files with different formats", "Data is encrypted", "Data is duplicated intentionally", "Data is stored only in memory"], 0],
+[9, "Purpose of Database System", "Which security concern does a DBMS help address that file systems struggle with?", ["Enforcing access controls on sensitive data", "Increasing screen resolution", "Reducing electricity usage", "Compiling faster code"], 0],
+[10, "Purpose of Database System", "Why is \"integrity\" listed as a key purpose of database systems?", ["To ensure data satisfies consistency constraints", "To increase file size", "To slow down updates", "To remove all constraints"], 0],
+[11, "Views of Data", "What does \"abstraction\" mean in the context of database views of data?", ["Hiding the complexity of how data is stored from users", "Displaying all storage details to the user", "Encrypting data permanently", "Deleting unused data"], 0],
+[12, "Views of Data", "Which is the lowest level of data abstraction?", ["Physical level", "Logical level", "View level", "Conceptual level"], 0],
+[13, "Views of Data", "Which level of abstraction describes what data is stored and the relationships among the data?", ["Logical level", "Physical level", "View level", "Network level"], 0],
+[14, "Views of Data", "What does the \"view level\" of data abstraction provide?", ["Only part of the database relevant to particular users, hiding the rest", "The complete physical storage structure", "The full logical schema to every user", "Direct access to hardware"], 0],
+[15, "Views of Data", "What is an \"instance\" of a database?", ["The collection of information stored in the database at a particular moment", "The permanent structure of the database", "A backup copy of the database", "A user interface"], 0],
+[16, "Views of Data", "What is the \"schema\" of a database?", ["The overall design or structure of the database", "A single row of data", "A query result", "A temporary table"], 0],
+[17, "Views of Data", "Which term refers to the schema at the logical level?", ["Logical schema", "Physical schema", "Subschema", "View schema"], 0],
+[18, "Views of Data", "What is \"physical data independence\"?", ["The ability to modify the physical schema without changing the logical schema", "The ability to change application programs without altering data", "Storing data physically in multiple locations", "Removing all schemas"], 0],
+[19, "Views of Data", "Which abstraction level is closest to the end user?", ["View level", "Physical level", "Logical level", "Storage level"], 0],
+[20, "Views of Data", "In the three-level architecture of DBMS, which level deals with how data is actually stored on disk?", ["Internal (physical) level", "External level", "Conceptual level", "View level"], 0],
+[21, "Database Models", "Which data model represents data and relationships between data through a collection of tables?", ["Relational model", "Hierarchical model", "Network model", "Object model"], 0],
+[22, "Database Models", "In the hierarchical data model, data is organized in the form of:", ["A tree structure", "Tables with rows and columns", "Graphs with cycles", "Independent objects only"], 0],
+[23, "Database Models", "Which model allows a child record to have more than one parent record?", ["Network model", "Hierarchical model", "Relational model", "Flat file model"], 0],
+[24, "Database Models", "Which model represents entities as objects encapsulating both data and behavior?", ["Object-oriented data model", "Hierarchical model", "Network model", "Relational model"], 0],
+[25, "Database Models", "Which model combines features of the relational model and object-oriented model?", ["Object-relational data model", "Hierarchical model", "Network model", "Flat model"], 0],
+[26, "Database Models", "Which model is best suited for representing data with no fixed schema, such as JSON documents?", ["Semi-structured data model", "Relational model", "Hierarchical model", "Network model"], 0],
+[27, "Database Models", "In the Entity-Relationship (ER) model, what does a rectangle typically represent?", ["An entity set", "A relationship", "An attribute", "A key"], 0],
+[28, "Database Models", "In the ER model, what does a diamond shape represent?", ["A relationship set", "An entity", "An attribute", "A primary key"], 0],
+[29, "Database Models", "Which of these is an advantage of the relational model over the hierarchical model?", ["Simpler structure and flexible querying using declarative languages", "Faster hardware access", "Better graphics rendering", "Mandatory use of pointers"], 0],
+[30, "Database Models", "Which database model represents relationships explicitly using pointers/links to allow many-to-many relationships more naturally than hierarchical model?", ["Network model", "Relational model", "Object model", "Flat file model"], 0],
+[31, "Database System Architecture", "Which component of a DBMS is responsible for managing the buffer space in main memory?", ["Buffer manager", "Transaction manager", "Query processor", "Authorization manager"], 0],
+[32, "Database System Architecture", "Which component translates DDL statements into a set of tables containing metadata?", ["DDL interpreter", "DML compiler", "Query evaluation engine", "File manager"], 0],
+[33, "Database System Architecture", "Which component of the storage manager keeps track of the location of files and their structure?", ["File manager", "Buffer manager", "Transaction manager", "Authorization manager"], 0],
+[34, "Database System Architecture", "Which component ensures that the database remains in a consistent state despite system failures?", ["Recovery manager", "Query optimizer", "DDL interpreter", "View manager"], 0],
+[35, "Database System Architecture", "What is the role of the \"query processor\" in DBMS architecture?", ["To interpret and execute DML statements", "To store data physically", "To manage user login credentials", "To design ER diagrams"], 0],
+[36, "Database System Architecture", "Which component checks whether a user has the required permissions to perform an operation?", ["Authorization and integrity manager", "Buffer manager", "File manager", "Query evaluation engine"], 0],
+[37, "Database System Architecture", "Which part of the storage manager maintains metadata about the structure of the database?", ["Data dictionary", "Buffer manager", "Transaction manager", "Query optimizer"], 0],
+[38, "Database System Architecture", "What does the \"transaction manager\" ensure in a DBMS?", ["The database remains in a consistent state despite concurrent transactions and failures", "Faster rendering of query results", "Physical storage of indexes", "Compilation of DDL statements"], 0],
+[39, "Database System Architecture", "Two-tier client-server architecture in DBMS refers to:", ["Application/client and database server communicating directly", "Only a single machine handling everything", "Three separate independent servers", "No client involvement at all"], 0],
+[40, "Database System Architecture", "In three-tier architecture, which tier lies between the client and the database server?", ["Application server (middle tier)", "Physical storage tier", "User tier", "Index tier"], 0],
+[41, "Introduction to Relational Databases", "In a relational database, data is represented as a collection of:", ["Relations (tables)", "Trees", "Graphs", "Objects only"], 0],
+[42, "Introduction to Relational Databases", "What is a \"relation\" in the relational model?", ["A table consisting of rows and columns", "A single value", "A stored procedure", "A network of pointers"], 0],
+[43, "Introduction to Relational Databases", "What is a \"tuple\" in a relation?", ["A row representing a single record", "A column heading", "A database file", "A query result set only"], 0],
+[44, "Introduction to Relational Databases", "What is an \"attribute\" in a relation?", ["A column of the table", "A row of the table", "The entire table", "A stored procedure"], 0],
+[45, "Introduction to Relational Databases", "What is the \"degree\" of a relation?", ["The number of attributes (columns) in the relation", "The number of tuples (rows) in the relation", "The number of databases", "The number of users accessing it"], 0],
+[46, "Introduction to Relational Databases", "What is the \"cardinality\" of a relation?", ["The number of tuples in the relation", "The number of attributes in the relation", "The number of relations in the database", "The number of keys in the relation"], 0],
+[47, "Introduction to Relational Databases", "What is a \"domain\" in the relational model?", ["The set of allowable values for an attribute", "A specific row in the table", "A type of index", "A group of tables"], 0],
+[48, "Introduction to Relational Databases", "Which property must every relation in the relational model satisfy regarding tuple order?", ["Tuples are considered unordered", "Tuples must be sorted alphabetically", "Tuples must be indexed physically", "Tuples must be duplicated"], 0],
+[49, "Introduction to Relational Databases", "Can a relation contain two identical tuples in the strict relational model?", ["No, all tuples must be distinct", "Yes, duplicates are always allowed", "Only if they have different column names", "Only in temporary tables"], 0],
+[50, "Introduction to Relational Databases", "What does \"relational database management system (RDBMS)\" mean?", ["A DBMS that manages data as relations following the relational model", "A DBMS that only manages hierarchical data", "A tool for managing spreadsheets", "A system for managing only images"], 0],
+[51, "Structure of Relational Databases", "Which SQL clause is used to define the structure of a new table?", ["CREATE TABLE", "SELECT", "INSERT", "UPDATE"], 0],
+[52, "Structure of Relational Databases", "In relational database structure, each column of a table is associated with a:", ["Domain of allowable values", "Separate physical file always", "Separate database", "Unique server"], 0],
+[53, "Structure of Relational Databases", "What does it mean for relational databases to be \"schema-based\"?", ["The structure of tables and their attributes is defined before data is inserted", "Data can be stored without any predefined structure", "Tables can have unlimited undefined columns", "There is no relationship between tables"], 0],
+[54, "Structure of Relational Databases", "In relational database structure, how are relationships between two tables typically represented?", ["Through foreign keys referencing primary keys", "Through file names", "Through screen layouts", "Through indexes only"], 0],
+[55, "Structure of Relational Databases", "What is a \"null value\" in the structure of a relational database?", ["A special marker indicating a missing or unknown value", "The number zero", "An empty string only", "A duplicate value"], 0],
+[56, "Structure of Relational Databases", "Which of the following best defines a \"relation schema\"?", ["It specifies the name of the relation and its attributes", "It specifies the actual data stored in the relation", "It specifies the number of users of the database", "It specifies the physical disk location"], 0],
+[57, "Structure of Relational Databases", "In the relational structure, what is the relationship between a relation schema and a relation instance?", ["The schema defines structure; the instance holds actual data at a given time", "They are exactly the same thing", "The instance defines structure; the schema holds data", "There is no relationship between them"], 0],
+[58, "Structure of Relational Databases", "Which of the following correctly represents the notation for describing a relation schema, e.g., for a relation \"Student\"?", ["Student(RollNo, Name, Dept)", "Student = {RollNo, Name, Dept} as a set of tuples only", "Student.docx", "Student[Data]"], 0],
+[59, "Structure of Relational Databases", "What is meant by \"relational database\"?", ["A collection of relations sharing common attributes to represent data and relationships", "A single unrelated table", "A hierarchical file system", "A spreadsheet with no formulas"], 0],
+[60, "Structure of Relational Databases", "Which characteristic distinguishes structured relational data from semi-structured data?", ["Relational data follows a fixed, predefined schema", "Relational data has no schema", "Relational data is always stored as text files", "Relational data cannot have keys"], 0],
+[61, "Database Design", "What is the primary goal of database design?", ["To create an efficient, non-redundant schema representing the required data", "To make the database as large as possible", "To reduce the number of users", "To eliminate all tables"], 0],
+[62, "Database Design", "Which phase of database design involves creating an ER diagram of the enterprise?", ["Conceptual design", "Physical design", "Logical design deployment", "Query optimization"], 0],
+[63, "Database Design", "What is \"normalization\" in database design?", ["The process of organizing data to reduce redundancy and improve integrity", "The process of duplicating data across tables", "The process of deleting all constraints", "The process of merging all tables into one"], 0],
+[64, "Database Design", "Which anomaly can occur in a poorly designed (non-normalized) database when deleting a row removes unintended information?", ["Deletion anomaly", "Insertion advantage", "Update efficiency", "Query simplification"], 0],
+[65, "Database Design", "Which anomaly occurs when adding new data requires unnecessary or unavailable additional data due to poor design?", ["Insertion anomaly", "Deletion advantage", "Query anomaly", "View anomaly"], 0],
+[66, "Database Design", "What is an \"update anomaly\"?", ["Inconsistent data resulting from partial updates of redundant data", "A successful update with no issues", "A backup process", "A type of query optimization"], 0],
+[67, "Database Design", "In database design, what does \"functional dependency\" describe?", ["A constraint where one attribute uniquely determines another", "The physical location of files", "The number of users accessing a table", "The color scheme of a report"], 0],
+[68, "Database Design", "Which normal form requires that all attributes be atomic (indivisible)?", ["First Normal Form (1NF)", "Second Normal Form (2NF)", "Third Normal Form (3NF)", "BCNF"], 0],
+[69, "Database Design", "What is the purpose of an ER diagram in database design?", ["To visually represent entities, attributes, and relationships before implementation", "To store actual data", "To execute SQL queries", "To manage user permissions"], 0],
+[70, "Database Design", "Which design step converts the ER model into relational schemas (tables)?", ["Logical design", "Physical design", "Requirement analysis", "Query design"], 0],
+[71, "Relational Model", "In the relational model, what is a \"relation instance\"?", ["The actual set of tuples the relation contains at a given point in time", "The permanent structure/schema of the relation", "A stored procedure", "A foreign key definition"], 0],
+[72, "Relational Model", "In the relational model, what uniquely identifies each tuple in a relation?", ["A key (such as the primary key)", "The relation name", "The number of attributes", "The domain"], 0],
+[73, "Relational Model", "Which relational model constraint ensures that a primary key value cannot be NULL?", ["Entity integrity constraint", "Referential integrity constraint", "Domain constraint", "Key constraint only for foreign keys"], 0],
+[74, "Relational Model", "What does the referential integrity constraint enforce?", ["A foreign key value must match a primary key value in the referenced relation or be null", "All attributes must be numeric", "All tables must have the same number of columns", "No table can have more than one key"], 0],
+[75, "Relational Model", "In the relational model, what is a \"superkey\"?", ["A set of attributes that uniquely identifies a tuple, possibly with extra attributes", "A key that can never be used", "A key made only of foreign keys", "A key with no attributes"], 0],
+[76, "Relational Model", "What is a \"candidate key\"?", ["A minimal superkey with no unnecessary attributes", "Any random attribute in the relation", "A key that must always be composite", "A foreign key from another table"], 0],
+[77, "Relational Model", "What is the difference between a candidate key and the primary key?", ["The primary key is the candidate key chosen by the designer to uniquely identify tuples", "There is no difference at all", "A candidate key must include all attributes", "A primary key cannot be a candidate key"], 0],
+[78, "Relational Model", "Which relational model constraint uses a foreign key to relate two relations?", ["Referential integrity constraint", "Domain constraint", "Entity constraint", "Null constraint"], 0],
+[79, "Relational Model", "In the relational model, what does a \"domain constraint\" enforce?", ["That the value of an attribute must belong to its defined domain", "That the relation must have exactly two attributes", "That every relation has a foreign key", "That tuples must be in sorted order"], 0],
+[80, "Relational Model", "Which relational model rule states that a relation must not have duplicate tuples?", ["Uniqueness of tuples in a relation", "Uniqueness of attribute names across the database", "Uniqueness of database names", "Uniqueness of file extensions"], 0],
+[81, "Keys", "What is a \"primary key\"?", ["A candidate key chosen to uniquely identify each tuple in a relation", "Any attribute in a table", "A key used only for indexing", "A key that allows duplicate values"], 0],
+[82, "Keys", "What is a \"foreign key\"?", ["An attribute in one relation that references the primary key of another relation", "A key that is always encrypted", "A key with no constraints", "A duplicate of the primary key in the same table"], 0],
+[83, "Keys", "What is a \"composite key\"?", ["A primary key made up of two or more attributes", "A key made of only one attribute", "A key that is never unique", "A key used only in views"], 0],
+[84, "Keys", "What is a \"unique key\"?", ["A key that ensures all values in a column are distinct, allowing at most one null", "A key that must always be the primary key", "A key that permits duplicate values", "A key used only for foreign key references"], 0],
+[85, "Keys", "What is an \"alternate key\"?", ["A candidate key that is not chosen as the primary key", "A key derived from a foreign key", "A key with no uniqueness constraint", "A temporary key used only in queries"], 0],
+[86, "Keys", "Which type of key is used to enforce a link between two tables based on a common attribute?", ["Foreign key", "Candidate key", "Super key", "Surrogate key"], 0],
+[87, "Keys", "What is a \"surrogate key\"?", ["A system-generated unique identifier with no business meaning", "A key derived from natural business data", "A duplicate of the primary key", "A key that can have null values"], 0],
+[88, "Keys", "Can a primary key contain a NULL value?", ["No, a primary key cannot contain NULL", "Yes, always", "Yes, but only in composite keys", "Only in foreign key relationships"], 0],
+[89, "Keys", "In a \"self-referencing\" relationship (e.g., an employee table referencing a manager in the same table), what kind of key is used?", ["A foreign key referencing the primary key of the same table", "A composite key only", "A domain constraint", "A super key exclusively"], 0],
+[90, "Keys", "Which of the following best describes the relationship between candidate keys and the primary key?", ["The primary key is selected from among the candidate keys", "Every attribute is automatically a candidate key", "A relation can never have more than one candidate key", "Candidate keys must always be composite"], 0],
+[91, "Relational Algebra & Additional Relational Algebra", "Which relational algebra operation retrieves rows satisfying a specified condition?", ["Selection (σ)", "Projection (π)", "Union (∪)", "Cartesian product (×)"], 0],
+[92, "Relational Algebra & Additional Relational Algebra", "Which relational algebra operation retrieves specific columns from a relation?", ["Projection (π)", "Selection (σ)", "Join (⨝)", "Difference (−)"], 0],
+[93, "Relational Algebra & Additional Relational Algebra", "Which operation combines tuples from two relations that have the same schema, removing duplicates?", ["Union (∪)", "Selection (σ)", "Projection (π)", "Cartesian product (×)"], 0],
+[94, "Relational Algebra & Additional Relational Algebra", "Which operation returns tuples present in one relation but not in another?", ["Set difference (−)", "Union (∪)", "Intersection (∩)", "Cartesian product (×)"], 0],
+[95, "Relational Algebra & Additional Relational Algebra", "Which operation returns tuples that are common to two relations?", ["Intersection (∩)", "Union (∪)", "Difference (−)", "Division (÷)"], 0],
+[96, "Relational Algebra & Additional Relational Algebra", "Which operation combines every tuple of one relation with every tuple of another relation?", ["Cartesian product (×)", "Selection (σ)", "Projection (π)", "Union (∪)"], 0],
+[97, "Relational Algebra & Additional Relational Algebra", "Which relational algebra operation combines related tuples from two relations based on a common attribute?", ["Join (⨝)", "Difference (−)", "Projection (π)", "Selection (σ)"], 0],
+[98, "Relational Algebra & Additional Relational Algebra", "In extended (additional) relational algebra, which operator computes aggregate values like SUM, COUNT, and AVG?", ["Generalized projection / aggregate operator (γ)", "Union (∪)", "Selection (σ)", "Cartesian product (×)"], 0],
+[99, "Relational Algebra & Additional Relational Algebra", "Which additional relational algebra operation renames a relation or its attributes?", ["Rename (ρ)", "Union (∪)", "Join (⨝)", "Projection (π)"], 0],
+[100, "Relational Algebra & Additional Relational Algebra", "Which additional relational algebra operator is used to find tuples in one relation associated with all tuples in another (e.g., \"students who have taken all courses\")?", ["Division (÷)", "Union (∪)", "Intersection (∩)", "Cartesian product (×)"], 0],
+[101, "Introduction to SQL / Overview of SQL Query Language", "What does SQL stand for?", ["Structured Query Language", "Sequential Query Language", "Simple Question Language", "Structured Question List"], 0],
+[102, "Introduction to SQL / Overview of SQL Query Language", "SQL is primarily classified as a:", ["Declarative language for managing relational databases", "Low-level assembly language", "Object-oriented programming language", "Markup language"], 0],
+[103, "Introduction to SQL / Overview of SQL Query Language", "Which sublanguage of SQL is used to define database structures like tables?", ["Data Definition Language (DDL)", "Data Manipulation Language (DML)", "Data Control Language (DCL)", "Transaction Control Language (TCL)"], 0],
+[104, "Introduction to SQL / Overview of SQL Query Language", "Which sublanguage of SQL is used to retrieve, insert, update, and delete data?", ["Data Manipulation Language (DML)", "Data Definition Language (DDL)", "Data Control Language (DCL)", "View Definition Language"], 0],
+[105, "Introduction to SQL / Overview of SQL Query Language", "Which SQL sublanguage is used to grant or revoke access privileges?", ["Data Control Language (DCL)", "Data Definition Language (DDL)", "Data Manipulation Language (DML)", "Query Language"], 0],
+[106, "Introduction to SQL / Overview of SQL Query Language", "Which command is used to permanently save changes made during a transaction?", ["COMMIT", "ROLLBACK", "SELECT", "DELETE"], 0],
+[107, "Introduction to SQL / Overview of SQL Query Language", "Which command undoes changes made in the current transaction?", ["ROLLBACK", "COMMIT", "UPDATE", "INSERT"], 0],
+[108, "Introduction to SQL / Overview of SQL Query Language", "SQL is generally considered which type of language due to its focus on \"what\" rather than \"how\"?", ["Declarative (non-procedural) language", "Fully procedural language", "Machine language", "Assembly language"], 0],
+[109, "Introduction to SQL / Overview of SQL Query Language", "Which of these is a widely used relational database that supports SQL?", ["Oracle, MySQL, PostgreSQL, etc.", "Photoshop", "Microsoft Word", "AutoCAD"], 0],
+[110, "Introduction to SQL / Overview of SQL Query Language", "What is the role of a \"query language\" like SQL in a DBMS?", ["To allow users to request and manipulate data stored in the database", "To design the physical hardware", "To manage network cables", "To render graphics"], 0],
+[111, "Introduction to SQL / Overview of SQL Query Language", "Which standard defines the syntax and semantics of SQL across different vendors?", ["ANSI/ISO SQL standard", "HTML standard", "TCP/IP standard", "Unicode standard"], 0],
+[112, "Introduction to SQL / Overview of SQL Query Language", "SQL was originally developed at which company?", ["IBM", "Microsoft", "Oracle", "Google"], 0],
+[113, "SQL Data Definition", "Which SQL statement is used to create a new table?", ["CREATE TABLE", "ALTER TABLE", "DROP TABLE", "INSERT INTO"], 0],
+[114, "SQL Data Definition", "Which SQL statement is used to remove an existing table permanently, including its structure?", ["DROP TABLE", "DELETE FROM", "TRUNCATE", "ALTER TABLE"], 0],
+[115, "SQL Data Definition", "Which SQL statement is used to modify the structure of an existing table, such as adding a column?", ["ALTER TABLE", "UPDATE", "CREATE TABLE", "DROP TABLE"], 0],
+[116, "SQL Data Definition", "Which SQL clause specifies the primary key while creating a table?", ["PRIMARY KEY", "FOREIGN KEY", "UNIQUE", "CHECK"], 0],
+[117, "SQL Data Definition", "Which SQL constraint ensures that a foreign key value matches a primary key value in another table?", ["FOREIGN KEY constraint", "NOT NULL constraint", "UNIQUE constraint", "DEFAULT constraint"], 0],
+[118, "SQL Data Definition", "Which SQL constraint prevents a column from storing NULL values?", ["NOT NULL", "UNIQUE", "CHECK", "DEFAULT"], 0],
+[119, "SQL Data Definition", "Which SQL clause is used to provide a default value for a column?", ["DEFAULT", "CHECK", "UNIQUE", "NOT NULL"], 0],
+[120, "SQL Data Definition", "Which SQL data definition command removes all rows from a table but retains its structure, typically faster than DELETE?", ["TRUNCATE TABLE", "DROP TABLE", "ALTER TABLE", "DELETE TABLE"], 0],
+[121, "SQL Data Definition", "Which SQL clause enforces a condition that column values must satisfy?", ["CHECK", "UNIQUE", "DEFAULT", "FOREIGN KEY"], 0],
+[122, "SQL Data Definition", "Which SQL data definition statement is used to create a view based on a query?", ["CREATE VIEW", "CREATE TABLE", "CREATE INDEX", "CREATE SCHEMA"], 0],
+[123, "SQL Data Definition", "Which command is used to create an index on a table to speed up data retrieval?", ["CREATE INDEX", "CREATE TABLE", "CREATE VIEW", "ALTER INDEX"], 0],
+[124, "SQL Data Definition", "Which SQL data type is typically used to store variable-length character strings?", ["VARCHAR", "INT", "DATE", "BOOLEAN"], 0],
+[125, "SQL Data Definition", "Which SQL statement removes a specific column from an existing table?", ["ALTER TABLE ... DROP COLUMN", "DELETE COLUMN", "DROP TABLE", "UPDATE TABLE"], 0],
+[126, "Basic Structure of SQL Queries", "Which clause in a SQL query specifies the columns to be retrieved?", ["SELECT", "FROM", "WHERE", "GROUP BY"], 0],
+[127, "Basic Structure of SQL Queries", "Which clause specifies the table(s) from which data is retrieved?", ["FROM", "SELECT", "WHERE", "HAVING"], 0],
+[128, "Basic Structure of SQL Queries", "Which clause is used to filter rows based on a specified condition?", ["WHERE", "SELECT", "FROM", "ORDER BY"], 0],
+[129, "Basic Structure of SQL Queries", "Which clause is used to sort the result set of a query?", ["ORDER BY", "GROUP BY", "WHERE", "HAVING"], 0],
+[130, "Basic Structure of SQL Queries", "Which keyword is used to remove duplicate rows from a query result?", ["DISTINCT", "UNIQUE", "ALL", "ONLY"], 0],
+[131, "Basic Structure of SQL Queries", "In SQL, what does \"SELECT *\" retrieve?", ["All columns from the specified table(s)", "Only the first column", "Only distinct rows", "Only rows with NULL values"], 0],
+[132, "Basic Structure of SQL Queries", "Which operator is used in the WHERE clause to specify a range of values?", ["BETWEEN", "IN", "LIKE", "EXISTS"], 0],
+[133, "Basic Structure of SQL Queries", "Which operator is used to check if a value matches any value in a list?", ["IN", "BETWEEN", "LIKE", "ALL"], 0],
+[134, "Basic Structure of SQL Queries", "Which operator is used for pattern matching with wildcards in SQL?", ["LIKE", "IN", "BETWEEN", "EXISTS"], 0],
+[135, "Basic Structure of SQL Queries", "In SQL LIKE patterns, what does the \"%\" wildcard represent?", ["Any sequence of zero or more characters", "Exactly one character", "A numeric digit only", "A null value"], 0],
+[136, "Basic Structure of SQL Queries", "In SQL LIKE patterns, what does the \"_\" wildcard represent?", ["Exactly one character", "Any sequence of characters", "A null value", "A numeric range"], 0],
+[137, "Basic Structure of SQL Queries", "Which clause combines rows from two or more tables based on a related column?", ["JOIN", "GROUP BY", "HAVING", "ORDER BY"], 0],
+[138, "Basic Structure of SQL Queries", "By default, does SQL's SELECT statement remove duplicate rows from the result?", ["No, duplicates are retained unless DISTINCT is used", "Yes, duplicates are always removed", "Only in subqueries", "Only when ORDER BY is used"], 0],
+[139, "Additional Basic Operations", "Which keyword is used to rename a column or table temporarily in the query output?", ["AS", "RENAME", "ALTER", "LIKE"], 0],
+[140, "Additional Basic Operations", "Which SQL feature allows use of a variable name to represent a relation, often useful in self-joins?", ["Tuple variable (table alias)", "Primary key", "Index", "View only"], 0],
+[141, "Additional Basic Operations", "Which SQL operation is used to sort query results in descending order?", ["ORDER BY column DESC", "ORDER BY column ASC", "GROUP BY column DESC", "SORT BY column"], 0],
+[142, "Additional Basic Operations", "Which SQL clause is used to limit the number of rows returned by a query in many database systems?", ["LIMIT", "TOP", "ROWCOUNT", "Both A and B are used depending on the DBMS"], 3],
+[143, "Additional Basic Operations", "Which arithmetic operators can typically be used directly in the SELECT clause of SQL?", ["+, −, *, /", "AND, OR, NOT only", "UNION, INTERSECT only", "GROUP BY, HAVING only"], 0],
+[144, "Additional Basic Operations", "Which logical operators can be used to combine multiple conditions in a WHERE clause?", ["AND, OR, NOT", "UNION, INTERSECT", "JOIN, GROUP BY", "SELECT, FROM"], 0],
+[145, "Additional Basic Operations", "What is the purpose of table aliasing in SQL (e.g., \"FROM employee AS e\")?", ["To provide a shorter or alternate name for a table within a query", "To physically rename the table permanently", "To delete the table", "To create an index"], 0],
+[146, "Additional Basic Operations", "Which SQL clause is used to combine two SELECT queries' results without removing duplicates, if supported by the DBMS?", ["UNION ALL", "UNION", "INTERSECT", "EXCEPT"], 0],
+[147, "Additional Basic Operations", "Which SQL keyword can order the result set based on multiple columns?", ["ORDER BY column1, column2", "GROUP BY column1 ONLY", "WHERE column1, column2", "HAVING column1, column2"], 0],
+[148, "Additional Basic Operations", "What does the SQL expression \"column1 || column2\" (or CONCAT) typically perform?", ["String concatenation", "Numeric addition", "Logical AND", "Set union"], 0],
+[149, "Additional Basic Operations", "Which SQL clause is used to specify a condition on grouped data (after GROUP BY)?", ["HAVING", "WHERE", "ORDER BY", "SELECT"], 0],
+[150, "Additional Basic Operations", "Which SQL statement retrieves rows where a column value is NOT equal to a specified value?", ["WHERE column <> value (or !=)", "WHERE column = value", "WHERE column LIKE value", "WHERE column IS value"], 0],
+[151, "Additional Basic Operations", "Which SQL feature allows renaming both relations and attributes for clarity within a single query?", ["The AS clause (rename operation)", "The GROUP BY clause", "The HAVING clause", "The DISTINCT clause"], 0],
+[152, "Set Operations", "Which SQL set operation returns all distinct rows appearing in either of two queries?", ["UNION", "INTERSECT", "EXCEPT (MINUS)", "JOIN"], 0],
+[153, "Set Operations", "Which SQL set operation returns only the rows common to both queries?", ["INTERSECT", "UNION", "EXCEPT", "UNION ALL"], 0],
+[154, "Set Operations", "Which SQL set operation returns rows present in the first query but not in the second?", ["EXCEPT (or MINUS)", "UNION", "INTERSECT", "UNION ALL"], 0],
+[155, "Set Operations", "For SQL set operations like UNION, INTERSECT, and EXCEPT to work correctly, the two queries must have:", ["The same number of columns with compatible data types", "Identical table names", "The same WHERE clause", "The same primary key"], 0],
+[156, "Set Operations", "Which set operation, unlike UNION, retains duplicate rows in the combined result?", ["UNION ALL", "INTERSECT", "EXCEPT", "UNION"], 0],
+[157, "Set Operations", "What does UNION do with duplicate rows found in both queries by default?", ["Removes duplicates, keeping only one copy", "Keeps all duplicates", "Deletes all matching rows", "Ignores both queries"], 0],
+[158, "Set Operations", "Which set operation would you use to find customers who have an account but do NOT have a loan (using two customer-related queries)?", ["EXCEPT", "UNION", "INTERSECT", "UNION ALL"], 0],
+[159, "Set Operations", "Which set operation would you use to find customers who have both an account AND a loan?", ["INTERSECT", "UNION", "EXCEPT", "UNION ALL"], 0],
+[160, "Set Operations", "In some SQL dialects (like Oracle), which keyword is used instead of EXCEPT to perform set difference?", ["MINUS", "SUBTRACT", "DIFFERENCE", "REMOVE"], 0],
+[161, "Set Operations", "Which of the following is true about UNION ALL compared to INTERSECT?", ["UNION ALL combines all rows from both queries including duplicates, while INTERSECT returns only common rows", "They produce identical results always", "INTERSECT allows duplicates but UNION ALL does not", "UNION ALL requires different column counts than INTERSECT"], 0],
+[162, "Set Operations", "Which set operation could be used to find all students who have taken either Course A or Course B (or both)?", ["UNION", "INTERSECT", "EXCEPT", "Cartesian Product"], 0],
+[163, "Set Operations", "True or False: Set operations in SQL (UNION, INTERSECT, EXCEPT) automatically eliminate duplicates unless \"ALL\" is specified.", ["True", "False", "Only for UNION, not INTERSECT or EXCEPT", "Only for numeric columns"], 0],
+[164, "Null Values", "What does a NULL value represent in SQL?", ["An unknown or missing value", "The numeric value zero", "An empty string", "A duplicate value"], 0],
+[165, "Null Values", "Which SQL keyword is used to test whether a column contains a NULL value?", ["IS NULL", "= NULL", "== NULL", "LIKE NULL"], 0],
+[166, "Null Values", "Which SQL keyword tests whether a column does NOT contain a NULL value?", ["IS NOT NULL", "<> NULL", "!= NULL", "NOT LIKE NULL"], 0],
+[167, "Null Values", "What is the result of comparing NULL with any value using the \"=\" operator in SQL?", ["Unknown (neither true nor false)", "Always true", "Always false", "A syntax error"], 0],
+[168, "Null Values", "In SQL three-valued logic, besides TRUE and FALSE, what is the third truth value?", ["UNKNOWN", "MAYBE", "NULL_TRUE", "UNDEFINED"], 0],
+[169, "Null Values", "How do most aggregate functions (like SUM, AVG) treat NULL values in a column, by default?", ["They ignore NULL values in the calculation", "They treat NULL as zero", "They cause an error", "They treat NULL as the maximum value"], 0],
+[170, "Null Values", "What does COUNT() do differently from COUNT(column_name) regarding NULLs?", ["COUNT() counts all rows including those with NULLs, while COUNT(column_name) ignores NULLs in that column", "Both behave identically in all cases", "COUNT(*) ignores NULLs, COUNT(column_name) counts them", "Both always return zero for NULLs"], 0],
+[171, "Null Values", "If a WHERE clause condition evaluates to UNKNOWN for a row, is that row included in the result?", ["No, only rows evaluating to TRUE are included", "Yes, always included", "Only if ORDER BY is used", "Only in subqueries"], 0],
+[172, "Null Values", "Which logical result does \"NULL AND FALSE\" produce in SQL's three-valued logic?", ["FALSE", "TRUE", "UNKNOWN", "NULL error"], 0],
+[173, "Null Values", "Which logical result does \"NULL OR TRUE\" produce in SQL's three-valued logic?", ["TRUE", "FALSE", "UNKNOWN", "Syntax error"], 0],
+[174, "Null Values", "Can a primary key column contain a NULL value?", ["No, primary key columns cannot contain NULL", "Yes, always", "Only in composite keys", "Only in foreign key columns"], 0],
+[175, "Null Values", "Which SQL clause allows you to substitute a default value in place of a NULL when displaying results (e.g., COALESCE)?", ["COALESCE (or IFNULL/NVL depending on the DBMS)", "DISTINCT", "HAVING", "GROUP BY"], 0],
+[176, "Aggregate Functions", "Which SQL aggregate function returns the total number of rows matching a condition?", ["COUNT", "SUM", "AVG", "MAX"], 0],
+[177, "Aggregate Functions", "Which aggregate function computes the total sum of a numeric column?", ["SUM", "COUNT", "AVG", "MIN"], 0],
+[178, "Aggregate Functions", "Which aggregate function computes the average value of a numeric column?", ["AVG", "SUM", "COUNT", "MAX"], 0],
+[179, "Aggregate Functions", "Which aggregate function returns the smallest value in a column?", ["MIN", "MAX", "AVG", "SUM"], 0],
+[180, "Aggregate Functions", "Which aggregate function returns the largest value in a column?", ["MAX", "MIN", "AVG", "COUNT"], 0],
+[181, "Aggregate Functions", "Which SQL clause is used together with aggregate functions to group rows sharing a common value?", ["GROUP BY", "ORDER BY", "WHERE", "HAVING alone without GROUP BY"], 0],
+[182, "Aggregate Functions", "Which clause is used to filter groups after aggregation, unlike WHERE which filters rows before aggregation?", ["HAVING", "WHERE", "ORDER BY", "SELECT"], 0],
+[183, "Aggregate Functions", "Can the WHERE clause directly use an aggregate function like COUNT() or SUM() to filter rows?", ["No, aggregate functions cannot be used in WHERE; use HAVING instead", "Yes, always allowed", "Only with GROUP BY omitted", "Only for COUNT, not SUM"], 0],
+[184, "Aggregate Functions", "What does \"SELECT COUNT(DISTINCT column_name)\" compute?", ["The number of distinct (unique) non-null values in the column", "The total number of rows regardless of duplicates", "The sum of the column values", "The average of the column values"], 0],
+[185, "Aggregate Functions", "Which SQL construct computes aggregates for each group defined by one or more columns, e.g., total sales per department?", ["GROUP BY with an aggregate function in SELECT", "ORDER BY with DISTINCT", "WHERE with LIKE", "JOIN without ON clause"], 0],
+[186, "Aggregate Functions", "In a query using GROUP BY, which columns can generally appear in the SELECT list (in standard SQL) besides aggregate functions?", ["Only the columns listed in the GROUP BY clause", "Any column from the table", "Only columns not in GROUP BY", "No columns at all"], 0],
+[187, "Aggregate Functions", "Which aggregate function combined with GROUP BY would find the maximum salary for each department?", ["SELECT department, MAX(salary) FROM employee GROUP BY department;", "SELECT department, MAX(salary) FROM employee;", "SELECT department, MAX(salary) FROM employee WHERE department;", "SELECT MAX(salary) FROM employee HAVING department;"], 0],
+[188, "Aggregate Functions", "Which clause would you add to retrieve only departments having more than 5 employees, after grouping by department?", ["HAVING COUNT() > 5", "WHERE COUNT() > 5", "GROUP BY COUNT() > 5", "ORDER BY COUNT() > 5"], 0],
+[189, "Nested Queries", "What is a \"nested query\" (subquery) in SQL?", ["A query embedded within another SQL query", "A query that runs on multiple servers simultaneously", "A query with no WHERE clause", "A query that only uses aggregate functions"], 0],
+[190, "Nested Queries", "Which SQL operator checks whether a value exists in the result set of a subquery?", ["IN", "EXISTS only", "BETWEEN", "LIKE"], 0],
+[191, "Nested Queries", "Which SQL operator is used to check whether a subquery returns at least one row?", ["EXISTS", "IN", "ALL", "ANY"], 0],
+[192, "Nested Queries", "Which SQL operator checks whether a subquery returns NO rows?", ["NOT EXISTS", "IN", "ANY", "SOME"], 0],
+[193, "Nested Queries", "Which operator is used to compare a value against ALL values returned by a subquery, requiring the condition to hold for every value?", ["ALL", "ANY", "IN", "EXISTS"], 0],
+[194, "Nested Queries", "Which operator is used to compare a value against SOME (at least one) value returned by a subquery?", ["ANY (or SOME)", "ALL", "EXISTS only", "IN only"], 0],
+[195, "Nested Queries", "What is a \"correlated subquery\"?", ["A subquery that references a column from the outer query", "A subquery that runs completely independently of the outer query", "A subquery with no WHERE clause", "A subquery that always uses UNION"], 0],
+[196, "Nested Queries", "Where can a nested subquery appear within an outer SQL query?", ["In the WHERE, FROM, HAVING, or SELECT clause", "Only in the SELECT clause", "Only in the ORDER BY clause", "Only outside the main query"], 0],
+[197, "Nested Queries", "What is the purpose of using a subquery in the FROM clause?", ["To treat the subquery's result as a temporary/derived table for the outer query", "To delete rows from the table", "To create a permanent view automatically", "To sort the final result"], 0],
+[198, "Nested Queries", "In \"SELECT name FROM student WHERE marks > (SELECT AVG(marks) FROM student);\", what does the subquery compute?", ["The average marks across all students, used as a comparison threshold", "The maximum marks of a single student", "The total number of students", "The names of all students"], 0],
+[199, "Nested Queries", "Which clause is often used with a nested subquery to test whether a row's value matches ANY value returned, e.g. \"marks > ANY (subquery)\"?", ["ANY (or SOME)", "ALL only", "EXISTS only", "HAVING only"], 0],
+[200, "Nested Queries", "Which of the following queries correctly finds employees earning more than every employee in the 'Sales' department using a nested subquery?", ["SELECT name FROM employee WHERE salary > ALL (SELECT salary FROM employee WHERE department = 'Sales');", "SELECT name FROM employee WHERE salary > ANY (SELECT salary FROM employee WHERE department = 'Sales');", "SELECT name FROM employee WHERE salary = ALL (SELECT salary FROM employee WHERE department = 'Sales');", "SELECT name FROM employee WHERE salary IN (SELECT department FROM employee);"], 0]
+];
+
+/* figures that are part of a question (shown under its text) */
+var FIG={"Rem Q14":"q/rem-q14.png","Rem Q20":"q/rem-q20.png","Rem Q22":"q/rem-q22.png","Rem Q23":"q/rem-q23.png","ER Q7a":"q/er-q7a.png","ER Q7b":"q/er-q7b.png","ER Q7c":"q/er-q7c.png","Asg1 Q1":"q/asg1-table.png","IA1Asg A1":"q/ia1asg-a.png","IA1Asg B1":"q/ia1asg-b.png"};
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+/* a source tag matches as a whole tag: 'Rem Q1' must not match inside 'Rem Q12' */
+function keyRe(k){return new RegExp('(?<![\\w])'+escRe(k)+'(?![\\w])')}
+function figImg(k,alt){return FIG[k]?'<img class="qimg" style="margin-top:8px" src="'+FIG[k]+'" alt="'+esc(alt||'figure for '+k)+'" loading="lazy">':''}
+function pyqBlock(tagText){
+  var out='';
+  PYQ.forEach(function(q){
+    if(keyRe(q[0]).test(tagText))
+      out+='<div class="pyq"><div class="log" style="margin:0 0 4px"><b>The question as set</b> · '+esc(q[0])+(q[2]?' · '+esc(q[2]):'')+'</div>'+esc(q[1])+figImg(q[0],q[1])+'</div>';
+  });
+  return out;
+}
+
+
+var WIDGETS={};          // selector -> function(el)
+var CONTENT={};          // chunk no -> {h, exam}
+function TBL(head,rows,cls){
+  return '<div class="scroll"><table class="tbl '+(cls||'')+'"><tr>'+head.map(function(h){return '<th>'+h+'</th>'}).join('')+'</tr>'+
+    rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+c+'</td>'}).join('')+'</tr>'}).join('')+'</table></div>';
+}
+function MODEL(title,body){return '<div class="card model"><h3>'+title+'</h3>'+pyqBlock(title)+body+'</div>'}
+function P(src,ans){return '<li>'+src+'<details class="ans"><summary>Show answer</summary><div>'+ans+'</div></details></li>'}
+function CODE(s){return '<pre class="sql">'+esc(s)+'</pre>'}
+
+/*@@CONTENT@@*/
+
+/* ===== IA1 MCQ drill: options shuffled per visit (the bank lists every answer as A) ===== */
+var MCQK='dbms-mcq-v1',MST={};
+try{MST=JSON.parse(localStorage.getItem(MCQK))||{}}catch(e){MST={}}
+function mcqSave(){try{localStorage.setItem(MCQK,JSON.stringify(MST))}catch(e){}}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+function mcqPage(){
+  var tops=[];MCQ.forEach(function(m){if(tops.indexOf(m[1])<0)tops.push(m[1])});
+  var right=Object.keys(MST).filter(function(k){return MST[k]===1}).length,tried=Object.keys(MST).length;
+  var h='<button class="menu" aria-label="Open chunk list">☰ Chunks</button><div class="kicker" style="margin-top:12px">DRILL</div><h1 style="font-size:1.8rem;margin-top:6px">IA1 MCQ bank</h1><p>The teacher’s 200 IA1 learning-material MCQs (Q1–100 Module 1, Q101–200 Module 2). In the file every answer is option A, so the options are shuffled here. Pick one; it marks itself.</p>';
+  h+='<div class="card"><div class="row" style="justify-content:space-between"><span class="log" style="margin:0" id="mcqscore">'+right+' right of '+tried+' tried</span><span class="row"><button data-mcqwrong>Only the ones I got wrong</button><button data-mcqreset>Reset</button></span></div></div>';
+  tops.forEach(function(t){
+    h+='<h2>'+esc(t)+'</h2>';
+    MCQ.filter(function(m){return m[1]===t}).forEach(function(m){
+      var ord=m[3].some(function(o){return /[A-D] and [A-D]/.test(o)})?[0,1,2,3]:shuffle([0,1,2,3]),st=MST[m[0]];
+      h+='<div class="w mcq'+(st===1?' ok':st===0?' bad':'')+'" data-n="'+m[0]+'" data-a="'+m[4]+'"><div class="cap">Q'+m[0]+'</div><p style="margin:0 0 8px">'+esc(m[2])+'</p><div class="row">'+ord.map(function(i){return '<button data-o="'+i+'">'+esc(m[3][i])+'</button>'}).join('')+'</div><div class="msg"></div></div>';
+    });
+  });
+  return h;
+}
+WIDGETS['.mcq']=function(el){
+  el.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-o]');if(!b||el.dataset.ans)return;el.dataset.ans=1;
+    var ok=+b.dataset.o===+el.dataset.a,good=$('button[data-o="'+el.dataset.a+'"]',el);
+    good.classList.add('sel');if(!ok)b.style.borderColor='var(--warn)';
+    $('.msg',el).className='msg '+(ok?'ok':'bad');$('.msg',el).textContent=ok?'Right.':'Not quite. The answer is highlighted.';
+    MST[el.dataset.n]=ok?1:0;mcqSave();
+    var r=Object.keys(MST).filter(function(k){return MST[k]===1}).length;$('#mcqscore').textContent=r+' right of '+Object.keys(MST).length+' tried';
+  });
+};
+
+/* ===== boot: module list, status, views, routing ===== */
+var TITLES=[
+ {n:1,name:'Introduction and database architecture',c:[['1.1','Purpose of database systems'],['1.2','Views of data: abstraction, schema, independence'],['1.3','Data models'],['1.4','Database system architecture and users'],['1.5','Relational model and its structure'],['1.6','Keys and integrity constraints'],['1.7','Relational algebra: fundamental operations'],['1.8','Additional relational algebra and writing queries']]},
+ {n:2,name:'SQL and its application',c:[['2.1','SQL overview, DDL, data types, constraints'],['2.2','Basic SELECT queries and functions'],['2.3','Set operations and NULL values'],['2.4','Aggregate functions, GROUP BY, HAVING'],['2.5','Nested queries and subqueries'],['2.6','Joins and modifying the database'],['2.7','Views, transactions, integrity, authorization'],['2.8','Embedded and dynamic SQL, PL/SQL, functions and procedures'],['2.9','Triggers']]},
+ {n:3,name:'Database design',c:[['3.1','ER model: entities, attributes, relationships'],['3.2','Constraints, weak entities, ER notation'],['3.3','Extended ER: generalization, specialization, aggregation'],['3.4','ER diagram to relational schema'],['3.5','Functional dependencies and Armstrong’s axioms'],['3.6','Normalization: 1NF to BCNF'],['3.7','Dependency preservation, 4NF and 5NF'],['3.8','Design case studies (online banking and others)']]},
+ {n:4,name:'File structure and indexing',c:[['4.1','Storage and RAID'],['4.2','File organization and records'],['4.3','Ordered indices'],['4.4','B+ tree index files'],['4.5','B-tree and multiple-key access'],['4.6','Hashing: static and dynamic']]},
+ {n:5,name:'Transactions',c:[['5.1','Transaction concept, states and ACID'],['5.2','Atomicity, durability and schedules'],['5.3','Serializability'],['5.4','Isolation levels and concurrency anomalies'],['5.5','Lock-based protocols: 2PL and multiple granularity'],['5.6','Timestamp, validation, multiversion and snapshot isolation']]},
+ {n:6,name:'NoSQL databases',c:[['6.1','NoSQL introduction and CAP theorem'],['6.2','Document and key-value stores'],['6.3','Column-family and graph databases']]}
+];
+/* Progress is per visitor: saved in this browser only (localStorage). */
+var PKEY='dbms-progress-v1',PROG={};
+try{PROG=JSON.parse(localStorage.getItem(PKEY))||{}}catch(e){PROG={}}
+function saveProg(){try{localStorage.setItem(PKEY,JSON.stringify(PROG))}catch(e){}}
+var MODS=TITLES.map(function(m){return {n:m.n,name:m.name,chunks:m.c.map(function(x){return {no:x[0],t:x[1]}})}});
+var ALL=[],seenNow=false;
+MODS.forEach(function(m){m.chunks.forEach(function(c){
+  c.id='c'+c.no.replace('.','-');c.mod=m;
+  var X=CONTENT[c.no];if(X){c.h=X.h.replace(/(<div class="card model"><h3>)(.*?)(<\/h3>)/g,function(m,a,t,b,off,str){return str.substr(off+m.length,16)==='<div class="pyq"'?m:m+pyqBlock(t)});c.exam=X.exam}
+  ALL.push(c);
+})});
+var TOTAL=ALL.length,DONE=0,PCT=0,BUILT=ALL.filter(function(c){return c.h}).length;
+function recalc(){
+  var seen=false;
+  ALL.forEach(function(c){
+    if(PROG[c.id])c.s='done';
+    else if(c.h){c.s=seen?'ready':'now';seen=true}
+    else c.s='todo';
+  });
+  DONE=ALL.filter(function(c){return c.s==='done'}).length;PCT=Math.round(DONE/TOTAL*100);
+}
+recalc();
+var PILL={done:'done',now:'up next',ready:'not started',todo:'being built'};
+
+/* ---------- source pages: one per paper / assignment, listing every question as set and where it is solved ---------- */
+var SECS=[
+ {id:'s-rev1',t:'End-sem revision 1',d:'Revision Questions 1, posted for end-sem: SQL, B+ tree, relational algebra, ER, subqueries, normalization, concurrency.',re:/^Rev1 /},
+ {id:'s-self',t:'End-sem revision 2 (self-assessment)',d:'DBMS question bank for self-evaluation, posted for end-sem.',re:/^Self /},
+ {id:'s-ia2qb',t:'IA2 question bank',d:'The IA2 question bank: Modules 1 to 3, Sections A, B and C. Tags read IA2QB M<module> <section><number>.',re:/^IA2QB /},
+ {id:'s-rem',t:'Remedial assignment (IA2 paper)',d:'The IA2 question paper, set again as the remedial assignment. The figures are from the paper.',re:/^Rem /},
+ {id:'s-er',t:'IA2 revision: ER models',d:'Design ER models, and convert three given ER diagrams to tables.',re:/^ER /},
+ {id:'s-sqla',t:'IA2 revision: SQL queries',d:'Thirty queries on the Student, Department, Course, Enrollment and Faculty tables.',re:/^SQLA /},
+ {id:'s-fpt',t:'IA2 revision: functions, procedures, triggers',d:'SQL functions, stored procedures and triggers.',re:/^FPT /},
+ {id:'s-plsql',t:'IA2 revision: PL/SQL',d:'PL/SQL programs: control flow, cursors, procedures, functions, exception handling.',re:/^PLSQL /},
+ {id:'s-asg1',t:'Assignment 1',d:'SQL and relational algebra on the EMPLOYEES table (30.07.2026).',re:/^Asg1 /},
+ {id:'s-ia1asg',t:'IA1 assignment',d:'The IA1 assignment questions (set A: simple selects; set B: combining customer and supplier tables).',re:/^IA1Asg /},
+ {id:'s-m4asg',t:'Module 4 assignment',d:'Posted 15.10.2026: records, indexing, file organization.',re:/^M4Asg /}
+];
+function natKey(k){return k.toLowerCase().replace(/\d+/g,function(n){return ('0000'+n).slice(-4)})}
+SECS.forEach(function(S){S.q=[]});
+PYQ.forEach(function(q){for(var i=0;i<SECS.length;i++){if(SECS[i].re.test(q[0])){SECS[i].q.push(q);break}}});
+SECS.forEach(function(S){S.q.sort(function(a,b){return natKey(a[0])<natKey(b[0])?-1:1})});
+SECS=SECS.filter(function(S){return S.q.length});
+var SRCMAP=null;
+function srcMap(){
+  if(SRCMAP)return SRCMAP;
+  SRCMAP=ALL.map(function(c){var t=[];(c.h||'').replace(/<span class="src">(.*?)<\/span>/g,function(m,x){t.push(x.replace(/<[^>]*>/g,''))});return t});
+  return SRCMAP;
+}
+function solvedIn(keys){
+  var res=keys.map(keyRe),map=srcMap(),out=[];
+  ALL.forEach(function(c,i){if(map[i].some(function(x){return res.some(function(re){return re.test(x)})}))out.push('<a href="#'+c.id+'">'+c.no+' '+esc(c.t)+'</a>')});
+  return out;
+}
+function srcPage(S){
+  var uniq=[],at={};
+  S.q.forEach(function(q){var k=q[1]+(FIG[q[0]]||'');if(at[k]!==undefined)at[k].keys.push(q[0]);else{at[k]={q:q,keys:[q[0]]};uniq.push(at[k])}});
+  var h='<button class="menu" aria-label="Open chunk list">\u2630 Chunks</button><div class="kicker" style="margin-top:12px">PAPERS AND ASSIGNMENTS</div><h1 style="font-size:1.8rem;margin-top:6px">'+esc(S.t)+'</h1><p>'+esc(S.d)+'</p><p class="log">'+uniq.length+' question'+(uniq.length===1?'':'s')+', each shown as set, with the chunks that solve it.</p>';
+  uniq.forEach(function(u){
+    var q=u.q,where=solvedIn(u.keys);
+    h+='<div class="pyq" id="q-'+esc(q[0].replace(/\W+/g,'-'))+'"><div class="log" style="margin:0 0 4px"><b>'+esc(q[0])+'</b>'+(q[2]?' \u00b7 '+esc(q[2]):'')+'</div>'+esc(q[1])+figImg(q[0],q[1])+'<div class="log" style="margin:6px 0 0">'+(where.length?'Solved in: '+where.join(' \u00b7 '):'Not yet linked to a chunk.')+'</div></div>';
+  });
+  return h;
+}
+/* ---------- search: chunks (title, exam chips, full text), papers, and every question ---------- */
+var SIDX=null,LASTQ='',PEND=null;
+function sstem(t){return t.length>4?t.replace(/(ing|ed|es|s|e|y)$/,''):t}
+function stoks(q){return q.toLowerCase().split(/[\s,;:.()\[\]{}"'“”‘’?!]+/).filter(function(x){return x}).map(sstem)}
+var SRX={};
+function srx(t){return SRX[t]||(SRX[t]=new RegExp('(^|[^a-z0-9])'+escRe(t)))}
+function sall(text,toks){for(var i=0;i<toks.length;i++)if(!srx(toks[i]).test(text))return false;return true}
+function sidx(){
+  if(SIDX)return SIDX;
+  SIDX={chunks:ALL.map(function(c){
+    var t=(c.h||'').replace(/<(script|style|svg)[\s\S]*?<\/\1>/g,' ').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/g,' ').replace(/\s+/g,' ');
+    return {c:c,head:(c.no+' '+c.t+' '+(c.exam||[]).join(' ')).toLowerCase(),body:t,low:t.toLowerCase()}
+  })};
+  return SIDX;
+}
+function ssnip(x,toks){
+  var best=-1;for(var i=0;i<toks.length;i++){var m=srx(toks[i]).exec(x.low);if(m&&(best<0||m.index<best))best=m.index+m[1].length}
+  if(best<0)return '';
+  var a=Math.max(0,best-50),b=Math.min(x.body.length,best+90);
+  return (a>0?'… ':'')+x.body.slice(a,b)+(b<x.body.length?' …':'');
+}
+function runSearch(q){
+  var toks=stoks(q);if(!toks.length)return null;
+  var X=sidx(),tier1=[],tier2=[],part=[],papers=[],qs=[];
+  X.chunks.forEach(function(x){
+    if(sall(x.head,toks))tier1.push({x:x});
+    else if(toks.length>1&&toks.some(function(t){return srx(t).test(x.head)}))part.push({x:x});
+    else if(sall(x.head+' '+x.low,toks))tier2.push({x:x,sn:ssnip(x,toks)});
+  });
+  SECS.forEach(function(S,i){
+    if(sall((S.t+' '+S.d).toLowerCase(),toks))papers.push(S);
+    S.q.forEach(function(qq){
+      if(sall((qq[0]+' '+qq[1]).toLowerCase(),toks))qs.push({S:S,q:qq});
+    });
+  });
+  return {toks:toks,tier1:tier1,part:part,tier2:tier2,papers:papers,qs:qs};
+}
+function sline(href,no,title,sn,pend){return '<a href="'+href+'" data-pend="'+encodeURIComponent(JSON.stringify(pend||{}))+'">'+(no?'<span class="sn">'+esc(no)+'</span>':'')+esc(title)+(sn?'<small>'+esc(sn)+'</small>':'')+'</a>'}
+function renderRes(){
+  var box=$('#qres');if(!box)return;
+  var q=LASTQ.trim();
+  if(q.length<2){box.hidden=true;box.innerHTML='';return}
+  var R=runSearch(q),h='';
+  if(!R.tier1.length&&!R.part.length&&!R.tier2.length&&!R.papers.length&&!R.qs.length){box.innerHTML='<div class="none">Nothing found for \u201c'+esc(q)+'\u201d. Try a shorter word, e.g. \u201cclos\u201d.</div>';box.hidden=false;return}
+  if(R.tier1.length){
+    h+='<h5>Topics (in module order)</h5>';
+    R.tier1.forEach(function(r){h+=sline('#'+r.x.c.id,r.x.c.no,r.x.c.t,'Module '+r.x.c.mod.n,{})});
+  }
+  if(R.part.length){
+    h+='<h5>Related topics</h5>';
+    R.part.forEach(function(r){h+=sline('#'+r.x.c.id,r.x.c.no,r.x.c.t,'Module '+r.x.c.mod.n,{})});
+  }
+  if(R.papers.length){
+    h+='<h5>Papers and assignments</h5>';
+    R.papers.forEach(function(S){h+=sline('#'+S.id,'',S.t,S.q.length+' questions',{})});
+  }
+  if(R.tier2.length){
+    h+='<h5>Also mentioned in</h5>';
+    R.tier2.slice(0,10).forEach(function(r){h+=sline('#'+r.x.c.id,r.x.c.no,r.x.c.t,r.sn,{t:R.toks})});
+    if(R.tier2.length>10)h+='<div class="more">and '+(R.tier2.length-10)+' more chunks. Add another word to narrow it down.</div>';
+  }
+  if(R.qs.length){
+    h+='<h5>Questions ('+R.qs.length+')</h5>';
+    R.qs.slice(0,12).forEach(function(r){h+=sline('#'+r.S.id,r.q[0],r.q[1].replace(/\s+/g,' ').slice(0,90),r.S.t,{id:'q-'+r.q[0].replace(/\W+/g,'-')})});
+    if(R.qs.length>12)h+='<div class="more">and '+(R.qs.length-12)+' more questions. Add another word to narrow it down.</div>';
+  }
+  box.innerHTML=h;box.hidden=false;
+}
+function pend(P){
+  var m=$('#main'),el=null;
+  if(P.id){el=document.getElementById(P.id)}
+  else if(P.t){
+    var cand=$$('h2,h3,h4,p,li,td,.pyq,.callout',m);
+    for(var i=0;i<cand.length&&!el;i++)if(sall(cand[i].textContent.toLowerCase(),P.t))el=cand[i];
+    for(var j=0;j<cand.length&&!el;j++)if(srx(P.t[0]).test(cand[j].textContent.toLowerCase()))el=cand[j];
+  }
+  if(el){el.scrollIntoView({block:'center'});el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}
+}
+if(typeof document!=='undefined'&&document.getElementById('side')){
+  var sd=document.getElementById('side');
+  sd.addEventListener('input',function(e){if(e.target.id==='qs'){LASTQ=e.target.value;renderRes()}});
+  sd.addEventListener('focusin',function(e){if(e.target.id==='qs')renderRes()});
+  sd.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('.sres a');if(!a)return;
+    try{PEND=JSON.parse(decodeURIComponent(a.getAttribute('data-pend')))}catch(x){PEND=null}
+    if(PEND&&!PEND.id&&!PEND.t)PEND=null;
+    if(location.hash===a.getAttribute('href')){e.preventDefault();route()}
+  });
+  sd.addEventListener('keydown',function(e){
+    if(e.target.id!=='qs')return;
+    var box=$('#qres'),links=box?$$('a',box):[],cur=links.findIndex(function(a){return a.classList.contains('sel')});
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      if(!links.length)return;e.preventDefault();
+      if(cur>=0)links[cur].classList.remove('sel');
+      cur=e.key==='ArrowDown'?Math.min(links.length-1,cur+1):Math.max(0,cur-1);
+      links[cur].classList.add('sel');links[cur].scrollIntoView({block:'nearest'});
+    }else if(e.key==='Enter'){var t=links[cur>=0?cur:0];if(t){e.preventDefault();t.click()}}
+    else if(e.key==='Escape'){LASTQ='';e.target.value='';renderRes()}
+  });
+  document.addEventListener('click',function(e){if(!e.target.closest||!e.target.closest('.srch')){var b=$('#qres');if(b)b.hidden=true}});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))){var i=$('#qs');if(i){e.preventDefault();document.body.classList.add('open');i.focus()}}
+  });
+}
+function side(cur){
+  var h='<div class="brand"><span>DBMS Tutor</span><small>23CS2013</small></div><div class="bar" aria-label="progress"><i style="width:'+PCT+'%"></i></div><div class="prog">'+DONE+' of '+TOTAL+' chunks done ('+PCT+'%)'+(BUILT<TOTAL?'<br>'+BUILT+' of '+TOTAL+' chunks built':'')+'</div>';
+  h+='<a href="#home" class="home'+(cur==='home'?' on':'')+'">Overview</a>';
+  h+='<div class="srch"><input id="qs" type="search" placeholder="Search topics, questions…  ( / )" autocomplete="off" spellcheck="false" aria-label="Search the whole site" value="'+esc(LASTQ)+'"><div id="qres" class="sres" hidden></div></div>';
+  MODS.forEach(function(m){
+    h+='<h4>Module '+m.n+'</h4>';
+    m.chunks.forEach(function(c){h+='<a href="#'+c.id+'" class="'+(cur===c.id?'on':'')+'"><span class="dot '+(c.s==='done'?'done':c.s==='now'?'now':c.s==='ready'?'ready':'')+'"></span><span class="no">'+c.no+'</span><span>'+esc(c.t)+'</span></a>'});
+  });
+  h+='<h4>Drill</h4><a href="#mcq" class="'+(cur==='mcq'?'on':'')+'"><span class="no">200</span><span>IA1 MCQ bank (Modules 1, 2)</span></a>';
+  h+='<h4>Papers and assignments</h4>';
+  SECS.forEach(function(S){h+='<a href="#'+S.id+'" class="'+(cur===S.id?'on':'')+'"><span class="no">'+S.q.length+'</span><span>'+esc(S.t)+'</span></a>'});
+  $('#side').innerHTML=h;
+}
+function home(){
+  var nxt=ALL.filter(function(c){return c.s!=='done'})[0];
+  var h='<button class="menu" aria-label="Open chunk list">☰ Chunks</button><div class="kicker" style="margin-top:12px">DATABASE MANAGEMENT SYSTEMS · ENDSEM PLAN</div><h1 style="font-size:1.9rem;margin-top:6px">Where you are</h1>';
+  h+='<div class="card"><div class="row" style="gap:22px;align-items:flex-end"><div><div class="big">'+PCT+'%</div><div class="log">'+DONE+' of '+TOTAL+' chunks done'+(BUILT<TOTAL?' · '+BUILT+' built':'')+'</div></div><div style="flex:1 1 220px"><div class="bar" style="margin:0"><i style="width:'+PCT+'%"></i></div><p style="margin:10px 0 0">'+(nxt?'Next: <a href="#'+nxt.id+'"><b>'+nxt.no+' '+esc(nxt.t)+'</b></a>':'All chunks done.')+'</p></div></div></div>';
+  h+='<div class="mods">'+MODS.map(function(m){var d=m.chunks.filter(function(c){return c.s==='done'}).length,b=m.chunks.filter(function(c){return c.h}).length,p=Math.round(d/m.chunks.length*100);
+    return '<div class="card" style="margin:0"><div class="kicker">MODULE '+m.n+'</div><div style="font-weight:600;margin:2px 0 8px">'+esc(m.name)+'</div><div class="bar" style="margin:0"><i style="width:'+p+'%"></i></div><div class="log" style="margin:6px 0 0">'+d+' / '+m.chunks.length+(b<m.chunks.length?' · '+b+' built':'')+'</div></div>'}).join('')+'</div>';
+  h+='<h2>What the exam looks like</h2><p>No past end-sem paper is in Classroom yet. The two <b>end-sem revision sheets</b> the teacher posted are the best guide, followed by the IA2 question bank and the remedial IA2 paper. Every question from them is on a page under <b>Papers and assignments</b>, with a link to the chunk that solves it.</p>';
+  h+='<div class="mods">'+[['s-rev1','End-sem revision 1'],['s-self','End-sem revision 2'],['s-ia2qb','IA2 question bank'],['mcq','IA1 MCQ drill']].map(function(x){return '<a class="card" style="margin:0;text-decoration:none;color:inherit" href="#'+x[0]+'"><div class="kicker">START HERE</div><div style="font-weight:600">'+x[1]+'</div></a>'}).join('')+'</div>';
+  h+='<h2>Three habits that earn the marks</h2><ul><li><b>SQL questions:</b> write the query, then the relational algebra if asked. Name the tables exactly as in the question.</li><li><b>ER questions:</b> draw it with the standard symbols (rectangle, diamond, ellipse, double lines) and then convert it to tables with primary and foreign keys underlined or marked.</li><li><b>Normalization:</b> list the functional dependencies first, find the key, then go 1NF → 2NF → 3NF → BCNF, showing the tables at every step, the way the teacher’s Online Bookstore answer does.</li></ul>';
+  h+='<p class="log" style="margin-top:24px">Progress is saved in this browser only. <button data-resetprog>Reset progress</button></p>';
+  return h;
+}
+function chunk(c,i){
+  var h='<button class="menu" aria-label="Open chunk list">☰ Chunks</button><div class="kicker" style="margin-top:12px">MODULE '+c.mod.n+' · '+esc(c.mod.name.toUpperCase())+'</div><h1 style="font-size:1.8rem;margin-top:6px">'+c.no+' '+esc(c.t)+'<span class="pill '+c.s+'">'+PILL[c.s]+'</span></h1>';
+  if(c.exam)h+='<div class="chips" aria-label="where this appears">'+c.exam.map(function(e){return '<span class="chip">'+esc(e)+'</span>'}).join('')+'</div>';
+  if(!c.h)h+='<div class="card"><p>This chunk is still being built. It will appear here.</p></div>';
+  else h+=c.h;
+  h+='<div class="card" style="margin-top:28px"><div class="row" style="justify-content:space-between"><span>'+(c.s==='done'?'You marked this chunk as done.':'Finished this chunk?')+'</span><button data-mark class="'+(c.s==='done'?'':'primary')+'">'+(c.s==='done'?'Mark as not done':'Mark as done')+'</button></div></div>';
+  var p=ALL[i-1],n=ALL[i+1];
+  h+='<div class="nav">'+(p?'<a class="btn" href="#'+p.id+'">← '+p.no+' '+esc(p.t)+'</a>':'<span></span>')+(n?'<a class="btn" href="#'+n.id+'">'+n.no+' '+esc(n.t)+' →</a>':'')+'</div>';
+  return h;
+}
+function hydrate(root){
+  Object.keys(WIDGETS).forEach(function(sel){$$(sel,root).forEach(function(el){if(!el.dataset.hyd){el.dataset.hyd=1;WIDGETS[sel](el)}})});
+}
+function route(){
+  var id=(location.hash||'#home').slice(1),main=$('#main');
+  document.body.classList.remove('open');recalc();
+  var SS=SECS.filter(function(S){return S.id===id})[0];
+  if(SS){side(id);main.innerHTML=srcPage(SS)}
+  else if(id==='mcq'){side(id);main.innerHTML=mcqPage()}
+  else if(id==='home'||!ALL.some(function(c){return c.id===id})){side('home');main.innerHTML=home()}
+  else{var i=ALL.map(function(c){return c.id}).indexOf(id);side(id);main.innerHTML=chunk(ALL[i],i)}
+  hydrate(main);
+  var mk=$('[data-mark]',main);if(mk)mk.onclick=function(){if(PROG[id])delete PROG[id];else PROG[id]=1;saveProg();var y=window.scrollY;route();window.scrollTo(0,y)};
+  var rp=$('[data-resetprog]',main);if(rp)rp.onclick=function(){if(confirm('Reset all DBMS progress in this browser?')){PROG={};saveProg();route()}};
+  var mw=$('[data-mcqwrong]',main);if(mw)mw.onclick=function(){$$('.mcq',main).forEach(function(w){w.hidden=MST[w.dataset.n]!==0})};
+  var mr=$('[data-mcqreset]',main);if(mr)mr.onclick=function(){if(confirm('Clear your MCQ answers?')){MST={};mcqSave();route()}};
+  var mb=$('.menu',main);if(mb)mb.onclick=function(){document.body.classList.toggle('open')};
+  var a=$('#side a.on');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest'});
+  window.scrollTo(0,0);
+  if(PEND){var PP=PEND;PEND=null;setTimeout(function(){pend(PP)},80)}
+}
+if(typeof document!=='undefined'&&document.getElementById('main')){window.addEventListener('hashchange',route);route()}
+
+</script>
+
+</body></html>
