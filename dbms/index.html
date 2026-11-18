@@ -181,6 +181,7 @@ table.cyk td.pad{padding:0}
 .card,.w,.callout{min-width:0;max-width:100%}
 code{overflow-wrap:anywhere}
 pre.sql{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:.88rem;line-height:1.5;white-space:pre;max-width:100%}
+.bp-leaf{fill:var(--ok-soft);stroke:var(--ink);stroke-width:1.2} .bp-in{fill:var(--accent-soft);stroke:var(--ink);stroke-width:1.2} .bp-hi{fill:var(--term-bg);stroke:var(--term);stroke-width:2.2} .bp-t{fill:var(--ink);font-size:13px} .bp-ptr{stroke:var(--muted);stroke-width:1.2}
 .mcq.ok{border-color:var(--ok)} .mcq.bad{border-color:var(--warn)} .mcq .row button{text-align:left}
 </style>
 </head>
@@ -726,6 +727,355 @@ function TBL(head,rows,cls){
 function MODEL(title,body){return '<div class="card model"><h3>'+title+'</h3>'+pyqBlock(title)+body+'</div>'}
 function P(src,ans){return '<li>'+src+'<details class="ans"><summary>Show answer</summary><div>'+ans+'</div></details></li>'}
 function CODE(s){return '<pre class="sql">'+esc(s)+'</pre>'}
+
+/* ===== B+ tree (Silberschatz, as in the Module 4 slides): order n = at most n pointers per node,
+   so a leaf holds at most n-1 keys. Leaf split keeps the first ⌈n/2⌉ keys and COPIES the first key of the new leaf up;
+   internal split keeps ⌈(n+1)/2⌉ pointers and MOVES the middle key up. Deletion merges if the two nodes fit in one, else borrows. ===== */
+function bpNew(leaf){return {leaf:leaf,keys:[],kids:[]}}
+function bpClone(t){return JSON.parse(JSON.stringify(t))}
+function bpInsert(root,k,n,log){
+  function ins(N){
+    if(N.leaf){
+      if(N.keys.indexOf(k)>=0){log.push(k+' is already in the tree.');return null}
+      N.keys.push(k);N.keys.sort(function(a,b){return a-b});
+      if(N.keys.length<=n-1){log.push('Leaf has room: ['+N.keys.join(', ')+'].');return null}
+      var m=Math.ceil(n/2),R=bpNew(true);R.keys=N.keys.slice(m);N.keys=N.keys.slice(0,m);
+      log.push('Leaf overflows ('+n+' keys, max '+(n-1)+'). Split: ['+N.keys.join(', ')+'] | ['+R.keys.join(', ')+']. Copy '+R.keys[0]+' up to the parent.');
+      return {key:R.keys[0],right:R};
+    }
+    var i=0;while(i<N.keys.length&&k>=N.keys[i])i++;
+    var r=ins(N.kids[i]);if(!r)return null;
+    N.keys.splice(i,0,r.key);N.kids.splice(i+1,0,r.right);
+    if(N.kids.length<=n){log.push('Parent takes '+r.key+': ['+N.keys.join(', ')+'].');return null}
+    var m2=Math.ceil((n+1)/2),up=N.keys[m2-1],R2=bpNew(false);
+    R2.keys=N.keys.slice(m2);R2.kids=N.kids.slice(m2);N.keys=N.keys.slice(0,m2-1);N.kids=N.kids.slice(0,m2);
+    log.push('Internal node overflows ('+(n+1)+' pointers, max '+n+'). Split: ['+N.keys.join(', ')+'] | ['+R2.keys.join(', ')+']. Move '+up+' up (it is not kept below).');
+    return {key:up,right:R2};
+  }
+  var r=ins(root);
+  if(r){var T=bpNew(false);T.keys=[r.key];T.kids=[root,r.right];log.push('The root split, so a new root ['+r.key+'] is made. The tree grows one level.');return T}
+  return root;
+}
+function bpDelete(root,k,n,log){
+  var path=[],N=root;
+  while(!N.leaf){var i=0;while(i<N.keys.length&&k>=N.keys[i])i++;path.push([N,i]);N=N.kids[i]}
+  var at=N.keys.indexOf(k);if(at<0){log.push(k+' is not in the tree.');return root}
+  N.keys.splice(at,1);log.push('Remove '+k+' from its leaf: ['+N.keys.join(', ')+'].');
+  var minLeaf=Math.ceil((n-1)/2),minKids=Math.ceil(n/2);
+  while(true){
+    if(!path.length){
+      if(!N.leaf&&N.kids.length===1){log.push('The root has one child left, so that child becomes the root.');return N.kids[0]}
+      return N;
+    }
+    var under=N.leaf?N.keys.length<minLeaf:N.kids.length<minKids;
+    if(!under){log.push('No underflow (min '+(N.leaf?minLeaf+' keys in a leaf':minKids+' pointers in an internal node')+'). Done.');return root}
+    var top=path.pop(),Pn=top[0],idx=top[1],left=idx>0,sib=left?Pn.kids[idx-1]:Pn.kids[idx+1],kp=left?idx-1:idx,Kp=Pn.keys[kp];
+    var fits=N.leaf?N.keys.length+sib.keys.length<=n-1:N.kids.length+sib.kids.length<=n;
+    var L=left?sib:N,R=left?N:sib;
+    if(fits){
+      if(N.leaf)L.keys=L.keys.concat(R.keys);
+      else{L.keys=L.keys.concat([Kp],R.keys);L.kids=L.kids.concat(R.kids)}
+      Pn.keys.splice(kp,1);Pn.kids.splice(kp+1,1);
+      log.push('Underflow. The node and its '+(left?'left':'right')+' sibling fit in one node, so merge them: ['+L.keys.join(', ')+']'+(N.leaf?'':' (separator '+Kp+' comes down)')+'. Remove '+Kp+' from the parent.');
+      N=Pn;continue;
+    }
+    if(N.leaf){
+      if(left){var x=sib.keys.pop();N.keys.unshift(x);Pn.keys[kp]=x}else{var y=sib.keys.shift();N.keys.push(y);Pn.keys[kp]=sib.keys[0]}
+    }else{
+      if(left){N.keys.unshift(Kp);N.kids.unshift(sib.kids.pop());Pn.keys[kp]=sib.keys.pop()}else{N.keys.push(Kp);N.kids.push(sib.kids.shift());Pn.keys[kp]=sib.keys.shift()}
+    }
+    log.push('Underflow, but the two nodes do not fit in one. Borrow one entry from the '+(left?'left':'right')+' sibling and update the separator in the parent to '+Pn.keys[kp]+'.');
+    return root;
+  }
+}
+function bpSVG(T,hi){
+  var lv=[],W=0,BW=26,GAP=16,H=0;
+  (function walk(N,d){(lv[d]=lv[d]||[]).push(N);N.d=d;N.kids.forEach(function(c){walk(c,d+1)})})(T,0);
+  var leaves=lv[lv.length-1],x=10;
+  leaves.forEach(function(N){N.w=Math.max(1,N.keys.length)*BW;N.x=x;x+=N.w+GAP});W=x;
+  for(var d=lv.length-2;d>=0;d--)lv[d].forEach(function(N){N.w=Math.max(1,N.keys.length)*BW;var a=N.kids[0],b=N.kids[N.kids.length-1];N.x=(a.x+b.x+b.w)/2-N.w/2});
+  var minx=Math.min.apply(null,lv.map(function(r){return r[0].x}));if(minx<10)lv.forEach(function(r){r.forEach(function(N){N.x+=10-minx})});
+  W=Math.max(W,Math.max.apply(null,lv.map(function(r){var z=r[r.length-1];return z.x+z.w+10})));
+  var out='',dy=64;H=lv.length*dy;
+  lv.forEach(function(r,d){r.forEach(function(N){var y=d*dy+10;
+    N.kids.forEach(function(c,i){var px=N.x+i*(N.w/Math.max(1,N.kids.length-1||1));if(N.kids.length===1)px=N.x+N.w/2;out+='<line class="tn-l" x1="'+Math.min(N.x+N.w,Math.max(N.x,N.x+i*BW))+'" y1="'+(y+24)+'" x2="'+(c.x+c.w/2)+'" y2="'+((d+1)*dy+10)+'"/>'});
+    N.keys.forEach(function(k,i){out+='<rect x="'+(N.x+i*BW)+'" y="'+y+'" width="'+BW+'" height="24" class="'+(N.leaf?'bp-leaf':'bp-in')+(hi===k?' bp-hi':'')+'"/><text x="'+(N.x+i*BW+BW/2)+'" y="'+(y+16)+'" text-anchor="middle" class="bp-t">'+k+'</text>'});
+    if(!N.keys.length)out+='<rect x="'+N.x+'" y="'+y+'" width="'+BW+'" height="24" class="bp-leaf"/>';
+  })});
+  for(var i=0;i<leaves.length-1;i++){var a=leaves[i],b=leaves[i+1],yy=(lv.length-1)*dy+22;out+='<line class="bp-ptr" x1="'+(a.x+a.w)+'" y1="'+yy+'" x2="'+(b.x-2)+'" y2="'+yy+'" marker-end="url(#bpa)"/>'}
+  return '<svg xmlns="'+NS+'" viewBox="0 0 '+W+' '+(H+6)+'" width="'+W+'" height="'+(H+6)+'" role="img" aria-label="B+ tree"><defs><marker id="bpa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fa-a"/></marker></defs>'+out+'</svg>';
+}
+/* data-n order, data-keys "15 8 3", optional data-then "+13 -18" applied to the finished tree (each from the tree the keys built) */
+function mkBpt(el){
+  var n=+el.dataset.n,keys=el.dataset.keys.trim().split(/[\s,]+/).map(Number),then=(el.dataset.then||'').trim().split(/\s+/).filter(Boolean);
+  var steps=[],T=bpNew(true);
+  keys.forEach(function(k){var log=[];T=bpInsert(T,k,n,log);steps.push({t:'Insert '+k,log:log,tree:bpClone(T),hi:k})});
+  var built=bpClone(T);
+  then.forEach(function(op){var k=+op.slice(1),log=[],U=bpClone(built);U=op[0]==='+'?bpInsert(U,k,n,log):bpDelete(U,k,n,log);steps.push({t:(op[0]==='+'?'From the finished tree, insert ':'From the finished tree, delete ')+k,log:log,tree:U,hi:op[0]==='+'?k:null,sep:1})});
+  var i=keys.length-1;
+  function draw(){var s=steps[i];el.innerHTML='<div class="row"><button data-a="0">⏮</button><button data-a="-1">◀ Prev</button><span class="log" style="margin:0">Step '+(i+1)+' of '+steps.length+'</span><button data-a="1">Next ▶</button><button data-a="9">⏭</button></div><p style="margin:8px 0 4px"><b>'+s.t+'</b></p><div class="log" style="margin:0 0 6px">'+s.log.map(esc).join('<br>')+'</div><div class="scroll">'+bpSVG(s.tree,s.hi)+'</div>'}
+  el.addEventListener('click',function(e){var b=e.target.closest('button[data-a]');if(!b)return;var a=+b.dataset.a;i=a===0?0:a===9?steps.length-1:Math.max(0,Math.min(steps.length-1,i+a));draw()});
+  draw();
+}
+WIDGETS['.bpt']=mkBpt;
+function BPT(cap,n,keys,then){return '<div class="w"><div class="cap">'+cap+'</div><div class="bpt" data-n="'+n+'" data-keys="'+keys+'"'+(then?' data-then="'+then+'"':'')+'></div></div>'}
+
+/* ===== functional dependencies: closure, candidate keys, normal form check ===== */
+function fdParse(t){return t.split(/[,;\n]+/).map(function(s){var p=s.split(/->|→/);if(p.length!==2)return null;return {l:fdSet(p[0]),r:fdSet(p[1])}}).filter(function(f){return f&&f.l.length&&f.r.length})}
+function fdSet(s){s=s.trim();return (/\s/.test(s)?s.split(/\s+/):s.split('')).filter(function(x){return x&&x!=='{'&&x!=='}'}).filter(function(x,i,a){return a.indexOf(x)===i}).sort()}
+function fdClosure(X,F,log){
+  var C=X.slice(),ch=true;
+  while(ch){ch=false;F.forEach(function(f){if(f.l.every(function(a){return C.indexOf(a)>=0})&&f.r.some(function(a){return C.indexOf(a)<0})){f.r.forEach(function(a){if(C.indexOf(a)<0)C.push(a)});if(log)log.push('use '+f.l.join('')+' → '+f.r.join('')+': {'+C.slice().sort().join(', ')+'}');ch=true}})}
+  return C.sort();
+}
+function fdKeys(R,F){
+  var keys=[],N=R.length;
+  for(var size=1;size<=N;size++){
+    (function comb(st,cur){
+      if(cur.length===size){if(keys.some(function(k){return k.every(function(a){return cur.indexOf(a)>=0})}))return;if(fdClosure(cur,F).length===N)keys.push(cur.slice());return}
+      for(var i=st;i<N;i++){cur.push(R[i]);comb(i+1,cur);cur.pop()}
+    })(0,[]);
+  }
+  return keys;
+}
+function mkFd(el){
+  el.innerHTML='<div class="row"><label>R = <input type="text" data-r value="'+esc(el.dataset.r)+'" size="14" aria-label="attributes"></label><label>F = <input type="text" data-f value="'+esc(el.dataset.f)+'" size="34" aria-label="functional dependencies"></label></div><div class="row" style="margin-top:8px"><label>Closure of <input type="text" data-x value="'+esc(el.dataset.x||'')+'" size="6" aria-label="attribute set"></label><button class="primary" data-go>Work it out</button></div><div class="out"></div><div class="log">Write attributes as single letters (ABCDE) or separated by spaces (StudentID Name). Separate FDs with commas, e.g. A->B, BC->D.</div>';
+  function go(){
+    var R=fdSet($('[data-r]',el).value),F=fdParse($('[data-f]',el).value),X=fdSet($('[data-x]',el).value),h='',log=[];
+    if(X.length){var C=fdClosure(X,F,log);h+='<p><b>'+X.join('')+'⁺</b>: start {'+X.join(', ')+'}<br>'+log.join('<br>')+'<br>= <b>{'+C.join(', ')+'}</b>'+(C.length===R.length?' = all of R, so '+X.join('')+' is a <b>superkey</b>.':'')+'</p>'}
+    var K=fdKeys(R,F),prime=[];K.forEach(function(k){k.forEach(function(a){if(prime.indexOf(a)<0)prime.push(a)})});
+    h+='<p>Candidate keys: <b>'+K.map(function(k){return k.join('')}).join(', ')+'</b>. Prime attributes: {'+prime.sort().join(', ')+'}.</p>';
+    var rows=[],nf=4;
+    F.forEach(function(f){f.r.forEach(function(a){
+      if(f.l.indexOf(a)>=0)return;
+      var sk=fdClosure(f.l,F).length===R.length,pr=prime.indexOf(a)>=0,partial=!pr&&K.some(function(k){return f.l.length<k.length&&f.l.every(function(b){return k.indexOf(b)>=0})});
+      var v=sk?'fine (left side is a superkey)':partial?'<b>violates 2NF</b>: partial dependency on part of a key':pr?'violates BCNF only (right side is prime)':'<b>violates 3NF</b>: transitive (left side is not a key, right side not prime)';
+      if(!sk)nf=Math.min(nf,partial?1:pr?3:2);
+      rows.push([f.l.join('')+' → '+a,v]);
+    })});
+    h+=TBL(['Dependency','Check'],rows);
+    h+='<p>Highest normal form: <b>'+['','1NF','2NF','3NF','BCNF'][nf]+'</b> (assuming atomic values).</p>';
+    $('.out',el).innerHTML=h;
+  }
+  $('[data-go]',el).onclick=go;go();
+}
+WIDGETS['.fdt']=mkFd;
+function FDT(cap,R,F,X){return '<div class="w"><div class="cap">'+cap+'</div><div class="fdt" data-r="'+R+'" data-f="'+F+'" data-x="'+(X||'')+'"></div></div>'}
+
+/* ===== conflict serializability: precedence graph from a schedule like "r1(A) w1(A) r2(A) w2(A)" ===== */
+function serCheck(src){
+  var ops=(src.match(/[rwRW]\s*\d+\s*\(\s*\w+\s*\)/g)||[]).map(function(t){var m=t.match(/([rwRW])\s*(\d+)\s*\(\s*(\w+)/);return {op:m[1].toUpperCase(),t:+m[2],x:m[3]}});
+  var T=[],E={},why={};ops.forEach(function(o){if(T.indexOf(o.t)<0)T.push(o.t)});T.sort();
+  ops.forEach(function(a,i){ops.slice(i+1).forEach(function(b){if(a.t!==b.t&&a.x===b.x&&(a.op==='W'||b.op==='W')){var k=a.t+'>'+b.t;if(!E[k]){E[k]=1;why[k]=a.op+a.t+'('+a.x+') before '+b.op+b.t+'('+b.x+')'}}})});
+  var indeg={},order=[],left=T.slice();T.forEach(function(t){indeg[t]=0});Object.keys(E).forEach(function(k){indeg[+k.split('>')[1]]++});
+  while(left.length){var z=left.filter(function(t){return indeg[t]===0})[0];if(z===undefined)break;order.push(z);left.splice(left.indexOf(z),1);Object.keys(E).forEach(function(k){if(+k.split('>')[0]===z)indeg[+k.split('>')[1]]--})}
+  return {ops:ops,T:T,E:Object.keys(E),why:why,cyc:left.length>0,order:order};
+}
+function serSVG(r){
+  var n=r.T.length,R=n<3?0:70,cx=130,cy=n<3?40:100,P={},out='';
+  r.T.forEach(function(t,i){P[t]=n<3?{x:60+i*140,y:cy}:{x:cx+R*Math.cos(2*Math.PI*i/n-Math.PI/2),y:cy+R*Math.sin(2*Math.PI*i/n-Math.PI/2)}});
+  r.E.forEach(function(k){var a=P[+k.split('>')[0]],b=P[+k.split('>')[1]],back=r.E.indexOf(k.split('>').reverse().join('>'))>=0,dx=b.x-a.x,dy=b.y-a.y,L=Math.sqrt(dx*dx+dy*dy),ux=dx/L,uy=dy/L,o=back?7:0;
+    out+='<line class="fa-e" x1="'+(a.x+ux*20-uy*o)+'" y1="'+(a.y+uy*20+ux*o)+'" x2="'+(b.x-ux*22-uy*o)+'" y2="'+(b.y-uy*22+ux*o)+'" marker-end="url(#sga)"/>'});
+  r.T.forEach(function(t){out+='<circle class="fa-c" cx="'+P[t].x+'" cy="'+P[t].y+'" r="18"/><text class="fa-t" x="'+P[t].x+'" y="'+(P[t].y+5)+'" text-anchor="middle">T'+t+'</text>'});
+  var W=n<3?80+Math.max(1,n-1)*140:260,H=n<3?80:200;
+  return '<svg xmlns="'+NS+'" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="precedence graph"><defs><marker id="sga" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fa-a"/></marker></defs>'+out+'</svg>';
+}
+function mkSer(el){
+  el.innerHTML='<div class="row"><input type="text" data-s value="'+esc(el.dataset.s)+'" style="flex:1 1 320px" aria-label="schedule"><button class="primary" data-go>Check</button></div><div class="out"></div><div class="log">Write each step as r1(A) or w2(B), in the order they run.</div>';
+  function go(){
+    var r=serCheck($('[data-s]',el).value),h='';
+    var cols=r.T.map(function(t){return 'T'+t});
+    h+=TBL(cols,r.ops.map(function(o){return r.T.map(function(t){return t===o.t?(o.op==='R'?'read':'write')+'('+o.x+')':''})}),'c');
+    h+='<p>Conflicting pairs (same item, different transactions, at least one write), each giving an edge:</p><ul>'+(r.E.length?r.E.map(function(k){return '<li>'+r.why[k]+' ⇒ <b>T'+k.replace('>',' → T')+'</b></li>'}).join(''):'<li>none</li>')+'</ul>';
+    h+='<div class="scroll">'+serSVG(r)+'</div>';
+    h+=r.cyc?'<p class="msg bad"><b>The graph has a cycle, so the schedule is NOT conflict serializable.</b></p>':'<p class="msg ok"><b>No cycle, so the schedule IS conflict serializable</b>. Equivalent serial order (topological sort): '+r.order.map(function(t){return 'T'+t}).join(' → ')+'.</p>';
+    $('.out',el).innerHTML=h;
+  }
+  $('[data-go]',el).onclick=go;go();
+}
+WIDGETS['.ser']=mkSer;
+function SER(cap,s){return '<div class="w"><div class="cap">'+cap+'</div><div class="ser" data-s="'+s+'"></div></div>'}
+
+/* ================= MODULE 1: Introduction and database architecture ================= */
+function S(t){return '<span class="src">'+t+'</span>'}
+var C11='<p>A <b>database</b> is a collection of related data. A <b>database management system (DBMS)</b> is that data plus the set of programs that store, retrieve and update it conveniently and efficiently. Before DBMSs, organisations kept data in separate operating-system files, each with its own programs. That is the <b>file-processing system</b>, and every purpose of a DBMS is a fix for one of its problems.</p>'+
+'<h2>Why not just files? Seven problems a DBMS solves</h2>'+TBL(['Problem with files','What goes wrong (university example)','How a DBMS fixes it'],[
+['<b>Data redundancy and inconsistency</b>','A student’s address is stored in both the Accounts file and the Library file. One copy is updated, the other is not.','One shared copy, normalized design'],
+['<b>Difficulty in accessing data</b>','“List students in CSE with CGPA above 8” needs a new program, because nobody wrote one.','A query language (SQL) answers new questions without new programs'],
+['<b>Data isolation</b>','Data is scattered in many files in different formats, so writing new programs is hard.','One data model and one catalogue'],
+['<b>Integrity problems</b>','“Balance must never go below 0” is buried in program code and hard to change.','Constraints declared once (CHECK, PRIMARY KEY, FOREIGN KEY)'],
+['<b>Atomicity problems</b>','The system crashes after ₹50 leaves account A but before it reaches B.','Transactions: all or nothing'],
+['<b>Concurrent-access anomalies</b>','Two clerks withdraw from the same account at the same time and one update is lost.','Concurrency control (locking)'],
+['<b>Security problems</b>','A payroll clerk can read student marks.','Authorization: GRANT / REVOKE, views']])+
+'<h2>Applications of DBMS</h2><p>'+S('Rem Q1')+'Banking (accounts, loans, transactions), airlines and railways (reservations, schedules), universities (students, courses, grades, e.g. Eduserve), e-commerce (products, orders, payments), telecom (call records, billing), human resources (employees, payroll), manufacturing (inventory, supply chain), healthcare (patients, appointments, prescriptions), social media (users, posts, friends).</p>'+
+'<h2>Solved models</h2>'+
+MODEL('1. Purpose of a database system and drawbacks of file processing '+S('IA2QB M1 C3'),'<div class="paper"><p><b>Purpose.</b> A database system lets many users store, retrieve and update shared data <b>conveniently</b> (through a query language), <b>efficiently</b> (indexes, query optimization), <b>correctly</b> (integrity constraints, transactions) and <b>securely</b> (authorization), while hiding how the data is physically stored.</p><p><b>Drawbacks of file-processing systems</b> (write each with one example):</p><p>1. Data redundancy and inconsistency. 2. Difficulty in accessing data. 3. Data isolation. 4. Integrity problems. 5. Atomicity problems. 6. Concurrent-access anomalies. 7. Security problems.</p><p>(Use the table above for the one-line example of each.)</p><p><b>Conclusion.</b> A DBMS removes these problems by keeping one integrated copy of the data under one system that enforces constraints, transactions, concurrency control and security.</p></div>')+
+'<h2>Practice</h2><ol class="practice">'+
+P(S('IA2QB M1 A1')+'Define a database.','A database is an organised collection of logically related data, stored so that it can be accessed, managed and updated easily. Example: a university database of students, courses and marks.')+
+P(S('IA2QB M1 A2')+'What is a DBMS?','A Database Management System is a collection of interrelated data together with a set of programs to access that data. It provides a convenient and efficient way to store and retrieve information. Examples: Oracle, MySQL, PostgreSQL.')+
+P(S('Rem Q1')+'List the applications of DBMS.','Banking, airlines/railway reservation, universities, e-commerce, telecommunication, human resources, manufacturing, healthcare, social media, finance (stock trading).')+
+'</ol>';
+
+var C12='<p>Users should not need to know how data sits on the disk. A DBMS hides that by describing the data at three levels. This is <b>data abstraction</b>.</p>'+
+'<h2>Three levels of data abstraction</h2>'+TBL(['Feature','Physical level','Logical level','View level'],[
+['Also called','Internal level','Conceptual level','External level'],['Position','Lowest','Middle','Highest'],['Describes','<b>How</b> data is stored: files, blocks, indexes, access paths','<b>What</b> data is stored and the relationships among it: tables, attributes, keys, constraints','<b>Part</b> of the database a particular user needs; the rest is hidden'],
+['Used by','Database administrator, DBMS developers','Database designers, DBA','End users, application programs'],
+['Eduserve example','Student records stored in disk blocks, index on Register_No','Student, Course and Marks tables and their keys','Student dashboard, faculty view, admin view']])+
+'<div class="w"><div class="cap">Three-schema architecture</div><div class="scroll"><svg xmlns="'+NS+'" viewBox="0 0 520 250" width="520" height="250" role="img" aria-label="three schema architecture"><g class="fa-t" text-anchor="middle">'+
+'<rect class="fa-c" x="20" y="10" width="140" height="34" rx="6"/><text x="90" y="32">View 1</text><rect class="fa-c" x="190" y="10" width="140" height="34" rx="6"/><text x="260" y="32">View 2</text><rect class="fa-c" x="360" y="10" width="140" height="34" rx="6"/><text x="430" y="32">View n</text>'+
+'<line class="fa-e" x1="90" y1="44" x2="240" y2="104"/><line class="fa-e" x1="260" y1="44" x2="260" y2="104"/><line class="fa-e" x1="430" y1="44" x2="280" y2="104"/>'+
+'<rect class="fa-c" x="140" y="104" width="240" height="36" rx="6"/><text x="260" y="127">Logical (conceptual) level</text><line class="fa-e" x1="260" y1="140" x2="260" y2="186"/>'+
+'<rect class="fa-c" x="140" y="186" width="240" height="36" rx="6"/><text x="260" y="209">Physical (internal) level</text>'+
+'<text x="455" y="80" style="font-size:12px;fill:var(--muted)">logical data</text><text x="455" y="94" style="font-size:12px;fill:var(--muted)">independence</text><text x="440" y="164" style="font-size:12px;fill:var(--muted)">physical data</text><text x="440" y="178" style="font-size:12px;fill:var(--muted)">independence</text></g></svg></div></div>'+
+'<h2>Schema and instance</h2><p>The <b>schema</b> is the overall design of the database (like a variable’s type); it rarely changes. The <b>instance</b> is the data in the database at a particular moment (like a variable’s value); it changes all the time. There is a physical schema, a logical schema and several subschemas (views).</p>'+
+'<h2>Data independence</h2><p>The ability to change the schema at one level without changing the schema at the next higher level.</p>'+TBL(['','Physical data independence','Logical data independence'],[['Meaning','Change the physical schema without changing the logical schema','Change the logical schema without changing the views / application programs'],['Example','Add an index on Register_No, move files to SSD, change file organization','Add a column Email to Student, split a table into two'],['How hard','Easier to achieve','Harder to achieve (programs depend on the logical structure)']])+
+'<h2>Solved models</h2>'+
+MODEL('1. Three levels of data abstraction with an example '+S('IA2QB M1 B2')+S('Self Q5'),'<div class="paper"><p>Data abstraction hides the complexity of storage from users by describing data at three levels.</p><p><b>1. Physical level (internal).</b> Lowest level. Describes <i>how</i> data is actually stored: file organization, disk blocks, indexes, access methods. <i>Hospital example:</i> patient records stored as fixed-length records in disk blocks with a B+ tree index on Patient_ID.</p><p><b>2. Logical level (conceptual).</b> Describes <i>what</i> data is stored and how it is related: Patient(Patient_ID, Name, Age), Doctor(Doctor_ID, Name, Specialization), Appointment(Appt_ID, Patient_ID, Doctor_ID, Date, Fee) with primary and foreign keys.</p><p><b>3. View level (external).</b> Highest level. Each user sees only the part they need. A receptionist sees patient name and appointment time; a doctor sees diagnosis and history; billing sees fees only.</p><p>Draw the three-schema diagram above, and state that it gives <b>physical and logical data independence</b>, security (each user sees only their view) and reduced complexity.</p></div>')+
+MODEL('2. Three-schema architecture '+S('IA2QB M1 C1')+S('Self Q6'),'<div class="paper"><p>The ANSI/SPARC three-schema architecture separates user applications from the physical database.</p><p><b>External schema</b>: many user views. <i>Airline:</i> the passenger view shows flights, seats and their booking; the crew view shows duty rosters; the agent view shows availability and fares.</p><p><b>Conceptual schema</b>: one description of the whole database for all users: entities Passenger, Flight, Booking, Payment, Airport, Aircraft, their attributes, relationships and constraints, without storage details.</p><p><b>Internal schema</b>: physical storage: Booking stored as a heap file with a hash index on PNR, Flight stored sorted on Flight_No with a B+ tree index on (Source, Destination, Date).</p><p><b>Mappings.</b> External/conceptual mapping converts a view request into the conceptual schema; conceptual/internal mapping converts it into storage operations. Because of these mappings we get <b>logical</b> and <b>physical data independence</b>.</p><p>(Draw the three-level diagram with mappings.)</p></div>')+
+'<h2>Practice</h2><ol class="practice">'+
+P(S('IA2QB M1 A3')+'List the three views/levels of data.','Physical (internal) level, logical (conceptual) level, view (external) level.')+
+P(S('IA2QB M1 A4')+'What is data abstraction?','Hiding the details of how data is stored and maintained, and showing users only what they need. Done at three levels: physical, logical and view.')+
+P(S('IA2QB M1 A7')+'What is the physical level?','The lowest level of abstraction. It describes how data is actually stored: files, blocks, indexes and access methods.')+
+P(S('IA2QB M1 A8')+'What is the logical level?','The middle level. It describes what data is stored and the relationships among the data: tables, attributes, keys and constraints.')+
+P(S('IA2QB M1 A9')+'What is the view level?','The highest level. It describes only the part of the database a particular user needs and hides the rest. Many views can exist for one database.')+
+P(S('IA2QB M1 A10')+'Define schema.','The overall logical design (structure) of the database: the relations, their attributes, keys and constraints. Example: Student(RollNo, Name, Dept).')+
+P(S('IA2QB M1 A11')+'What is an instance of a database?','The actual data stored in the database at a particular moment. It changes as data is inserted, deleted or updated; the schema does not.')+
+P(S('IA2QB M1 B3')+'What is data independence? Name its types.','The ability to change the schema at one level without having to change the schema at the next higher level. Types: physical data independence and logical data independence.')+
+P(S('IA2QB M1 B4')+'Distinguish between physical and logical data independence.','Use the table above: physical = change storage without changing the logical schema (easier); logical = change the logical schema without changing views/programs (harder).')+
+'</ol>';
+
+var C13='<p>A <b>data model</b> is a collection of conceptual tools for describing data, the relationships between data, the meaning of data and the constraints on it.</p>'+
+TBL(['Model','How data is organised','Example / note'],[
+['<b>Relational model</b>','A collection of tables (relations); relationships through common attribute values (keys)','Oracle, MySQL. Most widely used'],
+['<b>Entity-Relationship (ER) model</b>','Entities (things) and relationships among them, drawn as diagrams','Used for design (Module 3)'],
+['<b>Hierarchical model</b>','A tree: each child record has exactly one parent','IBM IMS. Good for 1:N, bad for M:N'],
+['<b>Network model</b>','A graph: a record can have many parents, links are pointers','CODASYL. Handles M:N, complex to program'],
+['<b>Object-based model</b>','Objects with data and methods; object-relational adds objects to tables','PostgreSQL types, Oracle objects'],
+['<b>Semi-structured model</b>','Items of the same type may have different attributes (no fixed schema)','XML, JSON (MongoDB documents)']])+
+'<h2>Solved model</h2>'+
+MODEL('1. Data models used in database systems '+S('IA2QB M1 C2'),'<div class="paper"><p>A data model describes data, relationships, semantics and constraints. The main models:</p><p><b>1. Relational model.</b> Data as tables of rows and columns. Example: Student(RollNo, Name, Dept). Simple, declarative querying with SQL.</p><p><b>2. ER model.</b> Real world as entities, attributes and relationships, drawn with rectangles, ellipses and diamonds. Used at the design stage and converted to tables.</p><p><b>3. Hierarchical model.</b> Records in a tree (parent–child). Example: Department → Employees. Each child has one parent; M:N is awkward.</p><p><b>4. Network model.</b> Records connected by links forming a graph; a child may have many parents, so M:N is natural, but navigation is procedural.</p><p><b>5. Object-oriented / object-relational model.</b> Objects encapsulate data and behaviour; object-relational adds user-defined types and inheritance to tables.</p><p><b>6. Semi-structured model.</b> Self-describing data (XML/JSON) where records of the same kind can have different fields.</p><p>Draw a small sketch for the hierarchical (tree) and network (graph) models, and a table for the relational model.</p></div>')+
+'<h2>Practice</h2><ol class="practice">'+
+P(S('IA2QB M1 A5')+'Define a data model.','A collection of conceptual tools for describing data, data relationships, data semantics and consistency constraints.')+
+P(S('IA2QB M1 A6')+'Name any two types of data models.','Relational model and Entity-Relationship model (others: hierarchical, network, object-based, semi-structured).')+
+'</ol>';
+
+var C14='<p>A database system is split into modules, each with one job. The two big functional components are the <b>storage manager</b> and the <b>query processor</b>, plus <b>transaction management</b>. This is the standard Silberschatz diagram the teacher’s slides follow.</p>'+
+'<div class="w"><div class="cap">Database system structure</div><div class="scroll"><svg xmlns="'+NS+'" viewBox="0 0 640 470" width="640" height="470" role="img" aria-label="database system architecture"><g class="fa-t" text-anchor="middle" style="font-size:12px">'+
+'<text x="80" y="20">naive users</text><text x="240" y="20">application programmers</text><text x="400" y="20">sophisticated users</text><text x="560" y="20">DBA</text>'+
+'<rect class="fa-c" x="20" y="32" width="120" height="30" rx="5"/><text x="80" y="52">application interfaces</text><rect class="fa-c" x="180" y="32" width="120" height="30" rx="5"/><text x="240" y="52">application programs</text><rect class="fa-c" x="340" y="32" width="120" height="30" rx="5"/><text x="400" y="52">query tools</text><rect class="fa-c" x="500" y="32" width="120" height="30" rx="5"/><text x="560" y="52">administration tools</text>'+
+'<rect x="10" y="80" width="620" height="140" rx="8" style="fill:none;stroke:var(--accent);stroke-dasharray:4 3"/><text x="70" y="98" style="fill:var(--accent);font-weight:600">query processor</text>'+
+'<rect class="fa-c" x="160" y="108" width="140" height="30" rx="5"/><text x="230" y="128">DML compiler + organizer</text><rect class="fa-c" x="340" y="108" width="120" height="30" rx="5"/><text x="400" y="128">DML queries</text><rect class="fa-c" x="490" y="108" width="120" height="30" rx="5"/><text x="550" y="128">DDL interpreter</text>'+
+'<rect class="fa-c" x="160" y="170" width="300" height="30" rx="5"/><text x="310" y="190">query evaluation engine</text>'+
+'<rect x="10" y="236" width="620" height="140" rx="8" style="fill:none;stroke:var(--accent);stroke-dasharray:4 3"/><text x="70" y="254" style="fill:var(--accent);font-weight:600">storage manager</text>'+
+'<rect class="fa-c" x="30" y="266" width="130" height="30" rx="5"/><text x="95" y="286">authorization and</text><text x="95" y="310" style="font-size:11px">integrity manager</text><rect class="fa-c" x="180" y="266" width="130" height="30" rx="5"/><text x="245" y="286">transaction manager</text><rect class="fa-c" x="330" y="266" width="120" height="30" rx="5"/><text x="390" y="286">file manager</text><rect class="fa-c" x="470" y="266" width="130" height="30" rx="5"/><text x="535" y="286">buffer manager</text>'+
+'<rect x="60" y="392" width="520" height="66" rx="8" style="fill:var(--code);stroke:var(--ink)"/><text x="320" y="412" style="font-weight:600">disk storage</text><text x="320" y="432">data files · data dictionary · indices · statistical data</text>'+
+'<line class="fa-e" x1="320" y1="62" x2="320" y2="80"/><line class="fa-e" x1="310" y1="200" x2="310" y2="236"/><line class="fa-e" x1="320" y1="376" x2="320" y2="392"/></g></svg></div></div>'+
+TBL(['Component','Job'],[
+['<b>DDL interpreter</b>','Interprets DDL statements and records the definitions in the data dictionary'],['<b>DML compiler</b>','Translates DML into an evaluation plan of low-level instructions; does query optimization (picks the cheapest plan)'],['<b>Query evaluation engine</b>','Executes the low-level instructions produced by the DML compiler'],
+['<b>Authorization and integrity manager</b>','Checks constraints and that the user has permission'],['<b>Transaction manager</b>','Keeps the database consistent despite failures (recovery) and runs concurrent transactions without conflict (concurrency control)'],['<b>File manager</b>','Allocates disk space and the data structures used on disk'],['<b>Buffer manager</b>','Fetches data from disk into main memory and decides what to cache'],
+['<b>Data files / data dictionary / indices</b>','The database itself / metadata about its structure / fast access paths']])+
+'<h2>Two-tier and three-tier architecture</h2><p><b>Two-tier</b>: the application on the client talks directly to the database server (ODBC/JDBC). <b>Three-tier</b>: the client is only a front end (browser); it talks to an <b>application server</b> holding the business logic, which talks to the database server. Large web applications are three-tier. Other system types: <b>centralized</b>, <b>client-server</b>, <b>parallel</b> and <b>distributed</b>.</p>'+
+'<h2>Database users and the DBA</h2>'+TBL(['User','Role'],[['Naive users','Use the system through ready-made application interfaces (ATM, ticket booking site)'],['Application programmers','Write the application programs (Java, Python with embedded SQL)'],['Sophisticated users','Write queries directly in SQL or use analysis tools'],['Specialized users','Write special database applications: CAD, expert systems, multimedia'],['Database administrator (DBA)','Has central control of the data and the programs that access it']])+
+'<p><b>Functions of the DBA</b>: schema definition; storage structure and access-method definition; schema and physical-organization modification; granting authorization for data access; routine maintenance (periodic backups, ensuring enough free disk space, monitoring performance).</p>'+
+'<h2>Solved models</h2>'+
+MODEL('1. Architecture and working of a DBMS with a neat sketch '+S('Rem Q11')+S('Rev1 Q13'),'<div class="paper"><p>Draw the structure diagram above. Then explain:</p><p><b>Users and interfaces.</b> Naive users, application programmers, sophisticated users and the DBA reach the system through application interfaces, programs, query tools and admin tools.</p><p><b>Query processor.</b> DDL interpreter (records definitions in the data dictionary), DML compiler (translates a query into an optimized evaluation plan) and query evaluation engine (executes it).</p><p><b>Storage manager.</b> The interface between low-level stored data and the programs and queries. Its parts: authorization and integrity manager, transaction manager, file manager, buffer manager.</p><p><b>Transaction management.</b> Ensures ACID: recovery manager restores consistency after failures; concurrency-control manager controls interaction among concurrent transactions.</p><p><b>Disk storage.</b> Data files, data dictionary (metadata), indices, statistical data.</p><p><b>Working.</b> A query is parsed and translated by the DML compiler, optimized into a plan, executed by the evaluation engine, which asks the storage manager for blocks; the buffer manager brings them into memory; results return to the user.</p></div>')+
+MODEL('2. Database system architectures and the role of the DBA '+S('IA2QB M1 C10'),'<div class="paper"><p><b>Centralized:</b> the DBMS runs on one computer; users connect by terminals. Simple but a single point of failure.</p><p><b>Client–server:</b> server machines run the DBMS; client machines run user interfaces/apps. <i>Two-tier</i> (client app talks to DB via ODBC/JDBC) and <i>three-tier</i> (client → application server → database).</p><p><b>Parallel:</b> many processors and disks work on one database to speed up queries.</p><p><b>Distributed:</b> data stored at several sites connected by a network; each site can process local transactions and take part in global ones. Gives availability and local autonomy.</p><p><b>Role of the DBA:</b> schema definition; storage structure and access-method definition; schema and physical-organization modification; granting authorization; routine maintenance: backups, disk space, performance monitoring, recovery.</p></div>')+
+'<h2>Practice</h2><ol class="practice">'+
+P(S('Rem Q5')+'List various users of DBMS and specify their roles.','Naive users (use apps like an ATM), application programmers (write programs), sophisticated users (write SQL queries directly), specialized users (CAD, expert systems), DBA (central control of data and programs).')+
+P(S('Rem Q7')+'Write the importance of Database Administrators.','The DBA defines the schema and storage structures, grants and revokes access, keeps backups and runs recovery, monitors and tunes performance, and maintains integrity. Without a DBA, security, availability and consistency of the shared data cannot be guaranteed.')+
+'</ol>';
+
+var C15='<p>The <b>relational model</b> represents the database as a collection of <b>relations</b> (tables). It is the model behind Oracle, MySQL and SQL.</p>'+
+TBL(['Term','Meaning','In the table below'],[['Relation','A table with rows and columns','instructor'],['Tuple','A row; one record','(10101, Srinivasan, Comp. Sci., 65000)'],['Attribute','A column (named)','ID, name, dept_name, salary'],['Domain','The set of allowed values of an attribute','salary: positive numbers'],['Degree (arity)','Number of attributes','4'],['Cardinality','Number of tuples','4'],['Relation schema','Name + attributes','instructor(ID, name, dept_name, salary)'],['Relation instance','The tuples at a given moment','the 4 rows shown']])+
+TBL(['ID','name','dept_name','salary'],[['10101','Srinivasan','Comp. Sci.','65000'],['12121','Wu','Finance','90000'],['22222','Einstein','Physics','95000'],['45565','Katz','Comp. Sci.','75000']])+
+'<p><b>Properties of a relation:</b> tuples are unordered; attributes are unordered (by name); no two tuples are identical; every value is <b>atomic</b> (indivisible); a value may be <b>NULL</b> (unknown/missing).</p>'+
+'<h2>Database design</h2><p>Database design is the process of deciding the schema: which relations, which attributes, which keys and constraints. Phases: <b>requirements analysis</b> → <b>conceptual design</b> (ER diagram) → <b>logical design</b> (ER to tables) → <b>schema refinement</b> (normalization) → <b>physical design</b> (indexes, file organization). Good design avoids <b>redundancy</b> and the insertion, deletion and update <b>anomalies</b>, and makes sure all needed information can be stored.</p>'+
+'<h2>Solved models</h2>'+
+MODEL('1. Structure of a relational database with an example '+S('IA2QB M1 C4'),'<div class="paper"><p>A relational database is a collection of relations (tables), each with a unique name. Draw the instructor table above and label: relation, tuple (row), attribute (column), domain, degree = 4, cardinality = 4.</p><p><b>Relation schema</b> instructor(ID, name, dept_name, salary); <b>relation instance</b> = the current set of tuples.</p><p>Relations are linked through keys: department(dept_name, building, budget) is related to instructor by dept_name (a foreign key in instructor).</p><p>Properties: no duplicate tuples, order of rows and columns does not matter, atomic values, NULL for unknown values.</p></div>')+
+MODEL('2. Relational schema for a Library Management System '+S('IA2QB M1 C9'),'<div class="paper"><p><b>Entities and attributes</b> (primary keys underlined, foreign keys marked FK):</p><p>Book(<u>Book_ID</u>, Title, ISBN, Publisher, Year, Author_ID FK)<br>Author(<u>Author_ID</u>, Name, Country)<br>Member(<u>Member_ID</u>, Name, Phone, Address, Join_Date)<br>Librarian(<u>Lib_ID</u>, Name, Shift)<br>Issue(<u>Issue_ID</u>, Book_ID FK, Member_ID FK, Lib_ID FK, Issue_Date, Due_Date, Return_Date, Fine)</p><p><b>Relational concepts applied:</b> each table is a relation; each row a tuple; domains (dates, positive fine); primary keys identify tuples (entity integrity); Issue.Book_ID references Book (referential integrity); Issue resolves the M:N between Member and Book over time.</p></div>')+
+'<h2>Practice</h2><ol class="practice">'+
+P(S('IA2QB M1 A12')+'What is a relational database?','A database that stores data as a collection of relations (tables), related to each other through common attributes (keys), and queried with a relational language like SQL.')+
+P(S('IA2QB M1 A13')+'Define a relation.','A table with a fixed set of named columns (attributes) and a set of rows (tuples), where each value comes from the domain of its attribute.')+
+P(S('IA2QB M1 A14')+'What is a tuple?','A single row of a relation, representing one record (one entity or relationship instance).')+
+P(S('IA2QB M1 A15')+'What is an attribute domain?','The set of permitted (atomic) values for an attribute. Example: domain of Age = integers 0 to 120.')+
+P(S('IA2QB M1 B5')+'Define database design and explain its importance.','Database design is deciding the logical and physical structure of the database (relations, attributes, keys, constraints, indexes). Importance: avoids redundancy and anomalies, keeps data consistent, makes queries efficient, and makes sure every needed fact can be stored.')+
+P(S('IA2QB M1 B6')+'What are the components of the relational model?','(1) Structure: relations, tuples, attributes, domains. (2) Integrity: keys, entity integrity, referential integrity, domain constraints. (3) Manipulation: relational algebra / SQL operations.')+
+'</ol>';
+
+var C16='<p>A <b>key</b> is a set of attributes whose values identify a tuple. Keys are how relations stay free of duplicates and how they refer to each other.</p>'+
+TBL(['Key','Definition','Example: Student(RollNo, RegNo, Name, Phone, DeptID)'],[
+['<b>Super key</b>','Any set of attributes that uniquely identifies a tuple (extra attributes allowed)','{RollNo}, {RegNo}, {RollNo, Name}, {RegNo, Phone}'],
+['<b>Candidate key</b>','A <i>minimal</i> super key: remove any attribute and it stops being unique','{RollNo}, {RegNo}'],
+['<b>Primary key</b>','The candidate key chosen by the designer; cannot be NULL or repeat','RollNo'],
+['<b>Alternate key</b>','A candidate key not chosen as primary','RegNo'],
+['<b>Composite key</b>','A key with two or more attributes','Enrollment(RollNo, CourseID) → {RollNo, CourseID}'],
+['<b>Foreign key</b>','Attributes in one relation that refer to the primary key of another','Student.DeptID refers to Department.DeptID'],
+['<b>Unique key</b>','Values must be distinct but one NULL is allowed','Phone'],
+['<b>Surrogate key</b>','A system-generated identifier with no business meaning','an auto-increment ID']])+
+'<p>Every candidate key is a super key, every primary key is a candidate key. A relation can have many candidate keys but only one primary key.</p>'+
+'<h2>Integrity constraints</h2>'+TBL(['Constraint','Rule'],[['<b>Domain constraint</b>','Every value of an attribute must come from its domain (type, range, CHECK)'],['<b>Entity integrity</b>','No primary-key attribute may be NULL'],['<b>Referential integrity</b>','A foreign-key value must match an existing primary-key value in the referenced table, or be NULL'],['<b>Key constraint</b>','No two tuples may have the same primary/candidate key value'],['NOT NULL / UNIQUE / CHECK','Column-level rules declared in SQL']])+
+'<h2>Solved model</h2>'+
+MODEL('1. Types of keys with examples '+S('IA2QB M1 C5')+S('Rev1 Q9'),'<div class="paper"><p>Take Employee(EmpID, Aadhaar, Email, Name, DeptID) and Department(DeptID, DName).</p><p><b>Super key:</b> any attribute set that identifies an employee: {EmpID}, {EmpID, Name}, {Aadhaar, Email}.</p><p><b>Candidate key:</b> a minimal super key: {EmpID}, {Aadhaar}, {Email}.</p><p><b>Primary key:</b> chosen candidate key, EmpID: unique and NOT NULL.</p><p><b>Alternate keys:</b> Aadhaar, Email.</p><p><b>Composite key:</b> in Works_On(EmpID, ProjID, Hours), the key is {EmpID, ProjID}.</p><p><b>Foreign key:</b> Employee.DeptID references Department.DeptID; it can only hold department numbers that exist.</p><p><b>Purpose:</b> keys guarantee uniqueness (no duplicate tuples), enforce entity and referential integrity, link tables for joins and are used for indexing.</p></div>')+
+'<h2>Practice</h2><ol class="practice">'+
+P(S('IA2QB M1 A16')+'Define primary key.','A candidate key chosen to uniquely identify each tuple of a relation. It must be unique and cannot be NULL.')+
+P(S('IA2QB M1 A17')+'What is a candidate key?','A minimal super key: a set of attributes that uniquely identifies tuples and from which no attribute can be removed.')+
+P(S('IA2QB M1 A18')+'What is a foreign key?','An attribute (or set) in one relation whose values must match the primary key of another (or the same) relation, linking the two.')+
+P(S('IA2QB M1 A20')+'What is a super key?','Any set of one or more attributes that together uniquely identify a tuple. It may contain extra attributes.')+
+P(S('IA2QB M1 B7')+'Explain super key with an example.','In Student(RollNo, Name, Phone), {RollNo} identifies each student, so it is a super key; adding attributes keeps it a super key: {RollNo, Name}, {RollNo, Phone}, {RollNo, Name, Phone}. {Name} alone is not, because names repeat.')+
+P(S('IA2QB M1 B8')+'Differentiate candidate key and primary key.','A relation may have several candidate keys (each a minimal super key, may allow NULL in practice); exactly one is chosen as the primary key, which must be NOT NULL. Example: RollNo and RegNo are candidate keys; RollNo is the primary key, RegNo is the alternate key.')+
+P(S('IA2QB M1 B9')+'What is a foreign key? Example using two tables.','Department(<u>DeptID</u>, DName) and Employee(<u>EmpID</u>, Name, DeptID). Employee.DeptID is a foreign key referencing Department.DeptID: an employee may only be put in a department that exists.')+
+P(S('Rem Q4')+'List any four integrity constraints.','Domain constraint, entity integrity constraint, referential integrity constraint, key (unique) constraint. (Also NOT NULL and CHECK.)')+
+'</ol>';
+
+var C17='<p><b>Relational algebra</b> is a procedural query language: each operation takes one or two relations and returns a new relation, so operations can be nested. SQL is built on it.</p>'+
+TBL(['Operation','Symbol','Type','Meaning'],[['Select','σ<sub>condition</sub>(R)','unary','rows that satisfy the condition'],['Project','π<sub>attributes</sub>(R)','unary','only the listed columns (duplicates removed)'],['Union','R ∪ S','binary','rows in R or S (or both)'],['Set difference','R − S','binary','rows in R but not in S'],['Cartesian product','R × S','binary','every row of R paired with every row of S'],['Rename','ρ<sub>X</sub>(R)','unary','give the result (or attributes) a new name']])+
+'<p>Union and set difference need <b>union-compatible</b> relations: the same number of attributes, with matching domains, in the same order.</p>'+
+'<h2>Worked examples on employee(EmpID, Name, Salary, DeptID) and dept(DeptID, DName)</h2>'+TBL(['Query','Relational algebra'],[['Employees earning above 50000','σ<sub>Salary &gt; 50000</sub>(employee)'],['Names of all employees','π<sub>Name</sub>(employee)'],['Names of employees in dept 10 earning above 30000','π<sub>Name</sub>(σ<sub>DeptID = 10 ∧ Salary &gt; 30000</sub>(employee))'],['DeptIDs that have employees or are in dept table','π<sub>DeptID</sub>(employee) ∪ π<sub>DeptID</sub>(dept)'],['Departments with no employees','π<sub>DeptID</sub>(dept) − π<sub>DeptID</sub>(employee)'],['Employee with department name','π<sub>Name, DName</sub>(σ<sub>employee.DeptID = dept.DeptID</sub>(employee × dept))'],['Highest salary (with rename)','π<sub>Salary</sub>(employee) − π<sub>e.Salary</sub>(σ<sub>e.Salary &lt; f.Salary</sub>(ρ<sub>e</sub>(employee) × ρ<sub>f</sub>(employee)))']])+
+'<h2>Solved models</h2>'+
+MODEL('1. Fundamental operations of relational algebra '+S('IA2QB M1 C7')+S('Rev1 Q5'),'<div class="paper"><p>Use two small tables: <b>Student</b>(RollNo, Name, Dept) = {(1, Asha, CSE), (2, Ravi, ECE), (3, Meena, CSE)} and <b>Club</b>(RollNo, Name, Dept) = {(2, Ravi, ECE), (4, John, MECH)}.</p><p><b>1. Selection σ</b> picks rows. σ<sub>Dept=\'CSE\'</sub>(Student) = {(1, Asha, CSE), (3, Meena, CSE)}.</p><p><b>2. Projection π</b> picks columns and removes duplicates. π<sub>Dept</sub>(Student) = {CSE, ECE}.</p><p><b>3. Union ∪</b> (union-compatible). Student ∪ Club = {(1,Asha,CSE), (2,Ravi,ECE), (3,Meena,CSE), (4,John,MECH)}; the common row appears once.</p><p><b>4. Set difference −</b>. Student − Club = {(1,Asha,CSE), (3,Meena,CSE)}.</p><p><b>5. Cartesian product ×</b>. Student × Course gives 3 × |Course| rows, each student paired with each course; degree = 3 + degree of Course.</p><p><b>6. Rename ρ</b>. ρ<sub>S</sub>(Student) lets us refer to a second copy, e.g. for comparing students with each other.</p><p>Show each result as a small table.</p></div>')+
+'<h2>Practice</h2><ol class="practice">'+
+P(S('IA2QB M1 A19')+'Name any two operators of relational algebra.','Selection (σ) and projection (π). Others: union, set difference, Cartesian product, rename, join.')+
+P(S('IA2QB M1 B10')+'Explain SELECT (σ) with syntax.','σ<sub>predicate</sub>(R) returns the tuples of R that satisfy the predicate. The predicate uses =, ≠, &lt;, ≤, &gt;, ≥ joined by ∧, ∨, ¬. Example: σ<sub>dept_name=\'Physics\' ∧ salary&gt;90000</sub>(instructor).')+
+P(S('IA2QB M1 B11')+'Explain PROJECT (π) with an example.','π<sub>A1,…,Ak</sub>(R) keeps only the listed attributes and removes duplicate rows. π<sub>ID, name, salary</sub>(instructor) lists those three columns for every instructor.')+
+P(S('IA2QB M1 B12')+'Relational algebra for employees with salary &gt; 50000 from EMPLOYEE(EmpID, Name, Salary).','σ<sub>Salary &gt; 50000</sub>(EMPLOYEE). For names only: π<sub>Name</sub>(σ<sub>Salary &gt; 50000</sub>(EMPLOYEE)).')+
+P(S('IA2QB M1 B13')+'Explain UNION and the conditions required.','R ∪ S contains every tuple in R, in S or in both, with duplicates removed. Conditions: R and S must have the same arity, and the i-th attributes must have the same domain (union-compatible). Example: π<sub>course_id</sub>(σ<sub>semester=\'Fall\'</sub>(section)) ∪ π<sub>course_id</sub>(σ<sub>semester=\'Spring\'</sub>(section)).')+
+P(S('IA2QB M1 B14')+'What is SET DIFFERENCE? Example.','R − S gives tuples in R but not in S (union-compatible). Courses offered in Fall but not in Spring: π<sub>course_id</sub>(σ<sub>semester=\'Fall\'</sub>(section)) − π<sub>course_id</sub>(σ<sub>semester=\'Spring\'</sub>(section)).')+
+P(S('IA2QB M1 B15')+'Explain Cartesian product with an example.','R × S pairs every tuple of R with every tuple of S. If R has 3 tuples of 2 attributes and S has 2 tuples of 3 attributes, R × S has 3 × 2 = 6 tuples of 5 attributes. Usually followed by σ to keep matching pairs: σ<sub>instructor.ID = teaches.ID</sub>(instructor × teaches).')+
+P(S('IA2QB M1 B20')+'Names of students who scored above 90 from STUDENT(RollNo, Name, Marks).','π<sub>Name</sub>(σ<sub>Marks &gt; 90</sub>(STUDENT))')+
+'</ol>';
+
+var C18='<p>The additional operations do not add power (each can be written with the fundamental six) but make queries much shorter.</p>'+
+TBL(['Operation','Symbol','Equivalent / meaning'],[['Set intersection','R ∩ S','R − (R − S): tuples in both'],['Natural join','R ⋈ S','π over σ<sub>common attributes equal</sub>(R × S), common columns kept once'],['Theta join','R ⋈<sub>θ</sub> S','σ<sub>θ</sub>(R × S) for any condition θ'],['Equi join','R ⋈<sub>R.a = S.b</sub> S','theta join where θ uses only ='],['Outer joins','⟕ ⟖ ⟗','join that keeps unmatched tuples of the left / right / both, padding with NULL'],['Division','R ÷ S','tuples of R related to <b>all</b> tuples of S'],['Assignment','temp ← expr','store a result in a temporary relation'],['Aggregation (generalized projection)','<sub>G</sub>γ<sub>F(A)</sub>(R)','group by G and apply sum, avg, count, min, max']])+
+'<h2>Division, step by step</h2><p>Takes(Student, Course) ÷ Required(Course) = students who took <b>every</b> required course. Formula: π<sub>Student</sub>(Takes) − π<sub>Student</sub>((π<sub>Student</sub>(Takes) × Required) − Takes).</p>'+
+'<div class="split"><div style="flex:1 1 180px">'+TBL(['Student','Course'],[['Asha','DBMS'],['Asha','OS'],['Ravi','DBMS'],['Meena','DBMS'],['Meena','OS']])+'</div><div style="flex:0 1 120px">'+TBL(['Course'],[['DBMS'],['OS']])+'</div><div style="flex:0 1 140px">'+TBL(['Result'],[['Asha'],['Meena']])+'</div></div>'+
+'<h2>Solved models</h2>'+
+MODEL('1. Relational algebra for the hospital schema '+S('Rev1 Q4'),'<div class="paper"><p>Patient(patient_id, patient_name, patient_email, patient_birthdate, patient_gender), Doctor(doctor_id, doctor_name, doctor_specialization, doctor_email, department_id), Appointment(appointment_id, patient_id, doctor_id, appointment_date, appointment_time, diagnosis), Department(department_id, department_name, department_location).</p>'+
+'<p><b>i.</b> π<sub>patient_id, patient_name</sub>(Patient)</p>'+
+'<p><b>ii.</b> γ<sub>count(patient_id)</sub>(π<sub>patient_id</sub>(Appointment ⋈ Doctor ⋈ σ<sub>department_name=\'Cardiology\'</sub>(Department)))<br><span class="pn">(project patient_id first so each patient is counted once)</span></p>'+
+'<p><b>iii.</b> π<sub>doctor_name, doctor_specialization</sub>(Doctor)</p>'+
+'<p><b>iv.</b> C ← <sub>doctor_id</sub>γ<sub>count(appointment_id) as n</sub>(Appointment)<br>M ← γ<sub>max(n) as m</sub>(C)<br>Result ← π<sub>doctor_name</sub>(Doctor ⋈ σ<sub>n = m</sub>(C × M))</p>'+
+'<p><b>v.</b> π<sub>patient_name, appointment_date</sub>(Patient ⋈ Appointment ⋈ Doctor ⋈ σ<sub>department_name=\'Neurology\'</sub>(Department))</p>'+
+'<p><b>vi.</b> π<sub>patient_birthdate</sub>(σ<sub>patient_id = 123</sub>(Patient))</p></div>')+
+MODEL('2. STUDENT and DEPT queries '+S('IA2QB M1 C6'),'<div class="paper"><p>STUDENT(RollNo, Name, DeptID), DEPT(DeptID, DeptName).</p><p><b>(a)</b> Students in CSE: σ<sub>DeptName=\'CSE\'</sub>(STUDENT ⋈ DEPT), or names only π<sub>Name</sub>(STUDENT ⋈ σ<sub>DeptName=\'CSE\'</sub>(DEPT)). The join matches DeptID; selection keeps CSE.</p><p><b>(b)</b> Names of all students: π<sub>Name</sub>(STUDENT). Projection keeps one column and removes duplicates.</p><p><b>(c)</b> Student with department details: STUDENT ⋈ DEPT (natural join on DeptID), equivalently σ<sub>STUDENT.DeptID = DEPT.DeptID</sub>(STUDENT × DEPT).</p></div>')+
+MODEL('3. Intersection, assignment and rename '+S('IA2QB M1 C8'),'<div class="paper"><p><b>Intersection ∩.</b> R ∩ S = tuples in both (union-compatible). Courses taught in both Fall 2009 and Spring 2010: π<sub>course_id</sub>(σ<sub>semester=\'Fall\' ∧ year=2009</sub>(section)) ∩ π<sub>course_id</sub>(σ<sub>semester=\'Spring\' ∧ year=2010</sub>(section)). It can be written as R − (R − S).</p><p><b>Assignment ←.</b> Stores an intermediate result in a temporary relation to write long queries in steps: temp1 ← σ<sub>dept_name=\'Physics\'</sub>(instructor); result ← π<sub>name</sub>(temp1).</p><p><b>Rename ρ.</b> ρ<sub>x(A1,…,An)</sub>(E) returns E named x with attributes A1..An. Needed to compare a relation with itself: the largest salary is π<sub>salary</sub>(instructor) − π<sub>i.salary</sub>(σ<sub>i.salary &lt; d.salary</sub>(ρ<sub>i</sub>(instructor) × ρ<sub>d</sub>(instructor))).</p></div>')+
+MODEL('4. Convert relational algebra into SQL '+S('Rem Q9'),'<div class="paper">'+CODE("-- σ dept_name = 'Physics' (instructor)\nSELECT * FROM instructor WHERE dept_name = 'Physics';\n\n-- σ dept_name = 'Physics' ∧ salary > 90000 (instructor)\nSELECT * FROM instructor WHERE dept_name = 'Physics' AND salary > 90000;\n\n-- π ID, name, salary (instructor)\nSELECT DISTINCT ID, name, salary FROM instructor;\n\n-- π dept_name (σ salary > 80000 (instructor))\nSELECT DISTINCT dept_name FROM instructor WHERE salary > 80000;\n\n-- π course_id (σ Fall 2009 (section)) ∪ π course_id (σ Spring 2010 (section))\nSELECT course_id FROM section WHERE semester = 'Fall' AND year = 2009\nUNION\nSELECT course_id FROM section WHERE semester = 'Spring' AND year = 2010;")+'<p class="pn">π removes duplicates, so DISTINCT is the exact translation; UNION also removes duplicates.</p></div>')+
+MODEL('5. Assignment 1: SQL and relational algebra on EMPLOYEES '+S('Asg1 Q1')+S('Asg1 Q2')+S('Asg1 Q3')+S('Asg1 Q4')+S('Asg1 Q5')+S('Asg1 Q6')+S('Asg1 Q7')+S('Asg1 Q8')+S('Asg1 Q9'),'<div class="paper">'+CODE("-- 1\nSELECT employee_id||','||first_name||','||last_name||','||email||','||phone_number||','||hire_date||','||job_id||','||salary||','||commission_pct||','||manager_id||','||department_id AS THE_OUTPUT FROM employees;\n-- 2\nSELECT last_name, job_id FROM employees WHERE manager_id IS NULL;\n-- 3\nSELECT last_name, salary FROM employees WHERE salary NOT BETWEEN 5000 AND 12000;\n-- 4\nSELECT last_name, department_id FROM employees WHERE department_id IN (20, 50) ORDER BY last_name;\n-- 5\nSELECT last_name, salary FROM employees WHERE salary BETWEEN 5000 AND 12000 AND department_id IN (20, 50);\n-- 6\nSELECT last_name, hire_date FROM employees WHERE hire_date LIKE '%94';   -- or EXTRACT(YEAR FROM hire_date) = 1994\n-- 7\nSELECT last_name, LPAD(salary, 15, '$') AS SALARY FROM employees;\n-- 8\nSELECT job_id, MAX(salary) \"Maximum\", MIN(salary) \"Minimum\", SUM(salary) \"Sum\", ROUND(AVG(salary)) \"Average\" FROM employees GROUP BY job_id;\n-- 9\nSELECT MAX(salary) - MIN(salary) AS DIFFERENCE FROM employees;")+
+'<p><b>Relational algebra</b> (E = employees):<br>2. π<sub>last_name, job_id</sub>(σ<sub>manager_id = null</sub>(E))<br>3. π<sub>last_name, salary</sub>(σ<sub>salary &lt; 5000 ∨ salary &gt; 12000</sub>(E))<br>4. π<sub>last_name, department_id</sub>(σ<sub>department_id = 20 ∨ department_id = 50</sub>(E)) (algebra has no ordering; ORDER BY is SQL only)<br>5. π<sub>last_name, salary</sub>(σ<sub>salary ≥ 5000 ∧ salary ≤ 12000 ∧ (department_id = 20 ∨ department_id = 50)</sub>(E))<br>6. π<sub>last_name, hire_date</sub>(σ<sub>year(hire_date) = 1994</sub>(E))<br>8. <sub>job_id</sub>γ<sub>max(salary), min(salary), sum(salary), avg(salary)</sub>(E)<br>9. γ<sub>max(salary) − min(salary)</sub>(E)<br>1 and 7 are formatting (string operations), done in SQL only.</p></div>')+
+'<h2>Practice</h2><ol class="practice">'+
+P(S('IA2QB M1 B16')+'What is a JOIN operation in relational algebra?','A join combines related tuples from two relations: a Cartesian product followed by a selection on a join condition. R ⋈<sub>θ</sub> S = σ<sub>θ</sub>(R × S). Types: theta, equi, natural, outer joins.')+
+P(S('IA2QB M1 B17')+'Differentiate theta join and equi join.','Theta join R ⋈<sub>θ</sub> S allows any comparison (&lt;, ≤, =, ≠, &gt;, ≥) in θ. Equi join is the special case where θ uses only equality. Example: employee ⋈<sub>e.salary &gt; m.salary</sub> manager is theta; employee ⋈<sub>e.DeptID = d.DeptID</sub> dept is equi.')+
+P(S('IA2QB M1 B18')+'What is a natural join? Example.','R ⋈ S joins on all attributes with the same name, keeps tuples whose common attributes are equal, and shows each common attribute once. instructor ⋈ teaches matches on ID.')+
+P(S('IA2QB M1 B19')+'Explain DIVISION with a use case.','R(A,B) ÷ S(B) gives the A-values related to every B in S. Use case: students who have taken all courses offered by the CSE department: Takes ÷ π<sub>course_id</sub>(σ<sub>dept=\'CSE\'</sub>(course)). See the worked table above.')+
+'</ol>';
+
+CONTENT['1.1']={h:C11,exam:['IA2QB M1 A1, A2, C3','Rem Q1','IA1 MCQ 1-10']};
+CONTENT['1.2']={h:C12,exam:['IA2QB M1 A3-A11, B2-B4, C1','Self Q5, Q6','IA1 MCQ 11-20']};
+CONTENT['1.3']={h:C13,exam:['IA2QB M1 A5, A6, C2','IA1 MCQ 21-30']};
+CONTENT['1.4']={h:C14,exam:['Rem Q5, Q7, Q11','Rev1 Q13','IA2QB M1 C10','IA1 MCQ 31-40']};
+CONTENT['1.5']={h:C15,exam:['IA2QB M1 A12-A15, B5, B6, C4, C9','IA1 MCQ 41-80']};
+CONTENT['1.6']={h:C16,exam:['IA2QB M1 A16-A18, A20, B7-B9, C5','Rev1 Q9','Rem Q4','IA1 MCQ 81-90']};
+CONTENT['1.7']={h:C17,exam:['IA2QB M1 A19, B10-B15, B20, C7','Rev1 Q5','IA1 MCQ 91-97']};
+CONTENT['1.8']={h:C18,exam:['Rev1 Q4','Rem Q9','IA2QB M1 B16-B19, C6, C8','Assignment 1']};
 
 /*@@CONTENT@@*/
 
