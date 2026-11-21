@@ -1,0 +1,728 @@
+=== RJS Q1
+@@SAME Nxt25 Q7
+
+=== RJS Q2
+<table class="tbl"><tr><th></th><th>var</th><th>let</th><th>const</th></tr>
+<tr><td>Scope</td><td>function</td><td>block <code>{ }</code></td><td>block</td></tr>
+<tr><td>Re-declare in same scope</td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td>Re-assign</td><td>yes</td><td>yes</td><td>no (must be given a value when declared)</td></tr>
+<tr><td>Hoisting</td><td>hoisted as undefined</td><td colspan="2">hoisted but unusable before the line (temporal dead zone)</td></tr></table>
+<p>A <code>const</code> object or array can still have its contents changed (<code>const a = [1]; a.push(2)</code> is fine); only the variable cannot point to something else. Use <code>const</code> by default, <code>let</code> when the value changes, and avoid <code>var</code>.</p>
+
+=== RJS Q3
+<p>An <b>object</b> is a collection of <b>key: value</b> pairs (properties) that describe one thing; values can be any type, including functions (methods).</p>
+```js
+let student = {
+  name: "Ravi",
+  age: 20,
+  marks: [80, 92],
+  greet: function () { return "Hi, I am " + this.name; }
+};
+console.log(student.name, student["age"], student.greet());
+```
+
+=== RJS Q4
+<p>The <b>DOM (Document Object Model)</b> is the browser's representation of an HTML page as a <b>tree of objects</b>: every tag, attribute and piece of text is a node. JavaScript uses it, through the <code>document</code> object, to read and change the page's content, structure and style.</p>
+
+=== RJS Q5
+<p><b>NaN</b> means "Not a Number": the result of an invalid number operation, e.g. <code>Number("abc")</code> or <code>0 / 0</code>. Its type is still number; check for it with <code>isNaN(x)</code> or <code>Number.isNaN(x)</code> (NaN is not even equal to itself).</p>
+
+=== RJS Q6
+<p><b>parseInt()</b> converts a string to an <b>integer</b>, reading digits from the start and stopping at the first non-digit: <code>parseInt("42px")</code> = 42, <code>parseInt("3.9")</code> = 3, <code>parseInt("abc")</code> = NaN. Used to turn input-box text into numbers. <code>parseInt("ff", 16)</code> = 255 (second argument = base).</p>
+
+=== RJS Q7
+```run html
+<button onclick="showMsg()">Click Me</button>
+<script>
+  function showMsg() {
+    alert("Hello World");
+  }
+</script>
+```
+
+=== RJS Q8
+<p>A <b>callback</b> is a function passed as an argument to another function, which calls it later: when a task finishes, an event happens, or for each item.</p>
+```js
+function download(file, done) {
+  console.log("Downloading " + file + "...");
+  done(file);                         // call the callback when finished
+}
+download("notes.pdf", function (f) { console.log(f + " downloaded"); });
+
+setTimeout(() => console.log("runs after 1 s"), 1000);     // callback for a timer
+[1, 2, 3].forEach(n => console.log(n * 2));                // callback for each item
+```
+
+=== RJS Q9
+<p>JavaScript is <b>dynamically typed</b>: a variable's type comes from the value it holds and can change.</p>
+<table class="tbl"><tr><th>Type</th><th>Example</th></tr>
+<tr><td>Number (integers and decimals)</td><td><code>let age = 25; let pi = 3.14;</code></td></tr>
+<tr><td>String</td><td><code>let name = "Karthik";</code></td></tr>
+<tr><td>Boolean</td><td><code>let isActive = true;</code></td></tr>
+<tr><td>Undefined (declared, no value)</td><td><code>let x;</code></td></tr>
+<tr><td>Null (deliberately empty)</td><td><code>let data = null;</code></td></tr>
+<tr><td>BigInt (very large integers)</td><td><code>let big = 12345678901234567890n;</code></td></tr>
+<tr><td>Symbol (unique id)</td><td><code>let id = Symbol("key");</code></td></tr>
+<tr><td>Object (incl. arrays, functions)</td><td><code>let s = { id: 1, name: "Ravi" }; let marks = [90, 85];</code></td></tr></table>
+<p>The first seven are <b>primitive</b> (single, immutable values); objects are <b>reference</b> types. <code>typeof</code> returns the type (note: <code>typeof null</code> is "object", a known quirk, and <code>typeof []</code> is "object").</p>
+
+=== RJS Q10
+@@SAME Nxt25 Q8
+
+=== RJS Q11
+```run html
+<input type="text" id="s" placeholder="Enter a word" value="Madam">
+<button onclick="check()">Check</button>
+<p id="r"></p>
+<script>
+  function check() {
+    var s = document.getElementById("s").value.toLowerCase().replace(/[^a-z0-9]/g, "");
+    var rev = s.split("").reverse().join("");
+    document.getElementById("r").innerHTML = (s != "" && s == rev) ? "Palindrome" : "Not a palindrome";
+  }
+</script>
+```
+<p>A palindrome reads the same backwards (madam, level, 121). The string is lower-cased and stripped of spaces/punctuation, then reversed with <code>split("").reverse().join("")</code> and compared.</p>
+
+=== RJS Q12
+@@SAME RJS Q26
+
+=== RJS Q13
+```js
+function sumArray(arr) {
+  let sum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+  return sum;
+}
+console.log(sumArray([10, 20, 30, 40]));                  // 100
+console.log([10, 20, 30, 40].reduce((a, b) => a + b, 0)); // 100, the same with reduce
+```
+
+=== RJS Q14
+```run html
+n = <input type="number" id="n" value="10" min="1">
+<button onclick="fib()">Print</button>
+<p id="out"></p>
+<script>
+  function fib() {
+    var n = parseInt(document.getElementById("n").value);
+    var a = 0, b = 1, terms = [];
+    for (var i = 0; i < n; i++) {
+      terms.push(a);
+      var next = a + b;
+      a = b;
+      b = next;
+    }
+    document.getElementById("out").innerHTML = terms.join(", ");
+  }
+  fib();
+</script>
+```
+<p>Each term is the sum of the previous two, starting 0, 1: for n = 10 it prints 0, 1, 1, 2, 3, 5, 8, 13, 21, 34.</p>
+
+=== RJS Q15
+```run html
+n = <input type="number" id="n" value="5" min="0">
+<button onclick="fact()">Factorial</button>
+<p id="out"></p>
+<script>
+  function fact() {
+    var n = parseInt(document.getElementById("n").value);
+    if (isNaN(n) || n < 0) { document.getElementById("out").innerHTML = "Enter a non-negative number"; return; }
+    var f = 1;
+    for (var i = 2; i <= n; i++) f *= i;
+    document.getElementById("out").innerHTML = n + "! = " + f;
+  }
+  fact();
+</script>
+```
+<p>n! = 1 × 2 × … × n, with 0! = 1. 5! = 120. Recursive version: <code>function f(n) { return n &lt;= 1 ? 1 : n * f(n - 1); }</code></p>
+
+=== RJS Q16
+@@SAME Nxt25 Q9
+
+=== RJS Q17
+```run html
+<input type="text" id="item" placeholder="New item">
+<button onclick="addItem()">Add</button>
+<ul id="list"></ul>
+<script>
+  function addItem() {
+    var text = document.getElementById("item").value.trim();
+    if (text == "") return;
+    var li = document.createElement("li");                    // Create
+    li.innerHTML = text + ' <button onclick="editItem(this)">Edit</button>' +
+                   ' <button onclick="this.parentElement.remove()">Delete</button>';   // Delete
+    document.getElementById("list").appendChild(li);          // append to the page
+    document.getElementById("item").value = "";
+  }
+  function editItem(btn) {                                     // Update
+    var li = btn.parentElement;
+    var now = prompt("Edit item:", li.firstChild.textContent.trim());
+    if (now) li.firstChild.textContent = now + " ";
+  }
+</script>
+```
+<p><b>Create</b>: <code>createElement</code> + <code>appendChild</code> append new HTML to the list. <b>Read</b>: the list itself shows the items. <b>Update</b>: change the node's text. <b>Delete</b>: <code>remove()</code>.</p>
+
+=== RJS Q18
+@@SAME Nxt25 Q10
+
+=== RJS Q19
+<table class="tbl"><tr><th>let</th><th>const</th></tr>
+<tr><td>Can be <b>re-assigned</b>: <code>let x = 1; x = 2;</code></td><td>Cannot be re-assigned: <code>const y = 1; y = 2;</code> gives a TypeError</td></tr>
+<tr><td>Can be declared without a value: <code>let x;</code></td><td>Must be initialised: <code>const y = 5;</code></td></tr>
+<tr><td>Use for counters and changing values</td><td>Use for fixed values and references (objects and arrays can still be modified inside)</td></tr></table>
+<p>Both are block-scoped and cannot be re-declared in the same scope.</p>
+
+=== RJS Q20
+@@SAME Nxt25 Q14
+
+=== RJS Q21
+```run html
+<button onclick="this.innerHTML='Clicked!'">1. onclick</button><br><br>
+<input type="text" placeholder="type here" onkeyup="document.getElementById('k').innerHTML=this.value">
+<span id="k"></span> (2. onkeyup)<br><br>
+<div onmouseover="this.style.background='gold'" onmouseout="this.style.background='#eee'"
+     style="background:#eee;padding:8px;width:220px">3. onmouseover / onmouseout</div><br>
+<select onchange="alert('You chose ' + this.value)">
+  <option>Pick</option><option>Red</option><option>Blue</option>
+</select> 4. onchange
+<script>
+  window.onload = function () { console.log("5. onload: page finished loading"); };
+</script>
+```
+<ul><li><b>onclick</b>: element is clicked.</li>
+<li><b>onkeyup</b> (or onkeydown): a key is released in an input.</li>
+<li><b>onmouseover / onmouseout</b>: the pointer enters / leaves.</li>
+<li><b>onchange</b>: a select or input value changes.</li>
+<li><b>onload</b>: the page has loaded. Also onsubmit, onfocus, onblur. In scripts: <code>el.addEventListener("click", fn)</code>.</li></ul>
+
+=== RJS Q22
+@@SAME Nxt25 Q15
+
+=== RJS Q23
+<ul><li><b>transition</b>: makes the change smooth and reversible (it animates back when the mouse leaves): <code>transition: all 0.3s ease;</code></li>
+<li><b>font-size</b>, <b>background-color</b>, <b>color</b>, <b>text-decoration</b>: the properties that change in the <code>:hover</code> rule.</li>
+<li><b>:hover</b> pseudo-class: applies the new values while the pointer is over the button. Optional: <code>transform: scale(1.05)</code> and <code>box-shadow</code> for extra feedback.</li></ul>
+```run html
+<style>
+  .cta {
+    font-size: 16px; background-color: #1565c0; color: white; text-decoration: none;
+    padding: 10px 22px; border: none; border-radius: 6px; cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .cta:hover {
+    font-size: 18px; background-color: #ffb300; color: #1a1a1a; text-decoration: underline;
+  }
+</style>
+<button class="cta">Get Started</button>
+```
+
+=== RJS Q25
+```run html
+Number 1: <input type="number" id="a"><br><br>
+Number 2: <input type="number" id="b"><br><br>
+<button onclick="add()">Add</button>
+<p id="res"></p>
+<script>
+  function add() {
+    var a = parseFloat(document.getElementById("a").value);
+    var b = parseFloat(document.getElementById("b").value);
+    if (isNaN(a) || isNaN(b)) { document.getElementById("res").innerHTML = "Enter two numbers"; return; }
+    document.getElementById("res").innerHTML = "Sum = " + (a + b);
+  }
+</script>
+```
+<p><code>parseFloat</code> is needed because input values are strings: without it, "2" + "3" would give "23".</p>
+
+=== RJS Q26
+```run html
+<input type="number" id="n" placeholder="Enter a number">
+<button onclick="check()">Check</button>
+<p id="res"></p>
+<script>
+  function check() {
+    var n = parseInt(document.getElementById("n").value);
+    if (isNaN(n)) { document.getElementById("res").innerHTML = "Enter a number"; return; }
+    document.getElementById("res").innerHTML = n + (n % 2 == 0 ? " is Even" : " is Odd");
+  }
+</script>
+```
+<p>The remainder operator <code>%</code>: a number is even when <code>n % 2 == 0</code>.</p>
+
+=== RJS Q28
+```run html
+Year: <input type="number" id="y" value="2024">
+<button onclick="leap()">Check</button>
+<p id="res"></p>
+<script>
+  function leap() {
+    var y = parseInt(document.getElementById("y").value);
+    var isLeap = (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
+    document.getElementById("res").innerHTML = y + (isLeap ? " is a leap year" : " is not a leap year");
+  }
+</script>
+```
+<p>Divisible by 4 but not by 100, <b>or</b> divisible by 400: 2024 and 2000 are leap years, 1900 is not.</p>
+
+=== RJS Q29
+```run html
+A: <input type="number" id="a"> B: <input type="number" id="b">
+<button onclick="largest()">Largest</button>
+<p id="res"></p>
+<script>
+  function largest() {
+    var a = parseFloat(document.getElementById("a").value);
+    var b = parseFloat(document.getElementById("b").value);
+    var r;
+    if (a > b) r = a + " is larger";
+    else if (b > a) r = b + " is larger";
+    else r = "Both are equal";
+    document.getElementById("res").innerHTML = r;
+  }
+</script>
+```
+
+=== RJS Q30
+@@SAME Nxt25 Q22
+
+=== RJS Q32
+```run html
+<input type="number" id="n" placeholder="Enter a number">
+<button onclick="sign()">Check</button>
+<p id="res"></p>
+<script>
+  function sign() {
+    var n = parseFloat(document.getElementById("n").value);
+    var r;
+    if (isNaN(n)) r = "Enter a number";
+    else if (n > 0) r = n + " is Positive";
+    else if (n < 0) r = n + " is Negative";
+    else r = "The number is Zero";
+    document.getElementById("res").innerHTML = r;
+  }
+</script>
+```
+
+=== RJS Q33
+```run html
+<!DOCTYPE html>
+<html>
+<body>
+  <form onsubmit="return validateForm()">
+    Register Number: <input type="text" id="reg"><br><br>
+    Name: <input type="text" id="name"><br><br>
+    Password: <input type="password" id="pwd"><br><br>
+    Phone Number: <input type="text" id="phone"><br><br>
+    <input type="submit" value="Register">
+  </form>
+  <p id="msg"></p>
+  <script>
+    function validateForm() {
+      var reg = document.getElementById("reg").value.trim();
+      var name = document.getElementById("name").value.trim();
+      var pwd = document.getElementById("pwd").value;
+      var phone = document.getElementById("phone").value.trim();
+      var msg = document.getElementById("msg");
+      msg.style.color = "red";
+
+      if (!/^[A-Za-z0-9]{11}$/.test(reg)) { msg.innerHTML = "Register Number must be exactly 11 letters/digits"; return false; }
+      if (name == "") { msg.innerHTML = "Name cannot be empty"; return false; }
+      if (pwd == "") { msg.innerHTML = "Password cannot be empty"; return false; }
+      if (!/^[0-9]{10}$/.test(phone)) { msg.innerHTML = "Phone Number must be exactly 10 digits"; return false; }
+
+      msg.style.color = "green";
+      msg.innerHTML = "Registration successful";
+      return false;   // demo: stay on the page (return true to submit)
+    }
+  </script>
+</body>
+</html>
+```
+<p><code>/^[A-Za-z0-9]{11}$/</code> = exactly 11 alphanumeric characters (^ and $ anchor the whole value); <code>/^[0-9]{10}$/</code> = exactly 10 digits. Returning <code>false</code> from <code>onsubmit</code> stops the form being sent. URK24CS1000 passes the register number check.</p>
+
+=== RJS Q34
+@@SAME Nxt25 Q23
+
+=== RJS Q35
+```run html
+<input type="number" id="n" value="29">
+<button onclick="prime()">Check</button>
+<p id="res"></p>
+<script>
+  function prime() {
+    var n = parseInt(document.getElementById("n").value);
+    var isPrime = n > 1;
+    for (var i = 2; i * i <= n; i++) {
+      if (n % i == 0) { isPrime = false; break; }
+    }
+    document.getElementById("res").innerHTML = n + (isPrime ? " is Prime" : " is not Prime");
+  }
+  prime();
+</script>
+```
+<p>A prime has no divisor other than 1 and itself. It is enough to test divisors up to √n (<code>i * i &lt;= n</code>); 0 and 1 are not prime.</p>
+
+=== RJS Q36
+<p>The <b>DOM</b> is a tree-shaped, object version of the HTML page that the browser builds when it loads the page. <code>document</code> is the root; each element is a node with parent, child and sibling nodes, and attributes and text are nodes too.</p>
+<p><b>Why it matters</b>: JavaScript cannot touch the HTML text file. Everything dynamic is done through the DOM:</p>
+<ul><li><b>Find</b> elements: <code>getElementById</code>, <code>querySelector</code>, …</li>
+<li><b>Change</b> content and style: <code>innerHTML</code>, <code>style</code>, <code>classList</code>, <code>setAttribute</code></li>
+<li><b>Add and remove</b> elements: <code>createElement</code>, <code>appendChild</code>, <code>remove</code></li>
+<li><b>React to the user</b>: <code>addEventListener("click", …)</code></li></ul>
+<p>The page updates without reloading, which is what makes interactive pages (form validation, live scores, to-do lists) possible; jQuery and React are built on top of the DOM. See May24 Q19a for the access methods with a running example.</p>
+
+=== RJS Q37
+@@SAME RJS Q40
+
+=== RJS Q38
+@@SAME Nxt25 Q24
+
+=== RJS Q39
+<ul>
+<li><b>Runs in every browser</b>, with nothing to install; it is the only language browsers run natively.</li>
+<li><b>Interpreted / just-in-time compiled</b>: no separate compile step.</li>
+<li><b>Dynamically typed</b>: variables take any type.</li>
+<li><b>Event-driven</b>: code responds to clicks, keys, timers and network replies.</li>
+<li><b>DOM manipulation</b>: it can read and change the page live.</li>
+<li><b>Asynchronous</b>: callbacks, Promises and async/await keep the page responsive while waiting for data (fetch).</li>
+<li><b>Object-based, with first-class functions</b>: functions can be stored, passed and returned (callbacks, closures); supports both OOP (classes) and functional styles.</li>
+<li><b>Lightweight and cross-platform</b>.</li>
+</ul>
+<p><b>Why powerful for web development</b>: the same language runs on the <b>client</b> (browser) and the <b>server</b> (Node.js), so a whole app (React front end, Express back end, MongoDB storing JSON) can be written in one language. It has a huge ecosystem (npm) and frameworks such as React, jQuery and Express, and JSON, its object notation, is the standard data format of the web.</p>
+
+=== RJS Q40
+<p>An <b>event</b> is something that happens on the page: a click, key press, mouse move, form submit, page load. <b>Event handling</b> means attaching a function (the <b>handler</b> or listener) that runs when the event fires.</p>
+<p><b>Three ways to attach a handler:</b></p>
+```run html
+<button onclick="alert('1. inline attribute')">Inline</button>
+<button id="b2">Property</button>
+<button id="b3">addEventListener</button>
+<div id="outer" style="padding:10px;background:#eef;margin-top:8px">outer div
+  <button id="inner">inner button (bubbling)</button>
+</div>
+<p id="log"></p>
+<script>
+  // 2. DOM property: only one handler per event
+  document.getElementById("b2").onclick = function () { alert("2. onclick property"); };
+
+  // 3. addEventListener: many handlers allowed, can be removed
+  document.getElementById("b3").addEventListener("click", function (e) {
+    alert("3. addEventListener; event type = " + e.type);
+  });
+
+  // bubbling: the click on the inner button also reaches the outer div
+  document.getElementById("outer").addEventListener("click", function () {
+    document.getElementById("log").innerHTML += "outer got the click<br>";
+  });
+  document.getElementById("inner").addEventListener("click", function (e) {
+    document.getElementById("log").innerHTML += "inner clicked<br>";
+    // e.stopPropagation();   // would stop it reaching the outer div
+  });
+</script>
+```
+<ul><li><b>Event object</b> <code>e</code>: details of the event (type, target, key pressed); <code>e.preventDefault()</code> stops the default action (e.g. a form submitting).</li>
+<li><b>Propagation</b>: an event <b>bubbles</b> up from the target to its ancestors; <code>stopPropagation()</code> stops it.</li>
+<li>Common events: click, dblclick, mouseover, mouseout, keydown, keyup, change, input, submit, focus, blur, load.</li></ul>
+<p><b>How events improve interactivity</b>: the page reacts immediately to what the user does (validation messages while typing, menus opening, scores updating) without reloading or contacting the server.</p>
+
+=== RJS Q41
+<p><b>Array</b>: an <b>ordered</b> list of values accessed by index (0, 1, 2…). <b>Object</b>: an <b>unordered</b> set of named properties accessed by key.</p>
+```js
+// Array
+let marks = [80, 92, 75];
+marks.push(88);                    // add at end      -> [80, 92, 75, 88]
+marks.pop();                       // remove last     -> [80, 92, 75]
+console.log(marks[1], marks.length);                  // 92 3
+console.log(marks.map(m => m + 5));                   // [85, 97, 80]
+console.log(marks.filter(m => m >= 80));              // [80, 92]
+console.log(marks.indexOf(75), marks.includes(100));  // 2 false
+
+// Object
+let student = { name: "Ravi", dept: "CSE" };
+student.cgpa = 8.6;                // add property
+student.dept = "IT";               // update
+delete student.cgpa;               // remove
+console.log(student.name, student["dept"]);           // Ravi IT
+console.log(Object.keys(student), Object.values(student));
+for (let k in student) console.log(k + ": " + student[k]);
+
+// arrays of objects: the usual shape of JSON data
+let list = [{ name: "Asha", cgpa: 9.1 }, { name: "John", cgpa: 7.8 }];
+console.log(list.filter(s => s.cgpa > 8).map(s => s.name));   // [ 'Asha' ]
+```
+<p><b>Output</b> (run with node):</p>
+```out
+@@OUT rjs-q41@@
+```
+<table class="tbl"><tr><th></th><th>Array</th><th>Object</th></tr>
+<tr><td>Access</td><td>by numeric index <code>a[0]</code></td><td>by key <code>o.name</code> / <code>o["name"]</code></td></tr>
+<tr><td>Order</td><td>ordered</td><td>keys, not a sequence</td></tr>
+<tr><td>Size</td><td><code>.length</code></td><td><code>Object.keys(o).length</code></td></tr>
+<tr><td>Loop</td><td><code>for</code>, <code>forEach</code>, <code>for…of</code></td><td><code>for…in</code>, <code>Object.keys()</code></td></tr>
+<tr><td>Use for</td><td>lists of similar items</td><td>one thing with named properties</td></tr></table>
+<p><code>typeof</code> says "object" for both; use <code>Array.isArray()</code> to tell them apart.</p>
+
+=== RJS Q42
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; text-align: center; }
+    .team { display: inline-block; width: 200px; margin: 10px; padding: 14px; border: 2px solid #c62828; border-radius: 10px; }
+    .pts { font-size: 44px; font-weight: bold; color: #c62828; }
+    button { margin: 3px; padding: 6px 12px; }
+  </style>
+</head>
+<body>
+  <h2>Kabaddi Score Tracker</h2>
+  <div class="team">
+    <h3>Team A</h3>
+    <div class="pts" id="scoreA">0</div>
+    <button onclick="addPoints('A', 1)">+1</button>
+    <button onclick="addPoints('A', 2)">+2</button>
+    <button onclick="addPoints('A', 3)">+3</button>
+  </div>
+  <div class="team">
+    <h3>Team B</h3>
+    <div class="pts" id="scoreB">0</div>
+    <button onclick="addPoints('B', 1)">+1</button>
+    <button onclick="addPoints('B', 2)">+2</button>
+    <button onclick="addPoints('B', 3)">+3</button>
+  </div>
+  <p id="status">Match started</p>
+  <button onclick="resetMatch()">Reset</button>
+
+  <script>
+    var score = { A: 0, B: 0 };
+
+    function addPoints(team, p) {
+      score[team] += p;
+      show("Team " + team + " scored " + p + (p > 1 ? " points" : " point"));
+    }
+
+    function show(last) {
+      document.getElementById("scoreA").innerHTML = score.A;
+      document.getElementById("scoreB").innerHTML = score.B;
+      var lead = score.A == score.B ? "Scores level" : (score.A > score.B ? "Team A leads" : "Team B leads");
+      document.getElementById("status").innerHTML = last + " | " + lead;
+    }
+
+    function resetMatch() {
+      score.A = 0; score.B = 0;
+      show("Match reset");
+    }
+  </script>
+</body>
+</html>
+```
+<p>One object holds both scores; each button calls <code>addPoints(team, points)</code>, and <code>show()</code> rewrites the live score and the leader after every click.</p>
+
+=== RJS Q43
+@@SAME RJS Q42
+
+=== RJS Q44
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; text-align: center; }
+    .t { display: inline-block; width: 170px; margin: 8px; padding: 10px; border: 2px solid #0277bd; border-radius: 10px; }
+    .p { font-size: 40px; font-weight: bold; }
+    #msg { font-weight: bold; color: #2e7d32; min-height: 1.3em; }
+  </style>
+</head>
+<body>
+  <h2>Volleyball Score Tracker</h2>
+  <p>Set <span id="set">1</span> | Sets won: A <span id="setsA">0</span> - <span id="setsB">0</span> B</p>
+  <div class="t"><h3>Team A</h3><div class="p" id="a">0</div><button onclick="point('A')">+1 Point</button></div>
+  <div class="t"><h3>Team B</h3><div class="p" id="b">0</div><button onclick="point('B')">+1 Point</button></div>
+  <p id="msg"></p>
+  <button onclick="reset()">Reset Match</button>
+
+  <script>
+    var pts = { A: 0, B: 0 }, sets = { A: 0, B: 0 }, setNo = 1;
+
+    function point(t) {
+      if (sets.A == 3 || sets.B == 3) return;          // match over
+      pts[t]++;
+      var o = t == "A" ? "B" : "A";
+      var target = setNo == 5 ? 15 : 25;               // 5th set is played to 15
+      if (pts[t] >= target && pts[t] - pts[o] >= 2) {  // win the set by 2 clear points
+        sets[t]++;
+        document.getElementById("msg").innerHTML = "Team " + t + " wins set " + setNo;
+        if (sets[t] == 3) document.getElementById("msg").innerHTML = "Team " + t + " wins the match!";
+        else { setNo++; pts = { A: 0, B: 0 }; }
+      }
+      show();
+    }
+
+    function show() {
+      document.getElementById("a").innerHTML = pts.A;
+      document.getElementById("b").innerHTML = pts.B;
+      document.getElementById("setsA").innerHTML = sets.A;
+      document.getElementById("setsB").innerHTML = sets.B;
+      document.getElementById("set").innerHTML = setNo;
+    }
+
+    function reset() {
+      pts = { A: 0, B: 0 }; sets = { A: 0, B: 0 }; setNo = 1;
+      document.getElementById("msg").innerHTML = "";
+      show();
+    }
+  </script>
+</body>
+</html>
+```
+<p>Volleyball rules are built in: a set is won at 25 points (15 in the fifth) with a 2-point lead, and the match goes to the first team to win 3 sets. The display updates after every rally.</p>
+
+=== RJS Q45
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; text-align: center; background: #fff3e0; }
+    .t { display: inline-block; width: 190px; margin: 8px; padding: 12px; border: 2px solid #e65100; border-radius: 10px; background: white; }
+    .p { font-size: 44px; font-weight: bold; color: #e65100; }
+    button { margin: 3px; }
+  </style>
+</head>
+<body>
+  <h2>Basketball Score Tracker</h2>
+  <div class="t"><h3>Home</h3><div class="p" id="home">0</div>
+    <button onclick="add('home',1)">Free throw +1</button><br>
+    <button onclick="add('home',2)">+2</button><button onclick="add('home',3)">3-pointer +3</button></div>
+  <div class="t"><h3>Guest</h3><div class="p" id="guest">0</div>
+    <button onclick="add('guest',1)">Free throw +1</button><br>
+    <button onclick="add('guest',2)">+2</button><button onclick="add('guest',3)">3-pointer +3</button></div>
+  <p id="lead">Tied</p>
+  <button onclick="reset()">New Game</button>
+  <script>
+    var s = { home: 0, guest: 0 };
+    function add(team, n) { s[team] += n; show(); }
+    function show() {
+      document.getElementById("home").innerHTML = s.home;
+      document.getElementById("guest").innerHTML = s.guest;
+      document.getElementById("lead").innerHTML =
+        s.home == s.guest ? "Tied" : (s.home > s.guest ? "Home" : "Guest") + " leads by " + Math.abs(s.home - s.guest);
+    }
+    function reset() { s.home = 0; s.guest = 0; show(); }
+  </script>
+</body>
+</html>
+```
+<p>Basketball scores 1 (free throw), 2 (field goal) or 3 (three-pointer); each button adds its value, and the leader and margin update live.</p>
+
+=== RJS Q46
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #ffffff; color: #222; transition: background 0.3s, color 0.3s; }
+    body.dark { background: #121212; color: #eeeeee; }
+    .card { padding: 14px; border: 1px solid #ccc; border-radius: 8px; }
+    body.dark .card { border-color: #444; background: #1e1e1e; }
+    button { padding: 6px 14px; }
+  </style>
+</head>
+<body>
+  <button id="toggle">🌙 Dark Mode</button>
+  <div class="card">
+    <h2>Welcome</h2>
+    <p>This page switches between light and dark themes.</p>
+  </div>
+  <script>
+    var btn = document.getElementById("toggle");
+
+    function apply(dark) {
+      document.body.classList.toggle("dark", dark);
+      btn.textContent = dark ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+
+    // remember the choice between visits
+    var saved = null;
+    try { saved = localStorage.getItem("theme"); } catch (e) {}
+    apply(saved == "dark");
+
+    btn.addEventListener("click", function () {
+      var dark = !document.body.classList.contains("dark");
+      apply(dark);
+      try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
+    });
+  </script>
+</body>
+</html>
+```
+<ul><li>All dark colours live in CSS under a <code>.dark</code> class; JavaScript only adds or removes that class with <code>classList.toggle</code>.</li>
+<li><code>transition</code> makes the switch smooth; the button label changes with the mode.</li>
+<li><code>localStorage</code> remembers the choice, so the page opens in the same theme next time.</li></ul>
+
+=== RJS Q47
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; padding: 10px; }
+    .filters button { margin: 2px; padding: 5px 12px; }
+    .filters button.on { background: #2e7d32; color: white; }
+    .item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding: 8px 0; width: 380px; }
+    #cart { margin-top: 12px; padding: 10px; background: #f1f8e9; width: 360px; }
+  </style>
+</head>
+<body>
+  <h2>Spice Garden Menu</h2>
+  <div class="filters">
+    <button class="on" onclick="filter('All', this)">All</button>
+    <button onclick="filter('Starter', this)">Starters</button>
+    <button onclick="filter('Main', this)">Main Course</button>
+    <button onclick="filter('Dessert', this)">Desserts</button>
+  </div>
+  <div id="menu"></div>
+  <div id="cart"><b>Your order:</b> <span id="items">empty</span><br><b>Total: Rs. <span id="total">0</span></b></div>
+
+  <script>
+    var menu = [
+      { name: "Paneer Tikka", type: "Starter", price: 220 },
+      { name: "Veg Spring Roll", type: "Starter", price: 160 },
+      { name: "Chicken Biryani", type: "Main", price: 280 },
+      { name: "Butter Naan with Dal", type: "Main", price: 190 },
+      { name: "Gulab Jamun", type: "Dessert", price: 90 },
+      { name: "Ice Cream Sundae", type: "Dessert", price: 140 }
+    ];
+    var order = [];
+
+    function show(list) {
+      var html = "";
+      list.forEach(function (m) {
+        html += '<div class="item"><span>' + m.name + " - Rs. " + m.price + '</span>' +
+                '<button onclick="addToOrder(\'' + m.name + '\')">Add</button></div>';
+      });
+      document.getElementById("menu").innerHTML = html;
+    }
+
+    function filter(type, btn) {
+      document.querySelectorAll(".filters button").forEach(function (b) { b.classList.remove("on"); });
+      btn.classList.add("on");
+      show(type == "All" ? menu : menu.filter(function (m) { return m.type == type; }));
+    }
+
+    function addToOrder(name) {
+      order.push(menu.find(function (m) { return m.name == name; }));
+      document.getElementById("items").innerHTML = order.map(function (m) { return m.name; }).join(", ");
+      document.getElementById("total").innerHTML = order.reduce(function (t, m) { return t + m.price; }, 0);
+    }
+
+    show(menu);
+  </script>
+</body>
+</html>
+```
+<p>The menu is an array of objects that JavaScript renders into the page; category buttons <code>filter()</code> it, and "Add" puts an item into the order and recalculates the total with <code>reduce</code>.</p>

@@ -1,0 +1,198 @@
+=== RAS Q1
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; }
+    form { width: 420px; }
+    label { display: inline-block; width: 140px; }
+    .err { color: red; font-size: 13px; margin-left: 6px; }
+    p { margin: 10px 0; }
+    #ok { color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h3>Student Registration</h3>
+  <form id="reg" onsubmit="return validate()" novalidate>
+    <p><label>Username</label><input type="text" id="user"><span class="err" id="eUser"></span></p>
+    <p><label>Email</label><input type="text" id="email"><span class="err" id="eEmail"></span></p>
+    <p><label>Password</label><input type="password" id="pwd"><span class="err" id="ePwd"></span></p>
+    <p><label>Confirm Password</label><input type="password" id="cpwd"><span class="err" id="eCpwd"></span></p>
+    <input type="submit" value="Register">
+  </form>
+  <p id="ok"></p>
+
+  <script>
+    function validate() {
+      var user = document.getElementById("user").value.trim();
+      var email = document.getElementById("email").value.trim();
+      var pwd = document.getElementById("pwd").value;
+      var cpwd = document.getElementById("cpwd").value;
+      var valid = true;
+
+      // clear old messages
+      ["eUser", "eEmail", "ePwd", "eCpwd"].forEach(function (id) { document.getElementById(id).innerHTML = ""; });
+      document.getElementById("ok").innerHTML = "";
+
+      if (user == "") { document.getElementById("eUser").innerHTML = "Username is required"; valid = false; }
+      else if (user.length < 5) { document.getElementById("eUser").innerHTML = "At least 5 characters"; valid = false; }
+      else if (!/^[A-Za-z0-9]+$/.test(user)) { document.getElementById("eUser").innerHTML = "Only letters and digits"; valid = false; }
+
+      if (email == "") { document.getElementById("eEmail").innerHTML = "Email is required"; valid = false; }
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.getElementById("eEmail").innerHTML = "Enter a valid email"; valid = false; }
+
+      if (pwd.length < 8 || !/[0-9]/.test(pwd)) { document.getElementById("ePwd").innerHTML = "Min 8 characters with a digit"; valid = false; }
+
+      if (cpwd != pwd || cpwd == "") { document.getElementById("eCpwd").innerHTML = "Passwords do not match"; valid = false; }
+
+      if (valid) document.getElementById("ok").innerHTML = "Registration Successful";
+      return false;   // stay on the page for the demo; return valid to really submit
+    }
+  </script>
+</body>
+</html>
+```
+<ul><li><b>Username</b>: empty check, <code>length &lt; 5</code>, and <code>/^[A-Za-z0-9]+$/</code> (only letters and digits from start to end).</li>
+<li><b>Email</b>: <code>/^[^\s@]+@[^\s@]+\.[^\s@]+$/</code> requires text, then @, then text, a dot, and more text, in that order.</li>
+<li><b>Password</b>: <code>length &gt;= 8</code> and <code>/[0-9]/</code> (contains a digit). <b>Confirm</b> must equal it.</li>
+<li>Each error goes into the <code>&lt;span&gt;</code> next to its field. <code>onsubmit="return validate()"</code> blocks submission when <code>false</code> is returned, so invalid data never leaves the page; when everything passes, "Registration Successful" is shown.</li></ul>
+
+=== RAS Q2
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; }
+    table { border-collapse: collapse; margin-top: 12px; }
+    th, td { border: 1px solid #555; padding: 5px 14px; }
+    .pass { color: green; } .fail { color: red; }
+  </style>
+</head>
+<body>
+  <h3>Student Marks Management</h3>
+  Name: <input type="text" id="name">
+  Marks: <input type="text" id="marks" size="5">
+  <button onclick="addStudent()">Add Student</button>
+  <button onclick="showAverage()">Show Class Average</button>
+
+  <table id="tbl">
+    <tr><th>Name</th><th>Marks</th><th>Result</th></tr>
+  </table>
+  <p id="avg"></p>
+
+  <script>
+    function addStudent() {
+      var name = document.getElementById("name").value.trim();
+      var marks = document.getElementById("marks").value.trim();
+
+      if (name == "") { alert("Student name cannot be empty"); return; }
+      if (marks == "" || isNaN(marks) || Number(marks) < 0 || Number(marks) > 100) {
+        alert("Marks must be a number between 0 and 100"); return;
+      }
+
+      var table = document.getElementById("tbl");
+      var row = table.insertRow();                 // new <tr> at the end
+      row.insertCell(0).innerHTML = name;
+      row.insertCell(1).innerHTML = marks;
+
+      var result = document.createElement("td");   // build the 3rd cell with createElement
+      var pass = Number(marks) >= 40;
+      result.appendChild(document.createTextNode(pass ? "Pass" : "Fail"));
+      result.className = pass ? "pass" : "fail";
+      row.appendChild(result);
+
+      document.getElementById("name").value = "";
+      document.getElementById("marks").value = "";
+    }
+
+    function showAverage() {
+      var rows = document.getElementById("tbl").rows;
+      if (rows.length <= 1) { alert("No students added yet"); return; }
+      var total = 0;
+      for (var i = 1; i < rows.length; i++) total += Number(rows[i].cells[1].innerHTML);
+      document.getElementById("avg").innerHTML = "Class Average: " + (total / (rows.length - 1)).toFixed(2);
+    }
+  </script>
+</body>
+</html>
+```
+<ul><li><b>Validation</b>: alert if the name is empty or the marks are not numeric (<code>isNaN</code>) or outside 0 to 100.</li>
+<li><b>DOM</b>: <code>insertRow()</code> adds a row, <code>insertCell()</code> the name and marks cells, and the result cell is built with <code>createElement("td")</code>, <code>createTextNode()</code> and <code>appendChild()</code>. Pass if marks ≥ 40.</li>
+<li><b>Average</b>: loops over the table rows (skipping the header row 0), sums column 1 and divides by the count.</li></ul>
+
+=== RAS Q3
+<p>Setup: <code>npm init -y</code>, <code>npm install express mongoose</code>, start MongoDB, <code>node app.js</code>.</p>
+```js
+// app.js
+const express = require("express");
+const mongoose = require("mongoose");
+
+const app = express();
+app.use(express.json());
+
+mongoose.connect("mongodb://127.0.0.1:27017/courseDB")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.log("DB error:", err.message));
+
+const courseSchema = new mongoose.Schema({
+  courseName: { type: String, required: true, unique: true, trim: true },
+  instructor: { type: String, required: true },
+  duration:   { type: Number, required: true, min: 1 },   // weeks
+  fees:       { type: Number, required: true, min: 0 }
+});
+const Course = mongoose.model("Course", courseSchema);
+
+// POST /api/courses : add a course
+app.post("/api/courses", async (req, res) => {
+  try {
+    const course = await Course.create(req.body);
+    res.status(201).json({ message: "Course added successfully", course });
+  } catch (err) {
+    if (err.code === 11000) return res.status(409).json({ message: "Course name already exists" });
+    if (err.name === "ValidationError") return res.status(400).json({ message: err.message });
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// GET /api/courses : all courses
+app.get("/api/courses", async (req, res) => {
+  try {
+    res.status(200).json(await Course.find());
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// PUT /api/courses/:coursename : update the fees
+app.put("/api/courses/:coursename", async (req, res) => {
+  try {
+    if (req.body.fees === undefined) return res.status(400).json({ message: "fees is required" });
+    const course = await Course.findOneAndUpdate(
+      { courseName: req.params.coursename },
+      { fees: req.body.fees },
+      { new: true, runValidators: true }
+    );
+    if (!course) return res.status(404).json({ message: "Course not found" });
+    res.status(200).json({ message: "Fees updated", course });
+  } catch (err) {
+    if (err.name === "ValidationError") return res.status(400).json({ message: err.message });
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+```
+<p><b>Testing every route</b> (real responses):</p>
+```out
+@@OUT ras-q3@@
+```
+<table class="tbl"><tr><th>Case</th><th>Status</th></tr>
+<tr><td>Course added</td><td>201 Created</td></tr>
+<tr><td>Duplicate course name (unique index, error code 11000)</td><td>409 Conflict</td></tr>
+<tr><td>Missing or invalid fields (ValidationError)</td><td>400 Bad Request</td></tr>
+<tr><td>List / update OK</td><td>200 OK</td></tr>
+<tr><td>Updating a course that does not exist</td><td>404 Not Found</td></tr>
+<tr><td>Database failure</td><td>500 Internal Server Error</td></tr></table>
+<p><code>findOneAndUpdate</code> with <code>{ new: true }</code> returns the updated document, and <code>runValidators</code> applies the schema rules (fees ≥ 0) to the update too. <code>:coursename</code> in the route is read from <code>req.params.coursename</code>.</p>

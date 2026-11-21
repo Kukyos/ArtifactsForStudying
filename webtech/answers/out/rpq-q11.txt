@@ -1,0 +1,11 @@
+$ node program.js
+Serialized: {"fullName":"Ananya R","seatPreferences":["Window","Front Row"],"hasCheckedBaggage":true,"flightNo":"AI 202"}
+Deserialized: {
+  fullName: 'Ananya R',
+  seatPreferences: [ 'Window', 'Front Row' ],
+  hasCheckedBaggage: true,
+  flightNo: 'AI 202'
+}
+Full name: Ananya R
+First seat preference: Window
+Baggage Checked

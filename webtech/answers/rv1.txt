@@ -1,0 +1,243 @@
+=== RV1 Q1
+<p>The handout gives no details, so this follows its own example: steps to reset a password, which happen in order, so they use a numbered list <code>&lt;ol&gt;</code>.</p>
+```run html
+<h3>How to reset your password</h3>
+<ol>
+  <li>Click "Forgot Password" on the login page.</li>
+  <li>Enter your registered email address.</li>
+  <li>Open the reset link sent to your email.</li>
+  <li>Type a new password and confirm it.</li>
+  <li>Log in with the new password.</li>
+</ol>
+```
+<p>For details with no order (e.g. features of a product) use <code>&lt;ul&gt;</code>; for term + meaning pairs use <code>&lt;dl&gt;</code>.</p>
+
+=== RV1 Q2
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    form { width: 380px; padding: 16px; border: 1px solid #aaa; border-radius: 8px; font-family: Arial; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    .opt { font-weight: normal; display: inline; margin-right: 8px; }
+    input[type=text], input[type=email], select { width: 100%; padding: 6px; box-sizing: border-box; }
+    button { margin-top: 14px; padding: 6px 16px; }
+  </style>
+</head>
+<body>
+  <form action="/register" method="post" enctype="multipart/form-data">
+    <h3>Workshop Registration</h3>
+
+    <label for="name">Full Name</label>
+    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" placeholder="name@example.com" required>
+
+    <label for="org">Organization</label>
+    <select id="org" name="org" required>
+      <option value="">-- Select --</option>
+      <option>Karunya Institute of Technology</option>
+      <option>Other College</option>
+      <option>Industry</option>
+    </select>
+
+    <label>Experience Level</label>
+    <input type="radio" id="b" name="level" value="Beginner" required><label class="opt" for="b">Beginner</label>
+    <input type="radio" id="i" name="level" value="Intermediate"><label class="opt" for="i">Intermediate</label>
+    <input type="radio" id="a" name="level" value="Advanced"><label class="opt" for="a">Advanced</label>
+
+    <label>Areas of Interest</label>
+    <input type="checkbox" name="interest" value="Web"> Web Development
+    <input type="checkbox" name="interest" value="AI"> AI / ML
+    <input type="checkbox" name="interest" value="Cloud"> Cloud
+
+    <label for="cv">Upload Resume</label>
+    <input type="file" id="cv" name="resume" accept=".pdf,.doc,.docx" required>
+
+    <button type="submit">Submit</button>
+    <button type="reset">Reset</button>
+  </form>
+</body>
+</html>
+```
+<p>Dropdown = <code>&lt;select&gt;</code>; select one = radio buttons with the same <code>name</code>; select multiple = checkboxes; file upload = <code>type="file"</code>, which needs <code>method="post"</code> and <code>enctype="multipart/form-data"</code>.</p>
+
+=== RV1 Q3
+<table class="tbl"><tr><th>Selector</th><th>Syntax</th><th>Selects</th></tr>
+<tr><td>Descendant</td><td><code>div p</code></td><td>every p <b>inside</b> the div, at any depth</td></tr>
+<tr><td>Adjacent sibling</td><td><code>h2 + p</code></td><td>the <b>one</b> p that comes <b>immediately after</b> an h2, with the same parent</td></tr>
+<tr><td>General sibling</td><td><code>h2 ~ p</code></td><td><b>all</b> p elements that come after the h2, with the same parent</td></tr></table>
+<p>Descendant looks <b>down</b> the tree (children, grandchildren); sibling selectors look <b>sideways</b> at elements sharing the same parent.</p>
+```run html
+<style>
+  div p  { color: blue; }
+  h2 + p { background: yellow; }
+  h2 ~ p { font-style: italic; }
+</style>
+<div>
+  <h2>Heading</h2>
+  <p>Right after h2: adjacent and general sibling, and a descendant of div</p>
+  <p>Later sibling: general sibling and descendant</p>
+</div>
+```
+
+=== RV1 Q4
+```css
+.breaking-news {
+  position: fixed;     /* placed relative to the browser window, not the page */
+  top: 0;              /* stuck to the very top */
+  left: 0;
+  width: 100%;         /* full width */
+  z-index: 1000;       /* stays above other content */
+  background: red;
+  color: white;
+  padding: 10px;
+}
+body {
+  padding-top: 45px;   /* so the banner does not cover the first lines of the page */
+}
+```
+<p><code>position: fixed</code> removes the banner from the page flow and fixes it to the viewport, so it stays at the top however far the user scrolls.</p>
+
+=== RV1 Q5
+```run html
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<p>Q: What does HTML stand for?</p>
+<button id="btn">Show Answer</button>
+<p id="answer" style="display:none">HyperText Markup Language</p>
+<script>
+  $(document).ready(function () {
+    $("#btn").click(function () {
+      $("#answer").toggle();
+      $(this).text($("#answer").is(":visible") ? "Hide Answer" : "Show Answer");
+    });
+  });
+</script>
+```
+<p><code>toggle()</code> shows the answer if hidden and hides it if shown, so one button does both. (<code>slideToggle()</code> or <code>fadeToggle()</code> would animate it.)</p>
+
+=== RV1 Q6
+```js
+let bookRecord = {
+  title: "Web Technologies",
+  authors: ["Uttam K. Roy", "Achyut Godbole"],
+  isAvailable: true,
+  year: 2020
+};
+
+// serialize: object -> JSON string
+let json = JSON.stringify(bookRecord);
+console.log("JSON string:", json);
+
+// deserialize: JSON string -> object
+let book = JSON.parse(json);
+console.log("Deserialized object:", book);
+
+console.log("Title:", book.title);
+console.log("First author:", book.authors[0]);
+console.log(book.isAvailable ? "Available" : "Not Available");
+```
+<p><b>Output</b> (run with node):</p>
+```out
+@@OUT rv1-q6@@
+```
+
+=== RV1 Q7
+<p>Alert: <code>&lt;div class="alert alert-warning"&gt;Low stock!&lt;/div&gt;</code>. Button: <code>&lt;button class="btn btn-primary"&gt;Buy&lt;/button&gt;</code>. (<code>alert</code> / <code>btn</code> is the base class, the second picks the colour.)</p>
+
+=== RV1 Q8
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+  <h3>Grade Calculator</h3>
+  Marks (out of 100): <input type="number" id="marks">
+  <button id="calc">Calculate</button>
+  <p id="result"></p>
+
+  <script>
+    $(document).ready(function () {
+      $("#calc").click(function () {
+        var m = parseFloat($("#marks").val());
+        if (isNaN(m) || m < 0 || m > 100) {
+          $("#result").text("Enter marks between 0 and 100").css("color", "red");
+          return;
+        }
+        var grade, status;
+        if (m >= 90)      { grade = "A"; status = "Excellent"; }
+        else if (m >= 75) { grade = "B"; status = "Good"; }
+        else if (m >= 50) { grade = "C"; status = "Average"; }
+        else              { grade = "F"; status = "Fail"; }
+        $("#result").text("Grade: " + grade + " (" + status + ")").css("color", grade == "F" ? "red" : "green");
+      });
+    });
+  </script>
+</body>
+</html>
+```
+<p><code>$("#marks").val()</code> reads the input, the if-else ladder checks from the highest band down, and <code>.text()</code> / <code>.css()</code> show the result. Try 92, 80, 60 and 30.</p>
+
+=== RV1 Q9
+```html
+<img src="sunset.jpg" alt="Ocean Sunset">
+```
+
+=== RV1 Q10
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .card {
+      width: 250px;              /* content width */
+      padding: 15px;             /* space inside, around the content */
+      border: 2px solid #333;
+      margin: 25px;              /* space outside the card */
+      background-color: #f1f8e9;
+      font-family: Arial;
+    }
+    .card h3 { margin-top: 0; color: #33691e; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h3>Wireless Mouse</h3>
+    <p><b>Price:</b> Rs. 799</p>
+    <p><b>Category:</b> Computer Accessories</p>
+  </div>
+</body>
+</html>
+```
+<p>Total width of the card = content 250 + padding 2 × 15 + border 2 × 2 = <b>284px</b>; with the margin it takes 284 + 2 × 25 = 334px of space. (With <code>box-sizing: border-box</code> the 250px would include padding and border.)</p>
+
+=== RV1 Q11
+```js
+function addToCart(product) {
+  console.log("Item added: " + product + "!");
+}
+
+addToCart("Laptop");      // Item added: Laptop!
+```
+<p>A template literal works too: <code>console.log(`Item added: ${product}!`);</code></p>
+
+=== RV1 Q12
+<p><code>text-decoration: line-through</code> draws a line <b>through the middle</b> of the text (used for old prices, completed tasks). <code>text-decoration: none</code> <b>removes</b> any decoration, most often the underline of links: <code>a { text-decoration: none; }</code>.</p>
+```run html
+<p style="text-decoration: line-through">Rs. 1000</p>
+<a href="#" style="text-decoration: none">Link with no underline</a>
+```
+
+=== RV1 Q13
+<p>Background colour: add <code>background-color: #f1f8e9;</code> to the card (as in Q10). The background fills the content <b>and the padding</b> area, but not the margin.</p>
+<ul>
+<li><b>Content</b>: the text and image area; its size is set by <code>width</code>/<code>height</code>.</li>
+<li><b>Padding</b>: space between the content and the border. Adds to the card's size, takes the background colour, and makes the content look less cramped.</li>
+<li><b>Border</b>: the line around the padding. Its thickness adds to the size.</li>
+<li><b>Margin</b>: transparent space <b>outside</b> the border, separating the card from other elements. It does not change the card's visible size, only the space it takes.</li>
+</ul>
+<p>Final visible width = width + left/right padding + left/right border (250 + 30 + 4 = 284px in Q10). <code>box-sizing: border-box</code> makes <code>width</code> include padding and border instead.</p>

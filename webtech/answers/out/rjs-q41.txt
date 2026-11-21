@@ -1,0 +1,10 @@
+$ node program.js
+92 3
+[ 85, 97, 80 ]
+[ 80, 92 ]
+2 false
+Ravi IT
+[ 'name', 'dept' ] [ 'Ravi', 'IT' ]
+name: Ravi
+dept: IT
+[ 'Asha' ]

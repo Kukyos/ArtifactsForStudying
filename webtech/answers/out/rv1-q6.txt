@@ -1,0 +1,11 @@
+$ node program.js
+JSON string: {"title":"Web Technologies","authors":["Uttam K. Roy","Achyut Godbole"],"isAvailable":true,"year":2020}
+Deserialized object: {
+  title: 'Web Technologies',
+  authors: [ 'Uttam K. Roy', 'Achyut Godbole' ],
+  isAvailable: true,
+  year: 2020
+}
+Title: Web Technologies
+First author: Uttam K. Roy
+Available

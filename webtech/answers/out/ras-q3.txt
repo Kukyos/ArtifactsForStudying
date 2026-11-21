@@ -1,0 +1,35 @@
+$ node app.js
+Server running on http://localhost:3000
+Connected to MongoDB
+
+$ curl -s -X POST http://localhost:3000/api/courses -H "Content-Type: application/json" -d '{"courseName":"Web Technology","instructor":"Dr. Priya","duration":12,"fees":4999}'
+{"message":"Course added successfully","course":{"courseName":"Web Technology","instructor":"Dr. Priya","duration":12,"fees":4999,"_id":"6b022ee8b42b5608e85cd6ab","__v":0}}
+(HTTP 201)
+
+$ curl -s -X POST http://localhost:3000/api/courses -H "Content-Type: application/json" -d '{"courseName":"Data Science","instructor":"Dr. Kumar","duration":10,"fees":5999}'
+{"message":"Course added successfully","course":{"courseName":"Data Science","instructor":"Dr. Kumar","duration":10,"fees":5999,"_id":"6b022ee8b42b5608e85cd6ac","__v":0}}
+(HTTP 201)
+
+$ curl -s -X POST http://localhost:3000/api/courses -H "Content-Type: application/json" -d '{"courseName":"Web Technology","instructor":"Mr. Ravi","duration":8,"fees":3000}'
+{"message":"Course name already exists"}
+(HTTP 409)
+
+$ curl -s -X POST http://localhost:3000/api/courses -H "Content-Type: application/json" -d '{"courseName":"Cloud"}'
+{"message":"Course validation failed: fees: Path `fees` is required., duration: Path `duration` is required., instructor: Path `instructor` is required."}
+(HTTP 400)
+
+$ curl -s http://localhost:3000/api/courses
+[{"_id":"6b022ee8b42b5608e85cd6ab","courseName":"Web Technology","instructor":"Dr. Priya","duration":12,"fees":4999,"__v":0},{"_id":"6b022ee8b42b5608e85cd6ac","courseName":"Data Science","instructor":"Dr. Kumar","duration":10,"fees":5999,"__v":0}]
+(HTTP 200)
+
+$ curl -s -X PUT "http://localhost:3000/api/courses/Web%20Technology" -H "Content-Type: application/json" -d '{"fees":4500}'
+{"message":"Fees updated","course":{"_id":"6b022ee8b42b5608e85cd6ab","courseName":"Web Technology","instructor":"Dr. Priya","duration":12,"fees":4500,"__v":0}}
+(HTTP 200)
+
+$ curl -s -X PUT http://localhost:3000/api/courses/Robotics -H "Content-Type: application/json" -d '{"fees":1000}'
+{"message":"Course not found"}
+(HTTP 404)
+
+$ curl -s -X PUT "http://localhost:3000/api/courses/Data%20Science" -H "Content-Type: application/json" -d '{"fees":-5}'
+{"message":"Validation failed: fees: Path `fees` (-5) is less than minimum allowed value (0)."}
+(HTTP 400)

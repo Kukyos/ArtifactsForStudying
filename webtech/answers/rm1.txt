@@ -1,0 +1,141 @@
+=== RM1 Q1
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .notice {
+      width: 350px;                 /* content area */
+      padding: 15px;                /* space between content and border */
+      border: 4px solid #c62828;
+      margin: 20px;                 /* space from other elements */
+      background-color: #fff8e1;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    .notice h3 { margin: 0 0 8px; color: #c62828; text-transform: uppercase; letter-spacing: 1px; }
+    .notice p  { margin: 0; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="notice">
+    <h3>Important Notice</h3>
+    <p>The Internal Assessment 2 examinations begin on 10 November. Students must carry their ID cards to the exam hall.</p>
+  </div>
+</body>
+</html>
+```
+<p><b>Total width of the panel</b> = content + left and right padding + left and right border = 350 + 15 + 15 + 4 + 4 = <b>388px</b>. With the 20px margin on each side it takes 388 + 40 = 428px of space on the page.</p>
+<ul>
+<li><b>Padding</b> is inside the border: it pushes the text away from the edge so it is not cramped, increases the panel's size, and takes the background colour.</li>
+<li><b>Border</b> is the visible outline; its thickness also adds to the size.</li>
+<li><b>Margin</b> is transparent space outside the border: it does not change the panel's size, it <b>positions</b> the panel by keeping other elements 20px away.</li>
+</ul>
+
+=== RM1 Q2
+@@SAME Nxt25 Q16
+
+=== RM1 Q3
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* element selector */
+    body { font-family: Arial, sans-serif; margin: 10px; }
+
+    /* ID selector */
+    #menu { background: #1e3a8a; padding: 0; margin: 0; list-style: none; display: flex; }
+
+    /* child selector: only <li> directly inside #menu */
+    #menu > li { padding: 10px 16px; }
+
+    /* descendant selector: links anywhere inside the nav */
+    nav a { color: white; text-decoration: none; }
+
+    /* class selector */
+    .student { border: 1px solid #ccc; padding: 10px; margin: 10px 0; width: 300px; }
+
+    /* attribute selector */
+    a[target="_blank"] { color: #fbbf24; }
+
+    /* grouping selector */
+    h2, h3 { color: #1e3a8a; }
+
+    .notify { background: #fef3c7; padding: 8px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <ul id="menu">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Students</a></li>
+      <li><a href="https://www.karunya.edu" target="_blank">Karunya</a></li>
+    </ul>
+  </nav>
+
+  <h2>Student Details</h2>
+  <div class="student">Name: Ananya R<br>Dept: CSE<br>Year: II</div>
+
+  <h3>Notifications</h3>
+  <p class="notify">IA2 results will be published on Friday.</p>
+</body>
+</html>
+```
+<table class="tbl"><tr><th>Selector</th><th>Used as</th><th>Styles</th></tr>
+<tr><td>Element</td><td><code>body</code></td><td>the whole page font</td></tr>
+<tr><td>ID</td><td><code>#menu</code></td><td>the menu bar (unique)</td></tr>
+<tr><td>Child</td><td><code>#menu &gt; li</code></td><td>only the direct list items</td></tr>
+<tr><td>Descendant</td><td><code>nav a</code></td><td>links inside the nav</td></tr>
+<tr><td>Class</td><td><code>.student</code>, <code>.notify</code></td><td>the details card and notice</td></tr>
+<tr><td>Attribute</td><td><code>a[target="_blank"]</code></td><td>links that open a new tab</td></tr>
+<tr><td>Grouping</td><td><code>h2, h3</code></td><td>both heading levels at once</td></tr></table>
+
+=== RM1 Q4
+```run html
+<style>
+  .help {
+    position: fixed;      /* relative to the browser window; stays when scrolling */
+    right: 20px;          /* 20px from the right edge */
+    bottom: 20px;         /* 20px from the bottom edge */
+    z-index: 9999;        /* drawn above all other content */
+    width: 50px; height: 50px; border-radius: 50%;
+    background: #2563eb; color: white; font-size: 26px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+</style>
+<p style="height:400px">Scroll the frame: the help icon stays in the lower-right corner.</p>
+<div class="help" title="Help">?</div>
+```
+<ul><li><b>position: fixed</b>: takes the icon out of the page flow and fixes it to the viewport, so it does not move when the page scrolls.</li>
+<li><b>right</b> and <b>bottom</b>: place it at the lower-right corner, with a gap from the edges.</li>
+<li><b>z-index</b>: a high value keeps it on top, so other content never hides it (works because the element is positioned).</li></ul>
+
+=== RM1 Q5
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    table { border-collapse: collapse; font-family: Arial; }
+    th, td { border: 1px solid #333; padding: 6px 12px; }
+    th { background: #1e3a8a; color: white; }
+    caption { font-weight: bold; font-size: 18px; margin-bottom: 8px; }
+    tr:nth-child(even) td { background: #eef2ff; }
+  </style>
+</head>
+<body>
+  <table>
+    <caption>Internal Assessment Examination Schedule</caption>
+    <tr><th>Date</th><th>Day</th><th>Session</th><th>Course Code</th><th>Course Name</th><th>Examination Hall</th></tr>
+    <tr><td>10-11-2026</td><td>Monday</td><td>FN</td><td>23CS2048</td><td>Web Technology</td><td>EH-101</td></tr>
+    <tr><td>11-11-2026</td><td>Tuesday</td><td>FN</td><td>23CS2013</td><td>Database Management Systems</td><td>EH-102</td></tr>
+    <tr><td>12-11-2026</td><td>Wednesday</td><td>AN</td><td>23CS2046</td><td>Theory of Computation</td><td>EH-101</td></tr>
+    <tr><td>13-11-2026</td><td>Thursday</td><td>FN</td><td>23CS2024</td><td>Data Science Ecosystem</td><td>EH-103</td></tr>
+  </table>
+</body>
+</html>
+```
+<p><code>&lt;caption&gt;</code> titles the table, <code>&lt;th&gt;</code> makes the header row, each <code>&lt;tr&gt;</code> is one exam. <code>border-collapse</code> gives single lines, and <code>tr:nth-child(even)</code> shades alternate rows for readability.</p>
