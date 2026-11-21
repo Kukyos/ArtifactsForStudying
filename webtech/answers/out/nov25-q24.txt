@@ -3,11 +3,11 @@ Server running on http://localhost:3000
 Connected to MongoDB
 
 $ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: application/json" -d '{"name":"Ananya R","department":"CSE","cgpa":8.7}'
-{"message":"Student added successfully","student":{"name":"Ananya R","department":"CSE","cgpa":8.7,"_id":"6b01fd881a88605333c2841b","__v":0}}
+{"message":"Student added successfully","student":{"name":"Ananya R","department":"CSE","cgpa":8.7,"_id":"6b0205545b35f6c592f385d1","__v":0}}
 (HTTP 201)
 
 $ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: application/json" -d '{"name":"Karthik S","department":"ECE","cgpa":7.9}'
-{"message":"Student added successfully","student":{"name":"Karthik S","department":"ECE","cgpa":7.9,"_id":"6b01fd881a88605333c2841c","__v":0}}
+{"message":"Student added successfully","student":{"name":"Karthik S","department":"ECE","cgpa":7.9,"_id":"6b0205545b35f6c592f385d2","__v":0}}
 (HTTP 201)
 
 $ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: application/json" -d '{"name":"Ananya R","department":"IT","cgpa":9.1}'
@@ -18,6 +18,10 @@ $ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: applica
 {"message":"name, department and cgpa are required"}
 (HTTP 400)
 
+$ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: application/json" -d '{"name":"Meera","department":"EEE","cgpa":12}'
+{"message":"Student validation failed: cgpa: Path `cgpa` (12) is more than maximum allowed value (10)."}
+(HTTP 400)
+
 $ curl -s http://localhost:3000/api/viewAllStudents
-[{"_id":"6b01fd881a88605333c2841b","name":"Ananya R","department":"CSE","cgpa":8.7,"__v":0},{"_id":"6b01fd881a88605333c2841c","name":"Karthik S","department":"ECE","cgpa":7.9,"__v":0}]
+[{"_id":"6b0205545b35f6c592f385d1","name":"Ananya R","department":"CSE","cgpa":8.7,"__v":0},{"_id":"6b0205545b35f6c592f385d2","name":"Karthik S","department":"ECE","cgpa":7.9,"__v":0}]
 (HTTP 200)
