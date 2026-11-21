@@ -1,0 +1,23 @@
+$ node server.js
+Server running on http://localhost:3000
+Connected to MongoDB
+
+$ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: application/json" -d '{"name":"Ananya R","department":"CSE","cgpa":8.7}'
+{"message":"Student added successfully","student":{"name":"Ananya R","department":"CSE","cgpa":8.7,"_id":"6b01fd881a88605333c2841b","__v":0}}
+(HTTP 201)
+
+$ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: application/json" -d '{"name":"Karthik S","department":"ECE","cgpa":7.9}'
+{"message":"Student added successfully","student":{"name":"Karthik S","department":"ECE","cgpa":7.9,"_id":"6b01fd881a88605333c2841c","__v":0}}
+(HTTP 201)
+
+$ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: application/json" -d '{"name":"Ananya R","department":"IT","cgpa":9.1}'
+{"message":"Student with this name already exists"}
+(HTTP 409)
+
+$ curl -s -X POST http://localhost:3000/api/addStudent -H "Content-Type: application/json" -d '{"name":"Meera"}'
+{"message":"name, department and cgpa are required"}
+(HTTP 400)
+
+$ curl -s http://localhost:3000/api/viewAllStudents
+[{"_id":"6b01fd881a88605333c2841b","name":"Ananya R","department":"CSE","cgpa":8.7,"__v":0},{"_id":"6b01fd881a88605333c2841c","name":"Karthik S","department":"ECE","cgpa":7.9,"__v":0}]
+(HTTP 200)

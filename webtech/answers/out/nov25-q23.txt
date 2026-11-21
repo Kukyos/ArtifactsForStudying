@@ -1,0 +1,78 @@
+test> use hospitalDB
+switched to db hospitalDB
+
+hospitalDB> db.createCollection("patients")
+{ ok: 1 }
+
+hospitalDB> db.patients.insertMany([
+...   { patientID: "P001", name: "Arun Kumar", age: 45, department: "Cardiology",
+...     admissionDate: new Date("2025-11-02"), dischargeDate: null, status: "admitted" },
+...   { patientID: "P002", name: "Divya S", age: 32, department: "Neurology",
+...     admissionDate: new Date("2025-10-20"), dischargeDate: new Date("2025-10-28"), status: "discharged" },
+...   { patientID: "P003", name: "Rahul M", age: 60, department: "Orthopedics",
+...     admissionDate: new Date("2025-11-05"), dischargeDate: null, status: "under observation" }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6b01fd56e237b6b357dd6b5b'),
+    '1': ObjectId('6b01fd56e237b6b357dd6b5c'),
+    '2': ObjectId('6b01fd56e237b6b357dd6b5d')
+  }
+}
+
+hospitalDB> db.patients.findOne({ patientID: "P002" })
+{
+  _id: ObjectId('6b01fd56e237b6b357dd6b5c'),
+  patientID: 'P002',
+  name: 'Divya S',
+  age: 32,
+  department: 'Neurology',
+  admissionDate: ISODate('2025-10-20T00:00:00.000Z'),
+  dischargeDate: ISODate('2025-10-28T00:00:00.000Z'),
+  status: 'discharged'
+}
+
+hospitalDB> db.patients.deleteOne({ patientID: "P002" })
+{ acknowledged: true, deletedCount: 1 }
+
+hospitalDB> db.patients.find({ department: "Cardiology" })
+[
+  {
+    _id: ObjectId('6b01fd56e237b6b357dd6b5b'),
+    patientID: 'P001',
+    name: 'Arun Kumar',
+    age: 45,
+    department: 'Cardiology',
+    admissionDate: ISODate('2025-11-02T00:00:00.000Z'),
+    dischargeDate: null,
+    status: 'admitted'
+  }
+]
+
+hospitalDB> db.patients.updateMany({}, { $set: { insuranceProvider: "Not Provided" } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 2,
+  modifiedCount: 2,
+  upsertedCount: 0
+}
+
+hospitalDB> db.patients.updateOne({ patientID: "P003" }, { $set: { status: "admitted" } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+hospitalDB> db.patients.find({}, { name: 1, department: 1, status: 1, _id: 0 }).sort({ admissionDate: -1 })
+[
+  { name: 'Rahul M', department: 'Orthopedics', status: 'admitted' },
+  { name: 'Arun Kumar', department: 'Cardiology', status: 'admitted' }
+]
+
+hospitalDB> db.patients.countDocuments({ status: "admitted" })
+2

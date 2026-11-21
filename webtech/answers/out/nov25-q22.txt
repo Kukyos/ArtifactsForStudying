@@ -1,0 +1,14 @@
+Serialized JSON:
+{"deviceName":"Smartwatch X100","deviceId":102,"category":"Wearables","specs":["Heart Rate Monitor","GPS","Water Resistant"],"available":false,"price":14999.99}
+Deserialized object:
+{
+  deviceName: 'Smartwatch X100',
+  deviceId: 102,
+  category: 'Wearables',
+  specs: [ 'Heart Rate Monitor', 'GPS', 'Water Resistant' ],
+  available: false,
+  price: 14999.99
+}
+Device ID: 102
+Second spec: GPS
+Over Priced

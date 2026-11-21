@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en" data-subject="webtech">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script src="../shared/study.js"></script>
+<meta charset="utf-8">
+<title>Web Tech Tutor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Same layout as the DBMS tutor. Past-paper pages: the question as a screenshot, then its answer. */
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --ink:#111c26; --muted:#566775; --line:#d8e0e6;
+  --accent:#0a6f8f; --accent-soft:#dff0f5; --accent-ink:#ffffff;
+  --var:#6d2fb0; --var-bg:#efe6fa; --term:#a8480a; --term-bg:#fdeedd;
+  --ok:#1b7f45; --ok-soft:#e0f3e8; --warn:#a8480a; --warn-soft:#fdeedd; --code:#eaf0f4;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;padding:0}
+h1,h2,h3{line-height:1.25;text-wrap:balance;margin:0}
+h2{font-size:1.25rem;margin-top:2rem} h3{font-size:1.05rem;margin-top:1.4rem}
+p{margin:.6rem 0} a{color:var(--accent)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+code{background:var(--code);padding:.08em .35em;border-radius:4px}
+.v{color:var(--var);font-weight:600} .t{color:var(--term);font-weight:600}
+.shell{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100vh}
+#side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:20px 12px 30px max(12px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);background:var(--surface)}
+#side h4{margin:20px 0 6px;padding:0 10px;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side a{display:flex;gap:10px;align-items:baseline;padding:5px 10px;text-align:left;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.92rem}
+#side a:hover{background:var(--accent-soft)} #side a.on{background:var(--accent-soft);font-weight:600}
+#side a .no{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:2.2rem;flex:none}
+#side a.home{margin-top:12px}
+#side .srch{position:relative;margin:10px 0 2px;padding:0 6px}
+#side .srch input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem}
+#side .sres{margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);max-height:62vh;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+#side .sres h5{margin:0;padding:9px 10px 3px;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side .sres a{display:block;padding:6px 10px;font-size:.86rem;line-height:1.3;border-radius:0}
+#side .sres a.sel,#side .sres a:hover{background:var(--accent-soft)}
+#side .sres a .sn{font-family:var(--mono);font-size:.76rem;color:var(--muted);margin-right:6px}
+#side .sres a small{display:block;color:var(--muted);font-size:.76rem;margin-top:1px;overflow-wrap:anywhere}
+#side .sres .none{padding:10px;color:var(--muted);font-size:.85rem}
+#side .sres .more{padding:4px 10px 8px;color:var(--muted);font-size:.76rem}
+.hit{animation:hit 2.4s ease-out}@keyframes hit{0%{outline:3px solid var(--term);outline-offset:3px}100%{outline:3px solid transparent;outline-offset:3px}}
+
+.nav .btn{text-decoration:none}
+.prog{padding:6px 10px 0;font-size:.8rem;color:var(--muted)}
+.scrim{display:none}
+.dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--muted);flex:none;transform:translateY(1px)}
+.dot.done{background:var(--ok);border-color:var(--ok)} .dot.now{border-color:var(--accent);background:var(--accent-soft)}
+.brand{display:flex;align-items:baseline;gap:10px;font-weight:600;padding:0 10px;font-size:1.05rem}
+.brand small{color:var(--muted);font-weight:400}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 8px 0}
+.bar i{display:block;height:100%;background:var(--ok)}
+main{padding:24px clamp(20px,4vw,56px) 80px;min-width:0;max-width:1060px;width:100%}
+.menu{display:none}
+.kicker{font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.04em}
+.pill{display:inline-block;font-size:.74rem;padding:1px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-left:8px;vertical-align:middle}
+.pill.done{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.now{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.chip{font-size:.78rem;font-family:var(--mono);padding:2px 8px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+.card.model{border-left:4px solid var(--accent)}
+.card h3:first-child{margin-top:0}
+.callout{background:var(--warn-soft);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:.95rem}
+.callout.ok{background:var(--ok-soft)}
+.tbl{border-collapse:collapse;width:100%;font-size:.93rem}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.tbl th{background:var(--code);font-weight:600}
+.scroll{overflow-x:auto;max-width:100%}
+.g{font-family:var(--mono);font-size:.95rem;white-space:pre-wrap}
+.gbox{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;white-space:pre;overflow-x:auto;margin:10px 0}
+ol.practice{padding-left:0;list-style:none;counter-reset:q;display:grid;gap:12px}
+ol.practice>li{counter-increment:q;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+ol.practice>li::before{content:"Q" counter(q);font-family:var(--mono);font-weight:600;color:var(--accent);margin-right:8px}
+.src{font-family:var(--mono);font-size:.74rem;background:var(--code);padding:1px 7px;border-radius:4px;color:var(--muted);margin-right:6px}
+details.ans{margin-top:8px} details.ans summary{cursor:pointer;color:var(--accent);font-size:.9rem;font-weight:500}
+details.ans>div{margin-top:8px;padding:10px 14px;background:var(--ok-soft);border-radius:8px;font-size:.95rem}
+button,.btn{font:inherit;font-size:.9rem;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:7px}
+button:hover{border-color:var(--accent)} button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=number]{font:inherit;font-family:var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:5px 9px;max-width:100%}
+.w{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.w .cap{font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.form{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0;font-family:var(--mono);font-size:1.1rem}
+.tok{padding:2px 8px;border-radius:6px;border:1px solid var(--line);min-width:1.9rem;text-align:center}
+.tok.var{background:var(--var-bg);color:var(--var);border-color:transparent;font-weight:600}
+.tok.term{background:var(--term-bg);color:var(--term);font-weight:600;border-color:transparent}
+button.tok.var{cursor:pointer;font:inherit;font-family:var(--mono);font-size:1.1rem;font-weight:600}
+.tok.var.sel{outline:2px solid var(--var);outline-offset:1px}
+.tok.dis{opacity:.4;cursor:default}
+.log{font-family:var(--mono);font-size:.88rem;color:var(--muted);margin:8px 0}
+.log b{color:var(--ink);font-weight:500}
+.split{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.split>*{min-width:0}
+.msg{margin-top:8px;font-size:.93rem}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--warn)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:38px;flex-wrap:wrap}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.big{font-size:2.6rem;font-weight:600;line-height:1;font-family:var(--mono)}
+@media (max-width:820px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:0}
+  #side{position:fixed;inset:0 auto 0 0;width:min(86vw,300px);z-index:30;box-shadow:0 0 24px rgba(0,0,0,.25);transform:translateX(-105%);transition:transform .2s;padding:18px 14px 30px max(16px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);height:100%}
+  body.open #side{transform:none}
+  body.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+  main{padding:56px 16px 80px}
+  .menu{display:inline-block}
+}
+@media (prefers-reduced-motion:reduce){#side{transition:none}}
+.dot.ready{border-color:var(--accent)}
+.pill.ready{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.steps{counter-reset:s;padding-left:0;list-style:none;display:grid;gap:10px;margin:10px 0}
+.steps>li{counter-increment:s;padding-left:36px;position:relative}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:.8rem;font-weight:600}
+.qimg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px}
+.pyq{border-left:3px solid var(--term);background:var(--warn-soft);border-radius:6px;padding:8px 12px;margin:6px 0 10px;font-size:.95rem;white-space:pre-line}
+.steps>li,.practice>li{min-width:0;overflow-wrap:anywhere}
+.steps>li .scroll,.card .scroll{max-width:100%}
+.card,.w,.callout{min-width:0;max-width:100%}
+code{overflow-wrap:anywhere}
+pre.sql{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:.88rem;line-height:1.5;white-space:pre;max-width:100%}
+.tbl{margin:10px 0}
+.qa{margin:18px 0 26px;scroll-margin-top:12px}
+.qa .qh{margin:0 0 6px}
+.answer{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:8px;padding:10px 16px;margin-top:8px;min-width:0}
+.answer .kicker{color:var(--ok);font-weight:600}
+.answer.todo{border-left-color:var(--line);color:var(--muted);font-size:.92rem}
+.answer ul{padding-left:1.3rem}
+pre.code,pre.out{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:.86rem;line-height:1.5;white-space:pre;max-width:100%}
+pre.code{border-left:3px solid var(--accent)}
+pre.out{background:#0f1720;color:#d5e3ee;border-left:3px solid var(--ok)}
+.runbox{margin:10px 0}
+.runbox pre{margin-bottom:6px}
+.runbox iframe{display:block;width:100%;min-height:120px;border:1px solid var(--line);border-radius:8px;background:#fff;margin-top:8px}
+.qjump{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0}
+.qjump a{font-family:var(--mono);font-size:.78rem;padding:2px 7px;border:1px solid var(--line);border-radius:5px;text-decoration:none;background:var(--surface)}
+.qjump a.todo{color:var(--muted);border-style:dashed}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav id="side" aria-label="Contents"></nav>
+  <main id="main"></main>
+</div>
+<div class="scrim" onclick="document.body.classList.remove('open')"></div>
+<script src="answers.js"></script>
+<script>
+/* PYQ: [tag, question text (for search and alt text), marks]. Generated by AutoLAB/Subjects/WebTech-theory/pyq/pyq_js.py */
+var PYQ=[
+["Nov25 Q1", "Name the HTML tag used to insert an image into a webpage.", "1 mark"],
+["Nov25 Q2", "Differentiate between inline and block elements in HTML with an example.", "1 mark"],
+["Nov25 Q3", "State the CSS property used to create space between the content of an HTML element and its border.", "1 mark"],
+["Nov25 Q4", "Identify the use of opacity property in CSS.", "1 mark"],
+["Nov25 Q5", "Write a JavaScript statement to declare a constant named pi and assign it the value 3.14.", "1 mark"],
+["Nov25 Q6", "State the role of the val() function in jQuery when accessing the form input.", "1 mark"],
+["Nov25 Q7", "Identify the Bootstrap class used to create a button with primary styling.", "1 mark"],
+["Nov25 Q8", "Write a simple React functional component named Greet that returns a paragraph with the text “Hi there!”.", "1 mark"],
+["Nov25 Q9", "Interpret what the command db.products.deleteOne({productID: \"P101\"}) does in MongoDB.", "1 mark"],
+["Nov25 Q10", "Cite the function used to start the express server in NodeJS.", "1 mark"],
+["Nov25 Q11", "Write the HTML code to display a heading “Hello World!”, a paragraph “Learning HTML is fun!”, and an image banner.jpg with alt text “Homepage Banner”.", "3 marks"],
+["Nov25 Q12", "Write the CSS code to style a heading with the following properties: text color: maroon, font size: 24px, background color: beige.", "3 marks"],
+["Nov25 Q13", "Describe the following Hyperlinks in HTML with an example for each.\nLink to External Website\nEmail Link\nPhone Link", "3 marks"],
+["Nov25 Q14", "Write a JavaScript function named showMessage that displays an alert box with the message “Submission Successful!” when it is called.", "3 marks"],
+["Nov25 Q15", "Differentiate between the MongoDB commands find() and findOne() with suitable examples.", "3 marks"],
+["Nov25 Q16", "Explain how to use Node.js to write the contents “Hello World” into a file named output.txt using the built-in fs module.", "3 marks"],
+["Nov25 Q17", "Illustrate the structure of an HTML form designed for a Course Registration Portal by organizing the following elements with appropriate placeholder text and styling for clarity and accessibility:\nText Boxes: Student Name, Email Address, and Registration Number\nPassword Field: For portal login, with a placeholder indicating password requirements\nDate Selector: To choose the course start date\nText Area: For student remarks or learning goals\nCheck Box: Option to subscribe to course updates and notifications\nRadio Buttons: Mode of learning (e.g., 'Online', 'Offline', 'Hybrid')\nDropdown Menu: Course selection (e.g., 'Web Development', 'Data Science', 'Cybersecurity', 'AI & ML')\nButtons: Submit and Reset\nUse appropriate HTML tags and attributes to ensure semantic structure, input validation, and a professional layout.", "12 marks"],
+["Nov25 Q18a", "Construct an HTML table to display the two-day seminar timetable for a college event. Your table should clearly present session names, timings, and speakers, and must meet the following design specifications:\nBorders: Apply borders around all table cells.\nHeader Row: Include a heading titled “Seminar Timetable” that spans two columns.\nDay Labels: Use the second row to label the columns as “Day1” and “Day 2”.\nMerged Session: Add a third row with a session (e.g., “Welcome Address”) that spans both columns.\nIndividual Sessions: Populate the fourth and fifth rows with sessions specific to Day 1 and Day 2.\nHTML Tags: Use appropriate tags and attributes such as colspan and rowspan to achieve the required layout.", "6 marks"],
+["Nov25 Q18b", "Explain the following CSS position properties by applying to the above question 18 (a) using HTML and CSS. (i)Relative Position (ii) Absolute Position.", "6 marks"],
+["Nov25 Q19a", "ABC College wants to design a student information card on their website. The card should have a border, padding, margin, and a hover effect where the background color changes smoothly when the mouse is moved over it.\nWrite the necessary HTML and CSS code to design this card with the following requirements:\nCard width should be 300px.\nAdd 15px padding inside the card.\nKeep 20px margin around the card.\nAdd a 2px solid border.\nOn hover, change the background color with a smooth transition.", "6 marks"],
+["Nov25 Q19b", "You are designing a Travel Website for a tourism company. The homepage should show:\nAn unordered list of popular travel destinations (e.g., Paris, Tokyo, Dubai).\nFor the destination Paris, include a nested ordered list that lists the top 3 tourist attractions in order of popularity (e.g., Eiffel Tower, Louvre Museum, Notre-Dame).\nWrite the HTML code to represent the above information using proper list tags and nesting structure.", "6 marks"],
+["Nov25 Q20", "Write a HTML page with embedded JavaScript that converts a weight value from grams to kilograms using the formula:\n\nYour form should include the following components:\nText Box: To enter the weight in grams (placeholder: “Enter weight in grams”)\nConvert Button: To trigger the conversion\nReset Button: To clear the form\nOutput Section: To display the converted weight in kilograms\nEnsure the interface is user-friendly, input is validated, and the result is dynamically displayed using appropriate HTML structure and JavaScript logic.", "12 marks"],
+["Nov25 Q21", "You are developing a Product Showcase Web Page for an e-commerce site. The page should have the following functionality:\nDisplay three product images initially hidden using CSS property display:none.\nProvide buttons to show and hide the product images using show() and hide().\nProvide a fade-in button that gradually displays all product images using fadeIn() and a fade-out button that gradually hides them using fadeOut().\nProvide a slide-down button to reveal product descriptions under each image using slideDown() and a slide-up button to hide the descriptions using slideUp().\nWrite the HTML and jQuery code to implement these functionalities.", "12 marks"],
+["Nov25 Q22", "A tech gadget store wants to manage its inventory of smart devices. The system should be able to serialize product data into JSON for storage and later convert it back into a JavaScript object for processing.\nWrite a JavaScript program to perform the following tasks:\nCreate an java script object named smartDevice with the following properties:\ndeviceName: \"Smartwatch X100\"\ndeviceId: 102\ncategory: \"Wearables\"\nspecs: [\"Heart Rate Monitor\", \"GPS\", \"Water Resistant\"]\navailable: false\nprice: 14999.99\nConvert the smartDevice object into a JSON string (Serialization)\nPrint the serialized JSON string to the console or web page.\nConvert the JSON string back into a JavaScript object (Deserialization) \nPrint the deserialized object and display the following:\ndeviceId\nThe second spec in the specs array\nDisplay \"Over Priced\" if the price is above 10000 otherwise \"Normal Price\"", "12 marks"],
+["Nov25 Q23", "A hospital is building a Patient Management System using MongoDB to store and manage patient records. Each patient entry should include the following fields:\npatientID\nname\nage\ndepartment (e.g., Cardiology, Neurology)\nadmissionDate\ndischargeDate\n status (e.g., admitted, discharged, under observation)\nIllustrate the following MongoDB shell operations to manage this patient database:\nCreate a database named hospitalDB. \nCreate a collection named patients. \nInsert 3 patient records with unique patientIDs and different departments. \nRetrieve a patient’s details using their patientID. \nDelete a patient record based on their patientID. \nList all patients admitted to the \"Cardiology\" department. \nAdd a new field insuranceProvider to all patients, setting it to \"Not Provided\" by default.\nUpdate the status of a patient using their patientID. \nRetrieve and display the name, department, and status of all patients sorted by admissionDate in descending order. \nCount the number of patients currently marked as \"admitted\".", "12 marks"],
+["Nov25 Q24", "A university wants to build a Student Record Management System using Node.js, Express.js, and MongoDB to store and retrieve student details. Each student record should include:\nStudent Name\nDepartment\nCGPA\nThe system must support the following operations:\nAdd a new student record to the database\nFetch and display all student records\nPrevent duplicate entries based on student name and return an appropriate message if a duplicate is detected\nDevelop a Node.js Express server program that connects to a MongoDB database and performs the above operations.\nWrite RESTful APIs for:\nPOST /api/addStudent – to add a new student\nGET /api/viewAllStudents – to fetch all student records\nEnsure proper error handling and validation to avoid duplicate student names.", "12 marks"],
+["Nxt25 Q1", "Write a HTML snippet to create a hyperlink that redirects to karunya.edu.", "1 mark"],
+["Nxt25 Q2", "Write a HTML snippet for the given list.", "1 mark"],
+["Nxt25 Q3", "Differentiate  ‘child selector’ from ‘descendant selector’.", "2 marks"],
+["Nxt25 Q4", "Write a CSS property to make an element appear on top of all other elements.", "2 marks"],
+["Nxt25 Q5", "Identify the purpose of breakpoints in CSS.", "3 marks"],
+["Nxt25 Q6", "Write the CSS syntax to apply a hover effect that changes the text color in a div tag from black to red.", "3 marks"],
+["Nxt25 Q7", "Write the JavaScript syntax to display the message “Welcome to JavaScript” in a popup box.", "4 marks"],
+["Nxt25 Q8", "Write a JavaScript code to add two numbers on clicking add button.", "4 marks"],
+["Nxt25 Q9", "Compare synchronous and asynchronous CRUD operations in JavaScript.", "5 marks"],
+["Nxt25 Q10", "Name the different data types available in JavaScript.", "5 marks"],
+["Nxt25 Q11", "Write a HTML code for the following contents using formatting elements.", "1 mark"],
+["Nxt25 Q12", "Explain the different types of positioning available in CSS.", "2 marks"],
+["Nxt25 Q13", "Design a webpage that changes background color and text color when the device orientation changes.", "3 marks"],
+["Nxt25 Q14", "Explain the two different functions used in Java Script with an example.", "4 marks"],
+["Nxt25 Q15", "Write the difference between ‘setTimeout()’ and ‘setInterval()’ in JavaScript", "5 marks"],
+["Apr26 Q1", "Give an example HTML code to create a hyperlink in a web page.", "1 mark"],
+["Apr26 Q2", "State the CSS Selector that selects the HTML element by # symbol.", "1 mark"],
+["Apr26 Q3", "State the JavaScript method used to display pop up dialog box.", "1 mark"],
+["Apr26 Q4", "Write the JQuery code snippet to store the data from the following text field.\n                Data: <input type='text' class='t1'>", "1 mark"],
+["Apr26 Q5", "State the JSON method to convert JavaScript object as JSON text.", "1 mark"],
+["Apr26 Q6", "Differentiate ng-model from ng-bind in Angular JS", "1 mark"],
+["Apr26 Q7", "List any four AngularJS validations state variables.", "1 mark"],
+["Apr26 Q8", "Identify the NodeJS method used to add new content to existing text file.", "1 mark"],
+["Apr26 Q9", "Write the module name used to create a server in NodeJS.", "1 mark"],
+["Apr26 Q10", "Define mongoose module in NodeJS.", "1 mark"],
+["Apr26 Q11", "Give an example HTML code to demonstrate the following form fields  \na) drop down list box  b) calendar field    c) radio buttons", "3 marks"],
+["Apr26 Q12", "Illustrate the HTML code with the necessary Bootstrap class to display the following buttons.", "3 marks"],
+["Apr26 Q13", "Write a JQuery program to demonstrate all slidding effects.", "3 marks"],
+["Apr26 Q14", "Describe the various JSON data types with examples.", "3 marks"],
+["Apr26 Q15", "Illustrate a HTML code with AngularJS to display the contents of an array variable in an ordered list.", "3 marks"],
+["Apr26 Q16", "Explain the mongodb methods for updating documents inside mongodb collection.", "3 marks"],
+["Apr26 Q17a", "Sketch the following content using HTML", "6 marks"],
+["Apr26 Q17b", "Describe the various HTML list elements with an example program.", "6 marks"],
+["Apr26 Q18a", "Describe the various CSS positioning with suitable program illustrations.", "6 marks"],
+["Apr26 Q18b", "Explain the process of designing navigation bar using HTML and CSS with an example as given below.", "6 marks"],
+["Apr26 Q19a", "Develop a mathematical calculator as given below using HTML and JavaScript. The result should be changed whenever user choose the operator in the drop down list box.", "6 marks"],
+["Apr26 Q19b", "Describe the various document object model methods used to access the HTML elements in JavaScript with example programs.", "6 marks"],
+["Apr26 Q20a", "Write a HTML program with JQuery to dynamically add text field when the Add Textbox Button is clicked and remove TextBox when Remove Textbox is clicked as given below", "6 marks"],
+["Apr26 Q20b", "Explain the various special effects in JQuery with proper example programs.", "6 marks"],
+["Apr26 Q21a", "Prepare a JSON to represent the following Bank Account details and convert JSON string to JavaScript Object and access individual values and display the account details having balance greater than Rs.10000 on a web page.", "6 marks"],
+["Apr26 Q21b", "Explain the HTML form validation using AngularJS with proper error messages for the following validators \nrequired\ntype=email", "6 marks"],
+["Apr26 Q22a", "Develop a HTML page with Angular JS to calculate the Monthly EMI, Total Repayment, and Total Interest for the given input when the Calculate EMI button is clicked. \nFormula Reference:  E = p * r * (1 + r ) n\n( ( 1 + r )n - 1 ) where E is EMI, p is principal loan amount, r is monthly rate of interest, n is number of months.", "6 marks"],
+["Apr26 Q22b", "Explain the AngularJS routing concepts with an example HTML and AngularJS program as given bellow.\nCreate a Home Page with the following Hyper Links\nLogin \nNew User Sign Up \nUpdate the Home Page section appropriately when the hyperlinks are clicked", "6 marks"],
+["Apr26 Q23", "Develop a Node JS server application program to design the following HTML form to collect user input and save the details in a mongodb database name “company” under the collection called “users” when the form is submitted via POST method.\n[Sample Output Given Below]\nURL:  http://localhost:2000/\n \nWhen Register button is clicked, the  URL: http://localhost:2000/server \nData Saved in MongoDB Database Successfully", "12 marks"],
+["Apr26 Q24", "Illustrate the following mongodb operations to perform the following banking operations.\ni) Create a database called ‘bank’ \nii) Create a collection ‘account’ with fields such as name, email, phone accno and balance\niii) Insert a new account details for four customers. \niv) Display the balance amount of a particular account \nv)  Deposit amount in the existing account specified by the accno\nvi) Withdraw amount from the existing account specified by the accno\nvii) Display all account details", "12 marks"],
+["Nov24 Q1", "State the purpose of the <meta> tag in an HTML document.", "1 mark"],
+["Nov24 Q2", "Describe the purpose of the .ready() function in jQuery.", "1 mark"],
+["Nov24 Q3", "Mention any two common data types supported by JavaScript and JSON.", "1 mark"],
+["Nov24 Q4", "State one benefit of using AngularJS for data binding in applications", "1 mark"],
+["Nov24 Q5", "Differentiate between the \"var\" and \"let\" keywords in JavaScript.", "1 mark"],
+["Nov24 Q6", "Define the purpose of the “ngRoute” in AngularJS", "1 mark"],
+["Nov24 Q7", "Name the HTML tag used to display an image.", "1 mark"],
+["Nov24 Q8", "Define the purpose of the “.container” class in Bootstrap.", "1 mark"],
+["Nov24 Q9", "Identify the Node.js module used for file operations.", "1 mark"],
+["Nov24 Q10", "Name the data format used by MongoDB to store documents", "1 mark"],
+["Nov24 Q11", "Analyze how the float property affects element positioning in CSS.", "3 marks"],
+["Nov24 Q12", "Identify a significant difference between jQuery and JavaScript.", "3 marks"],
+["Nov24 Q13", "Construct a sample JSON object to represent an online course, including properties like \"courseName\", \"duration\", and \"instructor\".", "3 marks"],
+["Nov24 Q14", "Demonstrate the use of ng-repeat to display a list of items in AngularJS.", "3 marks"],
+["Nov24 Q15", "Write code to create a simple web server using Node.js.", "3 marks"],
+["Nov24 Q16", "Contrast the insertOne and insertMany methods in MongoDB.", "3 marks"],
+["Nov24 Q17", "Develop an HTML form layout for a Feedback Submission page that includes the following elements. Style the form for a clean and user-friendly look.\nText Boxes: Fields for Name and Email, with suitable placeholder text.\nRadio Buttons: Options for Feedback Type (e.g., \"Positive,\" \"Neutral,\" \"Negative\").\nSelect Dropdown: A dropdown to choose the Product Category.\nText Area: A Comments section with guidance on character limits.\nCheckbox: An option to agree to Terms and Conditions.\nButtons: A Submit button to submit feedback and a Reset button to clear the form.", "12 marks"],
+["Nov24 Q18a", "Create a navigation bar for an Educational Website. Use an HTML <ul> element for structuring navigation links, and style with CSS.\nLinks: Home, Courses, Resources, Contact\nCSS Styling: Apply a background color suitable for an educational theme, display links horizontally, add padding, and use hover effects to change link color. Highlight the \"Home\" link as the active page.", "6 marks"],
+["Nov24 Q18b", "Explain the following CSS selectors and provide examples for each:\nUniversal Selector\nDescendant Selector\nPseudo-class Selector", "6 marks"],
+["Nov24 Q19a", "Describe three JavaScript Document Object Model (DOM) methods used to manipulate HTML content.", "6 marks"],
+["Nov24 Q19b", "Construct a JSON object representing a library’s book inventory, including fields for \"Title,\" \"Author,\" \"Genre,\" and \"Price\" for three books. Convert this JSON to a JavaScript object and display the data in an HTML table format.", "6 marks"],
+["Nov24 Q20a", "Develop a single-page application (SPA) using AngularJS that includes:\nA main HTML page utilizing AngularJS routing.\nLinks for sections: \"Dashboard,\" \"Profile,\" \"Settings”, and \"Logout\".", "6 marks"],
+["Nov24 Q20b", "Write an AngularJS application that manages a shopping list with the following features:\nCreate a controller to handle list items.\nAllow users to add items via a form, binding input to an item property.\nDisplay the shopping list dynamically.", "6 marks"],
+["Nov24 Q21", "Create a Node.js application using the Express framework to serve a login form (login.html). The form should collect a username and password and submit the data via POST.\n             URL: http://localhost:3000/\nWhen \"Login\" is clicked, redirect to http://localhost:3000/loginResult and display the submitted information in a formatted response.", "12 marks"],
+["Nov24 Q22", "Develop a currency converter using HTML and JavaScript, allowing users to convert between different currencies (e.g., USD, EUR, JPY).\nInput Field: Allows users to enter an amount in USD.\nDropdown Menu: Lets users select the target currency.\nConvert Button: Displays the converted amount in the chosen currency.\nFormulas: Implement simple conversion rates like USD to EUR (multiply by 0.85) and USD to JPY (multiply by 110.5).", "12 marks"],
+["Nov24 Q23a", "Explain the following jQuery effects for enhancing user interactions on a webpage:\nSlideToggle: How it’s used to create a sliding effect for visibility changes.\nFadeTo: When to use for gradual transitions and the performance impact on slower devices.\nStop: How it prevents queued animations, reducing animation load.\nProvide examples and discuss how they contribute to a better user experience.", "6 marks"],
+["Nov24 Q23b", "Generate the HTML code to display the following list:\nX. Tomato\nTomato: A red, juicy fruit commonly used in cooking.\nLycopene: Tomatoes are rich in lycopene, beneficial for health.\nXI. Carrot\nCarrot: An orange root vegetable high in beta-carotene.\nVitamin A: Carrots are an excellent source of Vitamin A.\nXII. Broccoli\nBroccoli: A green vegetable rich in vitamins and minerals.\nFiber: Broccoli is a good source of dietary fiber.", "6 marks"],
+["Nov24 Q24", "Illustrate the MongoDB shell functions to perform the following hospital management operations:\nCreate a database called hospital.\nCreate a collection called patients with fields such as name, patient_id, age, gender, contact, and address.\nInsert details for three new patients.\nCreate another collection called doctors with fields such as name, doctor_id, specialization, contact, and availability.\nInsert details for three new doctors.\nDisplay the specialization of a specific doctor using doctor_id.\nUpdate the contact information of a particular patient using patient_id.\nAssign a doctor to a patient by adding the doctor_id to the patient's document.\nCreate a collection called appointments with fields like appointment_id, patient_id, doctor_id, date, and status.\nSchedule an appointment for a patient by inserting a new document into the appointments collection.\nUpdate the status of an appointment (e.g., to \"completed\" or \"canceled\") using appointment_id.\nDisplay all upcoming appointments for a specific doctor using their doctor_id.", "12 marks"],
+["May24 Q1", "Give an example HTML code to create a hyperlink in a webpage.", "1 mark"],
+["May24 Q2", "Identify the CSS property to adjust the space between the border and the content of HTML elements.", "1 mark"],
+["May24 Q3", "Identify the JavaScript event triggered when the HTML button is pressed.", "1 mark"],
+["May24 Q4", "State the jQuery effect to switch between fade-in and fade-out.", "1 mark"],
+["May24 Q5", "Express the syntax to create a JSON object with name, age, and designation.", "1 mark"],
+["May24 Q6", "State the function to convert JSON string to a JavaScript object.", "1 mark"],
+["May24 Q7", "Differentiate between $pristine and $dirty in AngularJS.", "1 mark"],
+["May24 Q8", "Describe the AngularJS code to display the value of num inside the following <DIV> element. \n<div ng-init = 'num=10'></div>", "1 mark"],
+["May24 Q9", "Recall the module used to create server function in NodeJS program.", "1 mark"],
+["May24 Q10", "State the shell method used to create data collection in MongoDB Server.", "1 mark"],
+["May24 Q11", "Describe any three HTML multimedia elements with their syntax.", "3 marks"],
+["May24 Q12", "Write a CSS code to change the background color and text color of the <DIV> element when the user moves the cursor over that division.", "3 marks"],
+["May24 Q13", "Illustrate the three types of JavaScript popup boxes with suitable examples.", "3 marks"],
+["May24 Q14", "Describe the various JSON data types with examples.", "3 marks"],
+["May24 Q15", "Write the appropriate AngularJS filter code to display the following values in a HTML view.\na) Date: 12/04/2023     b) Price: ₹1,000     c) Name: ALICE", "3 marks"],
+["May24 Q16", "Write a NodeJS code snippet to read and display the text file contents in a terminal.", "3 marks"],
+["May24 Q17", "Develop the following HTML form layout with necessary attributes. \nMake all fields as mandatory\nInclude necessary placeholders\nAge field should be in the range of 18-25\nMobile number should be in 10-digits", "12 marks"],
+["May24 Q18a", "Write a code to design a navigation bar using HTML list element with CSS as given below.", "6 marks"],
+["May24 Q18b", "Explain any six CSS selectors with suitable program illustrations.", "6 marks"],
+["May24 Q19a", "Explain the various JavaScript document object model methods used for accessing the HTML elements with example programs.", "6 marks"],
+["May24 Q19b", "Prepare a JSON object to store the following details and convert as a JavaScript object. Finally, display the data in HTML table format.", "6 marks"],
+["May24 Q20a", "Develop a single page application with the following HTML pages.\na. Main HTML webpage with AngularJS routing\nb. Hyper Links\nPersonal Details\nAcademic Details\nInternship Details", "6 marks"],
+["May24 Q20b", "Describe the following directives in AngularJS with suitable code snippet.\ni) ng-app ii) ng-model iii) ng-init iv) ng-bind v) ng-controller vi) ng-click", "6 marks"],
+["May24 Q21", "Write a NodeJS server application program using NodeJS HTTP module to design the following HTML form to demonstrate payment transaction (payment.html) and display the same when the form is submitted via the POST method.\nURL: http://localhost:2000/\n\nWhen Transfer button is clicked, the URL changed to: http://localhost:2000/payment and display the submitted details as,", "12 marks"],
+["May24 Q22", "Develop a calculator using HTML and JavaScript as given below. The result should be changed whenever the user clicks the corresponding action button.", "12 marks"],
+["May24 Q23a", "Describe the following jQuery effects in a HTML webpage with suitable examples.\nHiding and showing effects\nFading effects\nSliding effects\nAnimation effects", "6 marks"],
+["May24 Q23b", "Explain the following lists with suitable HTML program.\nOrdered List\nUnordered List\nDefinition List", "6 marks"],
+["May24 Q24", "Illustrate the following MongoDB shell operations to manage the employee information such as name, empid, gender, email, phone, experience. \ni) Create a database ‘company’ \nii) Create a collection ‘employee’ \niii) Insert information for 5 employees\niv) Search a particular employee data using empid\nv)  Change the phone of a particular employee \nvi) Delete a particular employee data\nvii) Display all employee details whose experience is greater than 4.5 years", "12 marks"],
+["Nov23 Q1", "Which tag is used to create a paragraph in HTML?", "1 mark"],
+["Nov23 Q2", "Define style sheet.", "1 mark"],
+["Nov23 Q3", "Define DOM.", "1 mark"],
+["Nov23 Q4", "Expand JSON.", "1 mark"],
+["Nov23 Q5", "Identify the purpose of JSON.", "1 mark"],
+["Nov23 Q6", "Is AngularJS a structural framework? Justify it.", "1 mark"],
+["Nov23 Q7", "List any two key features of angularJS.", "1 mark"],
+["Nov23 Q8", "Distinguish between Node.JS and JavaScript.", "1 mark"],
+["Nov23 Q9", "Identify the best database for JSON data.", "1 mark"],
+["Nov23 Q10", "Write the purpose of Name Space in MongoDB.", "1 mark"],
+["Nov23 Q11", "Write a HTML code to display an image in browser.", "3 marks"],
+["Nov23 Q12", "What is a CSS selector?", "3 marks"],
+["Nov23 Q13", "Identify jQuery selector in JavaScript.", "3 marks"],
+["Nov23 Q14", "Write a JavaScript program to convert temperatures from Celsius to Fahrenheit and vice versa.", "3 marks"],
+["Nov23 Q15", "Compare angular JS and JavaScript.", "3 marks"],
+["Nov23 Q16", "List the different types of NoSQL", "3 marks"],
+["Nov23 Q17", "Design the following table layout using HTML5 table tags and populate the rows to display the results of five employees.", "12 marks"],
+["Nov23 Q18a", "Write about the HTML lists: (a) Unordered Lists (b) Ordered Lists (c) Definition Lists", "6 marks"],
+["Nov23 Q18b", "Write JavaScript code to get a message from the user and display it in the browser status bar.", "6 marks"],
+["Nov23 Q19a", "Demonstrate JavaScript function events with suitable example.", "6 marks"],
+["Nov23 Q19b", "Develop an HTML web page with appropriate JavaScript  as per the following design and read the value of A and B, then automatically display the sum of A and B in the result text box.", "6 marks"],
+["Nov23 Q20", "Explain some of the most commonly used directives in the AngularJS application.", "12 marks"],
+["Nov23 Q21", "Explain the following JSON components with examples.\ni)data types  ii)parse iii)stringify iv)objects  v)arrays", "12 marks"],
+["Nov23 Q22", "Examine Event-Driven Programming in Node.js", "12 marks"],
+["Nov23 Q23", "Discuss the Mongoose CRUD Operations with an example.", "12 marks"],
+["Nov23 Q24", "Write JavaScript to validate the following fields of the Registration page. \n1. First Name (Name should contain the alphabet and the length should not be less than 6 characters\n2. Password (Password should not be less than 6 characters in length). \n3. E-mail ID (should not contain any invalid and must follow the standard pattern name@domain.com) \n4. Mobile Number (The phone number should contain 10 digits only). \n5. Last Name and Address (should not be Empty)", "12 marks"]
+];/* ---------- helpers ---------- */
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+/* every question's screenshot is q/<paper>-q<no>.png, cut from the paper by AutoLAB/Subjects/WebTech-theory/pyq/crop_q.py */
+function qimg(k){var m=/^(\w+) Q(\w+)$/.exec(k);return 'q/'+m[1].toLowerCase()+'-q'+m[2]+'.png'}
+var WIDGETS={},CONTENT={};
+
+/* "See it run": render the answer's own code in a sandboxed frame under it */
+WIDGETS['.runbox']=function(el){
+  var b=$('button[data-run]',el);
+  b.onclick=function(){
+    var f=$('iframe',el);
+    if(f){f.remove();b.textContent='See it run';return}
+    f=document.createElement('iframe');
+    f.setAttribute('sandbox','allow-scripts allow-modals allow-forms allow-same-origin');  // same-origin only so the frame can be sized; it runs this page's own answer code
+    f.title='Rendered output';
+    f.srcdoc=$('pre',el).textContent;
+    f.onload=function(){try{f.style.height=Math.min(640,Math.max(120,f.contentDocument.documentElement.scrollHeight+24))+'px'}catch(e){}};
+    el.appendChild(f);b.textContent='Hide output';
+  };
+};
+
+/* ===== modules (chunks are filled in as they are built) ===== */
+var TITLES=[
+ {n:1,name:'HTML, CSS and Bootstrap',c:[['1.1','The web, HTML document structure and basic tags'],['1.2','Lists, links, images, media and tables'],['1.3','Forms and input types'],['1.4','CSS: syntax, selectors, cascade'],['1.5','CSS box model, backgrounds, text, gradients'],['1.6','CSS positioning, display, flexbox and responsive design'],['1.7','Bootstrap: grid, utilities, components']]},
+ {n:2,name:'JavaScript and JSON',c:[['2.1','JavaScript basics: variables, operators, output'],['2.2','Functions, arrays, objects, control flow'],['2.3','DOM and events'],['2.4','Form validation'],['2.5','JSON: syntax, stringify and parse']]},
+ {n:3,name:'jQuery',c:[['3.1','jQuery syntax, selectors and events'],['3.2','Get and set content, traversing, manipulation'],['3.3','Effects: show/hide, fade, slide, animate']]},
+ {n:4,name:'React',c:[['4.1','React, JSX and components'],['4.2','Props, state and event handling'],['4.3','Forms and small apps in React']]},
+ {n:5,name:'MongoDB',c:[['5.1','MongoDB: documents, databases, collections'],['5.2','CRUD in the mongo shell'],['5.3','Query operators, projection, sort, count'],['5.4','Mongoose']]},
+ {n:6,name:'Node.js and Express',c:[['6.1','Node.js runtime, modules and the event loop'],['6.2','http and fs modules'],['6.3','Express routing and REST APIs'],['6.4','Express with MongoDB (full-stack CRUD)']]}
+];
+var PKEY='webtech-progress-v1',PROG={};
+try{PROG=JSON.parse(localStorage.getItem(PKEY))||{}}catch(e){PROG={}}
+function saveProg(){try{localStorage.setItem(PKEY,JSON.stringify(PROG))}catch(e){}}
+var MODS=TITLES.map(function(m){return {n:m.n,name:m.name,chunks:m.c.map(function(x){return {no:x[0],t:x[1]}})}});
+var ALL=[];
+MODS.forEach(function(m){m.chunks.forEach(function(c){c.id='c'+c.no.replace('.','-');c.mod=m;var X=CONTENT[c.no];if(X){c.h=X.h;c.exam=X.exam}ALL.push(c)})});
+var TOTAL=ALL.length,DONE=0,PCT=0,BUILT=ALL.filter(function(c){return c.h}).length;
+function recalc(){
+  var seen=false;
+  ALL.forEach(function(c){if(PROG[c.id])c.s='done';else if(c.h){c.s=seen?'ready':'now';seen=true}else c.s='todo'});
+  DONE=ALL.filter(function(c){return c.s==='done'}).length;PCT=Math.round(DONE/TOTAL*100);
+}
+recalc();
+var PILL={done:'done',now:'up next',ready:'not started',todo:'being built'};
+
+/* ---------- past papers: every question as a screenshot, answered right under it ---------- */
+var SECS=[
+ {id:'s-nov25',t:'End-sem Nov/Dec 2025',code:'23CS2048',d:'Your exact course (23CS2048), the only past paper for it so far. 100 marks: Part A 10 × 1, Part B 6 × 3, Part C any five of Q17–Q23 plus the compulsory Q24, 12 marks each.',re:/^Nov25 /},
+ {id:'s-apr26',t:'End-sem Apr/May 2026',code:'20CS2056',d:'The previous-regulation Web Technology paper (20CS2056). Same pattern and mostly the same topics; it has AngularJS where 23CS2048 has React.',re:/^Apr26 /},
+ {id:'s-nov24',t:'End-sem Nov/Dec 2024',code:'20CS2056',d:'Previous-regulation paper (20CS2056).',re:/^Nov24 /},
+ {id:'s-may24',t:'End-sem Apr/May 2024',code:'20CS2056',d:'Previous-regulation paper (20CS2056).',re:/^May24 /},
+ {id:'s-nov23',t:'End-sem Nov/Dec 2023',code:'20CS2056',d:'Previous-regulation paper (20CS2056).',re:/^Nov23 /},
+ {id:'s-nxt25',t:'Nov/Dec 2025 (25CS208)',code:'25CS208',d:'The Web Technology paper for the batch after yours (25CS208), set the same semester. Different pattern (Part A 10 × 2, Part B 5 × 6, Part C 5 × 10) but the same subject, so it is good practice.',re:/^Nxt25 /}
+];
+function natKey(k){return k.toLowerCase().replace(/\d+/g,function(n){return ('0000'+n).slice(-4)})}
+SECS.forEach(function(S){S.q=PYQ.filter(function(q){return S.re.test(q[0])});S.q.sort(function(a,b){return natKey(a[0])<natKey(b[0])?-1:1})});
+function qid(k){return 'q-'+k.replace(/\W+/g,'-')}
+function srcPage(S){
+  var done=S.q.filter(function(q){return ANS[q[0]]}).length;
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">PAST PAPERS · '+esc(S.code)+'</div><h1 style="font-size:1.8rem;margin-top:6px">'+esc(S.t)+'</h1><p>'+esc(S.d)+'</p>';
+  h+='<p class="log">'+S.q.length+' questions, each shown as set with its answer right under it'+(done<S.q.length?' · '+done+' answered so far':'')+'. Code answers marked <b>See it run</b> render live.</p>';
+  h+='<div class="qjump">'+S.q.map(function(q){return '<a href="#'+S.id+'" data-q="'+qid(q[0])+'" class="'+(ANS[q[0]]?'':'todo')+'">'+esc(q[0].split(' ')[1])+'</a>'}).join('')+'</div>';
+  var part='';
+  S.q.forEach(function(q){
+    var n=parseInt(q[0].split(' Q')[1],10),p=S.code==='25CS208'?(n<=10?'A':n<=12?'B':'C'):(n<=10?'A':n<=16?'B':'C');
+    if(p!==part){part=p;h+='<h2>Part '+p+'</h2>'}
+    h+='<section class="qa" id="'+qid(q[0])+'"><div class="log qh"><b>'+esc(q[0])+'</b> · '+esc(q[2])+'</div><img class="qimg" src="'+qimg(q[0])+'" alt="'+esc(q[1])+'" loading="lazy">'+
+       (ANS[q[0]]?'<div class="answer"><div class="kicker">ANSWER</div>'+ANS[q[0]]+'</div>':'<div class="answer todo">Answer being written.</div>')+'</section>';
+  });
+  return h;
+}
+
+/* ---------- search: chunks, papers, every question and its answer ---------- */
+var LASTQ='',PEND=null;
+function stoks(q){return q.toLowerCase().split(/[\s,;:.()\[\]{}"'“”‘’?!]+/).filter(function(x){return x})}
+function sall(text,toks){for(var i=0;i<toks.length;i++)if(text.indexOf(toks[i])<0)return false;return true}
+function plain(h){return (h||'').replace(/<[^>]+>/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/\s+/g,' ')}
+function renderRes(){
+  var box=$('#qres');if(!box)return;
+  var q=LASTQ.trim(),toks=stoks(q);
+  if(q.length<2||!toks.length){box.hidden=true;box.innerHTML='';return}
+  var topics=ALL.filter(function(c){return sall((c.no+' '+c.t+' '+plain(c.h)).toLowerCase(),toks)}),qs=[];
+  SECS.forEach(function(S){S.q.forEach(function(qq){if(sall((qq[0]+' '+qq[1]+' '+plain(ANS[qq[0]])).toLowerCase(),toks))qs.push({S:S,q:qq})})});
+  var h='';
+  if(!topics.length&&!qs.length){box.innerHTML='<div class="none">Nothing found for “'+esc(q)+'”.</div>';box.hidden=false;return}
+  if(topics.length){h+='<h5>Topics</h5>';topics.slice(0,8).forEach(function(c){h+='<a href="#'+c.id+'"><span class="sn">'+c.no+'</span>'+esc(c.t)+'</a>'})}
+  if(qs.length){
+    h+='<h5>Questions ('+qs.length+')</h5>';
+    qs.slice(0,14).forEach(function(r){h+='<a href="#'+r.S.id+'" data-q="'+qid(r.q[0])+'"><span class="sn">'+esc(r.q[0])+'</span>'+esc(r.q[1].replace(/\s+/g,' ').slice(0,90))+'<small>'+esc(r.S.t)+'</small></a>'});
+    if(qs.length>14)h+='<div class="more">and '+(qs.length-14)+' more. Add another word to narrow it down.</div>';
+  }
+  box.innerHTML=h;box.hidden=false;
+}
+function goQ(id){var el=document.getElementById(id);if(el){el.scrollIntoView({block:'start'});el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}}
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[data-q]');
+  if(a){PEND=a.getAttribute('data-q');if(location.hash===a.getAttribute('href')){e.preventDefault();var p=PEND;PEND=null;document.body.classList.remove('open');goQ(p)}}
+  if(!e.target.closest||!e.target.closest('.srch')){var b=$('#qres');if(b)b.hidden=true}
+});
+var sd=document.getElementById('side');
+sd.addEventListener('input',function(e){if(e.target.id==='qs'){LASTQ=e.target.value;renderRes()}});
+sd.addEventListener('focusin',function(e){if(e.target.id==='qs')renderRes()});
+sd.addEventListener('keydown',function(e){
+  if(e.target.id!=='qs')return;
+  var box=$('#qres'),links=box?$$('a',box):[],cur=links.findIndex(function(a){return a.classList.contains('sel')});
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    if(!links.length)return;e.preventDefault();
+    if(cur>=0)links[cur].classList.remove('sel');
+    cur=e.key==='ArrowDown'?Math.min(links.length-1,cur+1):Math.max(0,cur-1);
+    links[cur].classList.add('sel');links[cur].scrollIntoView({block:'nearest'});
+  }else if(e.key==='Enter'){var t=links[cur>=0?cur:0];if(t){e.preventDefault();t.click()}}
+  else if(e.key==='Escape'){LASTQ='';e.target.value='';renderRes()}
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))){var i=$('#qs');if(i){e.preventDefault();document.body.classList.add('open');i.focus()}}
+});
+
+/* ---------- views ---------- */
+function side(cur){
+  var h='<div class="brand"><span>Web Tech Tutor</span><small>23CS2048</small></div><div class="bar" aria-label="progress"><i style="width:'+PCT+'%"></i></div><div class="prog">'+DONE+' of '+TOTAL+' chunks done ('+PCT+'%)'+(BUILT<TOTAL?'<br>'+BUILT+' of '+TOTAL+' chunks built':'')+'</div>';
+  h+='<a href="#home" class="home'+(cur==='home'?' on':'')+'">Overview</a>';
+  h+='<div class="srch"><input id="qs" type="search" placeholder="Search topics, questions…  ( / )" autocomplete="off" spellcheck="false" aria-label="Search the whole site" value="'+esc(LASTQ)+'"><div id="qres" class="sres" hidden></div></div>';
+  h+='<h4>Past papers (answered)</h4>';
+  SECS.forEach(function(S){h+='<a href="#'+S.id+'" class="'+(cur===S.id?'on':'')+'"><span class="no">'+S.q.length+'</span><span>'+esc(S.t)+'</span></a>'});
+  MODS.forEach(function(m){
+    h+='<h4>Module '+m.n+' · '+esc(m.name)+'</h4>';
+    m.chunks.forEach(function(c){h+='<a href="#'+c.id+'" class="'+(cur===c.id?'on':'')+'"><span class="dot '+(c.s==='done'?'done':c.s==='now'?'now':c.s==='ready'?'ready':'')+'"></span><span class="no">'+c.no+'</span><span>'+esc(c.t)+'</span></a>'});
+  });
+  $('#side').innerHTML=h;
+}
+function home(){
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">WEB TECHNOLOGY · 23CS2048 · ENDSEM PLAN</div><h1 style="font-size:1.9rem;margin-top:6px">Where you are</h1>';
+  h+='<h2>Past papers, answered</h2><p>Every question is shown exactly as it was set (cut from the paper), with the answer directly under it. HTML, CSS, JavaScript and jQuery answers have a <b>See it run</b> button that renders the code; the MongoDB and Node answers show the real output from running them.</p>';
+  h+='<div class="mods">'+SECS.map(function(S){var d=S.q.filter(function(q){return ANS[q[0]]}).length;
+    return '<a class="card" style="margin:0;text-decoration:none;color:inherit" href="#'+S.id+'"><div class="kicker">'+esc(S.code)+(S.code==='23CS2048'?' · START HERE':'')+'</div><div style="font-weight:600;margin:2px 0 8px">'+esc(S.t)+'</div><div class="bar" style="margin:0"><i style="width:'+Math.round(d/S.q.length*100)+'%"></i></div><div class="log" style="margin:6px 0 0">'+d+' of '+S.q.length+' answered</div></a>'}).join('')+'</div>';
+  h+='<h2>What the exam looks like</h2><p>100 marks in 3 hours: <b>Part A</b> 10 × 1, <b>Part B</b> 6 × 3, <b>Part C</b> any five of Q17–Q23 plus the <b>compulsory Q24</b>, 12 marks each. In both 23CS2048 and the older 20CS2056 papers, <b>Q24 is a full-stack build</b>: a Node/Express server with MongoDB, or a JavaScript form with validation. Every CO gets one Part C question: HTML/CSS (CO1), JavaScript/JSON (CO2), jQuery (CO3), React/Bootstrap (CO4), MongoDB (CO5), Node/Express (CO6).</p>';
+  h+='<div class="mods">'+MODS.map(function(m){var d=m.chunks.filter(function(c){return c.s==='done'}).length,b=m.chunks.filter(function(c){return c.h}).length,p=Math.round(d/m.chunks.length*100);
+    return '<div class="card" style="margin:0"><div class="kicker">MODULE '+m.n+'</div><div style="font-weight:600;margin:2px 0 8px">'+esc(m.name)+'</div><div class="bar" style="margin:0"><i style="width:'+p+'%"></i></div><div class="log" style="margin:6px 0 0">'+d+' / '+m.chunks.length+(b<m.chunks.length?' · '+b+' built':'')+'</div></div>'}).join('')+'</div>';
+  h+='<h2>Three habits that earn the marks</h2><ul><li><b>Write complete code.</b> A full <code>&lt;!DOCTYPE html&gt;</code> page with head and body, not a fragment, for every 6- and 12-mark question.</li><li><b>Name things exactly as the question does</b> (ids, function names, collection names, routes like <code>/api/addStudent</code>).</li><li><b>Add two or three lines under the code</b> saying which tag, property or method does each required thing. That is what the examiner ticks.</li></ul>';
+  h+='<p class="log" style="margin-top:24px">Progress is saved in this browser only. <button data-resetprog>Reset progress</button></p>';
+  return h;
+}
+function chunk(c,i){
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">MODULE '+c.mod.n+' · '+esc(c.mod.name.toUpperCase())+'</div><h1 style="font-size:1.8rem;margin-top:6px">'+c.no+' '+esc(c.t)+'<span class="pill '+c.s+'">'+PILL[c.s]+'</span></h1>';
+  if(c.exam)h+='<div class="chips">'+c.exam.map(function(e){return '<span class="chip">'+esc(e)+'</span>'}).join('')+'</div>';
+  h+=c.h||'<div class="card"><p>This chunk is still being built. The past papers are already answered: start there.</p></div>';
+  if(c.h)h+='<div class="card" style="margin-top:28px"><div class="row" style="justify-content:space-between"><span>'+(c.s==='done'?'You marked this chunk as done.':'Finished this chunk?')+'</span><button data-mark class="'+(c.s==='done'?'':'primary')+'">'+(c.s==='done'?'Mark as not done':'Mark as done')+'</button></div></div>';
+  var p=ALL[i-1],n=ALL[i+1];
+  h+='<div class="nav">'+(p?'<a class="btn" href="#'+p.id+'">← '+p.no+' '+esc(p.t)+'</a>':'<span></span>')+(n?'<a class="btn" href="#'+n.id+'">'+n.no+' '+esc(n.t)+' →</a>':'')+'</div>';
+  return h;
+}
+function hydrate(root){Object.keys(WIDGETS).forEach(function(sel){$$(sel,root).forEach(function(el){if(!el.dataset.hyd){el.dataset.hyd=1;WIDGETS[sel](el)}})})}
+function route(){
+  var id=(location.hash||'#home').slice(1),main=$('#main');
+  document.body.classList.remove('open');recalc();
+  var SS=SECS.filter(function(S){return S.id===id})[0];
+  if(SS){side(id);main.innerHTML=srcPage(SS)}
+  else if(id==='home'||!ALL.some(function(c){return c.id===id})){side('home');main.innerHTML=home()}
+  else{var i=ALL.map(function(c){return c.id}).indexOf(id);side(id);main.innerHTML=chunk(ALL[i],i)}
+  hydrate(main);
+  var mk=$('[data-mark]',main);if(mk)mk.onclick=function(){if(PROG[id])delete PROG[id];else PROG[id]=1;saveProg();var y=window.scrollY;route();window.scrollTo(0,y)};
+  var rp=$('[data-resetprog]',main);if(rp)rp.onclick=function(){if(confirm('Reset all Web Tech progress in this browser?')){PROG={};saveProg();route()}};
+  var mb=$('.menu',main);if(mb)mb.onclick=function(){document.body.classList.toggle('open')};
+  var a=$('#side a.on');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest'});
+  window.scrollTo(0,0);
+  if(PEND){var P=PEND;PEND=null;setTimeout(function(){goQ(P)},60)}
+}
+window.addEventListener('hashchange',route);route();
+</script>
+</body></html>
