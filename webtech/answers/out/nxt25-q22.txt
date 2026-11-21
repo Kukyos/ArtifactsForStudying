@@ -1,0 +1,5 @@
+  80 units -> Total bill: Rs. 0.00
+ 150 units -> Total bill: Rs. 112.50
+ 250 units -> Total bill: Rs. 450.00
+ 450 units -> Total bill: Rs. 1425.00
+ 600 units -> Total bill: Rs. 2525.00

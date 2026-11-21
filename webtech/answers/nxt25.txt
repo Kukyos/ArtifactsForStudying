@@ -1,0 +1,463 @@
+=== Nxt25 Q1
+```html
+<a href="https://www.karunya.edu">Karunya University</a>
+```
+<p>Add <code>target="_blank"</code> to open it in a new tab.</p>
+
+=== Nxt25 Q2
+```run html
+<ol>
+  <li>Coffee</li>
+  <li>Tea
+    <ul>
+      <li>Green tea</li>
+      <li>Black tea</li>
+    </ul>
+  </li>
+  <li>Milk</li>
+</ol>
+```
+<p>The bulleted sub-list goes <b>inside</b> the Tea <code>&lt;li&gt;</code>, which is why Milk is still numbered 3.</p>
+
+=== Nxt25 Q3
+<p><b>Descendant selector</b> <code>div p</code> (space) matches every <code>&lt;p&gt;</code> anywhere inside the div, at any depth. <b>Child selector</b> <code>div &gt; p</code> matches only <code>&lt;p&gt;</code> elements that are <b>direct children</b> of the div, not ones nested deeper (e.g. inside a section within the div).</p>
+
+=== Nxt25 Q4
+<p><code>z-index</code> on a positioned element: <code>.top { position: relative; z-index: 9999; }</code>. A higher z-index is drawn above lower ones; it only works when position is not static.</p>
+
+=== Nxt25 Q5
+<p>A <b>breakpoint</b> is a screen width at which the layout changes, written with a media query, e.g. <code>@media (max-width: 768px) { ... }</code>. Breakpoints make a page <b>responsive</b>: columns can stack, fonts shrink and menus collapse on phones and tablets.</p>
+
+=== Nxt25 Q6
+```css
+div { color: black; }
+div:hover { color: red; }
+```
+
+=== Nxt25 Q7
+```js
+alert("Welcome to JavaScript");
+```
+
+=== Nxt25 Q8
+```run html
+<input type="number" id="a"> + <input type="number" id="b">
+<button onclick="add()">Add</button>
+<p id="sum"></p>
+<script>
+  function add() {
+    var a = Number(document.getElementById("a").value);
+    var b = Number(document.getElementById("b").value);
+    document.getElementById("sum").innerHTML = "Sum = " + (a + b);
+  }
+</script>
+```
+
+=== Nxt25 Q9
+<p><b>Synchronous</b>: each operation (create, read, update, delete) blocks; the next line waits until it finishes, e.g. <code>fs.readFileSync()</code>. Simple to write, but freezes the page or server while waiting. <b>Asynchronous</b>: the operation starts and the code continues; the result arrives later through a callback, a Promise or <code>async/await</code>, e.g. <code>fetch()</code> or <code>await Student.find()</code>. Used for databases and servers because the app stays responsive while it waits.</p>
+
+=== Nxt25 Q10
+<p>Primitive types: <b>String, Number, BigInt, Boolean, Undefined, Null, Symbol</b>. Non-primitive: <b>Object</b> (including arrays and functions). <code>typeof</code> tells the type of a value.</p>
+
+=== Nxt25 Q11
+```run html
+<p>The <b>Hyper Text Markup Language</b> or <i>HTML</i> is the standard markup language.
+<strong>HTML</strong> describes the <em>structure</em> of a web page.
+HTML Tags are written using <small>angle brackets</small>.
+The Product MRP Rs. 1000, <u>Offer Price </u>is <del>Rs. 1000</del> Rs. 799.
+A<sup>2</sup>, X<sub>2</sub>.</p>
+```
+<table class="tbl"><tr><th>Look</th><th>Tag</th></tr>
+<tr><td>bold</td><td><code>&lt;b&gt;</code>, or <code>&lt;strong&gt;</code> for important text</td></tr>
+<tr><td>italic</td><td><code>&lt;i&gt;</code>, or <code>&lt;em&gt;</code> for emphasis</td></tr>
+<tr><td>small text</td><td><code>&lt;small&gt;</code></td></tr>
+<tr><td>underline</td><td><code>&lt;u&gt;</code> (or <code>&lt;ins&gt;</code>)</td></tr>
+<tr><td>struck-out price</td><td><code>&lt;del&gt;</code> (or <code>&lt;s&gt;</code>)</td></tr>
+<tr><td>A² and X₂</td><td><code>&lt;sup&gt;</code> and <code>&lt;sub&gt;</code></td></tr></table>
+
+=== Nxt25 Q12
+@@SAME Apr26 Q18a
+
+=== Nxt25 Q13
+<p>A media query on <code>orientation</code> changes the colours when the device is turned. In the preview, make the frame wider or narrower than it is tall, or rotate a phone.</p>
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; text-align: center; padding: 30px; transition: all 0.4s; }
+
+    @media (orientation: portrait) {
+      body { background-color: #1e3a8a; color: #ffffff; }
+      .mode::after { content: "Portrait mode"; }
+    }
+
+    @media (orientation: landscape) {
+      body { background-color: #fde68a; color: #7c2d12; }
+      .mode::after { content: "Landscape mode"; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Orientation Demo</h2>
+  <p class="mode"></p>
+</body>
+</html>
+```
+<p><code>orientation: portrait</code> applies when height ≥ width and <code>landscape</code> when width &gt; height. The viewport meta tag makes the page use the device width. (JavaScript can do the same with <code>window.matchMedia("(orientation: portrait)")</code> and a change listener, but CSS alone is enough.)</p>
+
+=== Nxt25 Q14
+<p>The two ways to define a function:</p>
+<ul>
+<li><b>Function declaration</b> (named function): <code>function add(a, b) { return a + b; }</code>. It is <b>hoisted</b>, so it can be called before the line where it is written.</li>
+<li><b>Function expression / arrow function</b>: the function is stored in a variable: <code>const mul = function (a, b) { return a * b; };</code> or <code>const mul = (a, b) =&gt; a * b;</code>. It is <b>not hoisted</b>, so it can only be called after it is defined; arrow functions are shorter and are commonly used as callbacks.</li>
+</ul>
+```js
+console.log(add(2, 3));          // 5: works, declarations are hoisted
+
+function add(a, b) {
+  return a + b;
+}
+
+const mul = (a, b) => a * b;     // arrow function expression
+console.log(mul(4, 5));          // 20
+
+[1, 2, 3].forEach(n => console.log(n * 10));   // arrow function as a callback
+```
+<p>(If the question means <b>built-in vs user-defined</b> functions: built-in ones come with JavaScript, like <code>alert()</code>, <code>parseInt()</code> and <code>Math.max()</code>; user-defined ones are written by the programmer, like <code>add()</code> above.)</p>
+
+=== Nxt25 Q15
+<table class="tbl"><tr><th>setTimeout(fn, ms)</th><th>setInterval(fn, ms)</th></tr>
+<tr><td>Runs the function <b>once</b> after the delay</td><td>Runs the function <b>repeatedly</b>, every ms milliseconds</td></tr>
+<tr><td>Cancelled with <code>clearTimeout(id)</code></td><td>Stopped with <code>clearInterval(id)</code></td></tr>
+<tr><td>Use: show a message after 3 s, delayed redirect</td><td>Use: clocks, countdowns, slideshows, polling</td></tr></table>
+```run html
+<p id="once">Waiting...</p>
+<p id="tick">0</p>
+<script>
+  setTimeout(function () {
+    document.getElementById("once").innerHTML = "setTimeout ran once after 2 seconds";
+  }, 2000);
+
+  var n = 0;
+  var id = setInterval(function () {
+    n++;
+    document.getElementById("tick").innerHTML = "setInterval count: " + n;
+    if (n == 10) clearInterval(id);   // stop after 10 ticks
+  }, 1000);
+</script>
+```
+
+=== Nxt25 Q16
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    form { width: 380px; padding: 16px; border: 1px solid #aaa; border-radius: 8px; font-family: Arial; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    .opt { font-weight: normal; display: inline; margin-right: 10px; }
+    input[type=text], input[type=email], select { width: 100%; padding: 6px; box-sizing: border-box; }
+    button { margin-top: 14px; padding: 6px 16px; }
+  </style>
+</head>
+<body>
+  <form action="/register" method="post" enctype="multipart/form-data">
+    <h3>Event Registration</h3>
+
+    <label for="name">Full Name</label>
+    <input type="text" id="name" name="name" placeholder="Enter full name" required>
+
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" placeholder="name@example.com" required>
+
+    <label for="dept">Department</label>
+    <select id="dept" name="dept" required>
+      <option value="">-- Select department --</option>
+      <option>CSE</option>
+      <option>ECE</option>
+      <option>EEE</option>
+      <option>Mechanical</option>
+      <option>Civil</option>
+    </select>
+
+    <label>Gender</label>
+    <input type="radio" id="m" name="gender" value="Male" required><label class="opt" for="m">Male</label>
+    <input type="radio" id="f" name="gender" value="Female"><label class="opt" for="f">Female</label>
+    <input type="radio" id="o" name="gender" value="Other"><label class="opt" for="o">Other</label>
+
+    <label>Hobbies</label>
+    <input type="checkbox" name="hobbies" value="Music"> Music
+    <input type="checkbox" name="hobbies" value="Sports"> Sports
+    <input type="checkbox" name="hobbies" value="Reading"> Reading
+    <input type="checkbox" name="hobbies" value="Coding"> Coding
+
+    <label for="idp">Upload ID proof</label>
+    <input type="file" id="idp" name="idproof" accept=".pdf,.jpg,.jpeg,.png" required>
+
+    <button type="submit">Submit</button>
+    <button type="reset">Reset</button>
+  </form>
+</body>
+</html>
+```
+<ul><li>Dropdown: <code>&lt;select&gt;</code>; gender: radio buttons with one shared <code>name</code> (select one); hobbies: checkboxes (several can be ticked).</li>
+<li>File upload: <code>&lt;input type="file"&gt;</code>, with <code>accept</code> limiting the file types. A form that uploads files <b>must</b> use <code>method="post"</code> and <code>enctype="multipart/form-data"</code>.</li>
+<li><code>required</code> and <code>type="email"</code> give validation; submit sends the form, reset clears it.</li></ul>
+
+=== Nxt25 Q17
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    table { border-collapse: collapse; font-family: Arial; font-size: 13px; text-align: center; }
+    th, td { border: 1px solid black; padding: 4px 6px; }
+    td.day, th { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <table>
+    <tr><th>TT</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th></tr>
+    <tr>
+      <td class="day">Day/Time</td>
+      <td>9:10 am -<br>10:00 am</td><td>10:05 am -<br>10:55 am</td><td>11:00 am -<br>11:50 am</td><td>11:55 am -<br>12:45 am</td>
+      <td rowspan="6" class="day">LUNCH</td>
+      <td>2:00 pm -<br>2:50 pm</td><td>2:55 pm -<br>3:45 pm</td><td>3:50 pm -<br>4:40 pm</td>
+    </tr>
+    <tr><td class="day">Monday</td><td colspan="2">DS Lab</td><td colspan="2">DST</td><td colspan="3">Digital Design</td></tr>
+    <tr><td class="day">Tuesday</td><td colspan="3">Web Technology</td><td>PT</td><td colspan="3">C Programming</td></tr>
+    <tr><td class="day">Wednesday</td><td colspan="2">English</td><td colspan="2">Placement</td><td>Library</td><td colspan="2">Mentor</td></tr>
+    <tr><td class="day">Thursday</td><td colspan="4">Mathematics</td><td colspan="3">DS Lab</td></tr>
+    <tr><td class="day">Friday</td><td colspan="3">Web Technology</td><td>PT</td><td>DST</td><td colspan="2">Placement</td></tr>
+  </table>
+</body>
+</html>
+```
+<ul><li><b>LUNCH</b> starts in the Day/Time row and runs down to Friday: <code>rowspan="6"</code>. The rows below it therefore have one cell fewer.</li>
+<li>Subjects that cover several periods use <code>colspan</code>: DS Lab 2, Web Technology 3, Mathematics 4, Digital Design 3.</li>
+<li>Check each row adds up to 8 period columns (plus LUNCH): e.g. Monday 2 + 2 + 3 = 7, plus lunch = 8.</li></ul>
+
+=== Nxt25 Q18
+```run html
+<style>
+  p { width: 260px; padding: 4px; font-family: Arial; }
+  p.dotted { border-style: dotted; }
+  p.dashed { border-style: dashed; }
+  p.solid  { border-style: solid; }
+  p.double { border-style: double; }
+  p.groove { border-style: groove; }
+  p.ridge  { border-style: ridge; }
+  p.inset  { border-style: inset; }
+  p.outset { border-style: outset; }
+  p.none   { border-style: none; }
+  p.hidden { border-style: hidden; }
+  p.mix    { border-style: dotted dashed solid double; }
+</style>
+<p class="dotted">A dotted border.</p>
+<p class="dashed">A dashed border.</p>
+<p class="solid">A solid border.</p>
+<p class="double">A double border.</p>
+<p class="groove">A groove border.</p>
+<p class="ridge">A ridge border.</p>
+<p class="inset">An inset border.</p>
+<p class="outset">An outset border.</p>
+<p class="none">No border.</p>
+<p class="hidden">A hidden border.</p>
+<p class="mix">A mixed border.</p>
+```
+<p><code>border-style</code> sets the line type. With four values the order is <b>top, right, bottom, left</b>, so <code>dotted dashed solid double</code> gives the mixed border. <code>none</code> and <code>hidden</code> both show no border (hidden matters only in collapsed tables). Width and colour come from <code>border-width</code> and <code>border-color</code>, or the shorthand <code>border: 2px solid red</code>.</p>
+
+=== Nxt25 Q19
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);   /* four columns */
+      grid-template-rows: repeat(3, 120px);    /* three rows */
+      gap: 10px;
+    }
+    .gallery img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;          /* scale to fill the cell without stretching */
+      display: block;
+    }
+    .gallery img:first-child {
+      grid-column: span 2;
+      grid-row: span 2;
+      outline: 4px solid gold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Photo Gallery</h2>
+  <div class="gallery">
+    <img src="https://picsum.photos/id/10/400/300" alt="1">
+    <img src="https://picsum.photos/id/11/400/300" alt="2">
+    <img src="https://picsum.photos/id/12/400/300" alt="3">
+    <img src="https://picsum.photos/id/13/400/300" alt="4">
+    <img src="https://picsum.photos/id/14/400/300" alt="5">
+    <img src="https://picsum.photos/id/15/400/300" alt="6">
+    <img src="https://picsum.photos/id/16/400/300" alt="7">
+    <img src="https://picsum.photos/id/17/400/300" alt="8">
+    <img src="https://picsum.photos/id/18/400/300" alt="9">
+    <img src="https://picsum.photos/id/19/400/300" alt="10">
+    <img src="https://picsum.photos/id/20/400/300" alt="11">
+    <img src="https://picsum.photos/id/21/400/300" alt="12">
+  </div>
+</body>
+</html>
+```
+<ul><li><code>display: grid</code> with <code>grid-template-columns: repeat(4, 1fr)</code> makes four equal, flexible columns; three rows; <code>gap: 10px</code>.</li>
+<li><code>width/height: 100%</code> with <code>object-fit: cover</code> makes every image scale to its cell. <code>1fr</code> columns shrink with the window, so the gallery is responsive.</li>
+<li>The first image spans <b>two columns and two rows</b> (<code>grid-column: span 2; grid-row: span 2</code>). It takes 4 cells, so the 12 cells hold the large image plus 8 more. With all 12 images, 3 overflow into an extra auto row; to keep strictly 3 rows, use 9 images or add <code>grid-auto-rows</code>.</li></ul>
+
+=== Nxt25 Q20
+<ul>
+<li><b>Git and GitHub (with GitHub Actions)</b>: Git tracks every change to the code, with branches for features and merges after review. GitHub hosts the repository; <b>Actions</b> run a CI/CD pipeline on every push: install, lint, test, build, and deploy (e.g. to Vercel or GitHub Pages) automatically.</li>
+<li><b>npm and a build tool (Vite / Webpack)</b>: npm installs and versions the project's packages (<code>package.json</code>) and runs scripts like <code>npm run build</code>. Vite or Webpack bundles and minifies the JS and CSS, so the shipped site is small and fast.</li>
+</ul>
+<p>Others worth naming: <b>ESLint/Prettier</b> (code quality and formatting checks in the pipeline), <b>Docker</b> (the same environment everywhere), <b>Jenkins</b> (a CI server).</p>
+
+=== Nxt25 Q21
+<p>Use the CSS <b>animation</b> property with a <b>@keyframes</b> rule that moves the ball with <code>transform: translateX()</code> (or <code>left</code>), set to repeat forever.</p>
+```run html
+<style>
+  .track { position: relative; height: 60px; border-bottom: 2px solid #555; overflow: hidden; }
+  .ball {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ff8a80, #c62828);
+    animation: roll 3s linear infinite;
+  }
+  @keyframes roll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(100vw - 70px)); }
+  }
+</style>
+<div class="track"><div class="ball"></div></div>
+```
+<p><code>animation: roll 3s linear infinite</code> = keyframes name, duration, constant speed, repeat forever. Add <code>alternate</code> to make it roll back instead of jumping to the start.</p>
+
+=== Nxt25 Q22
+```run html
+<!DOCTYPE html>
+<html>
+<body>
+  <h3>Electricity Bill (Non-commercial)</h3>
+  Units consumed: <input type="number" id="units" min="0">
+  <button onclick="calcBill()">Calculate</button>
+  <p id="bill"></p>
+
+  <script>
+    function calcBill() {
+      var u = parseFloat(document.getElementById("units").value);
+      var out = document.getElementById("bill");
+      if (isNaN(u) || u < 0) { out.innerHTML = "Enter a valid number of units."; return; }
+
+      var amt = 0;
+      if (u > 500) { amt += (u - 500) * 8.00; u = 500; }
+      if (u > 400) { amt += (u - 400) * 6.00; u = 400; }
+      if (u > 200) { amt += (u - 200) * 4.50; u = 200; }
+      if (u > 100) { amt += (u - 100) * 2.25; u = 100; }
+      // first 100 units are free (Rs.0/unit)
+
+      out.innerHTML = "Total bill: Rs. " + amt.toFixed(2);
+    }
+  </script>
+</body>
+</html>
+```
+<p>Each slab is charged only for the units that fall in it, working down from the top slab. Example, <b>450 units</b>: 50 × 6.00 + 200 × 4.50 + 100 × 2.25 + 100 × 0 = 300 + 900 + 225 = <b>Rs. 1425.00</b>. The <b>Output</b> below is that function run with node for several readings:</p>
+```out
+@@OUT nxt25-q22@@
+```
+
+=== Nxt25 Q23
+<p>A form's <code>method</code> attribute decides how its data is sent to the <code>action</code> URL:</p>
+<table class="tbl"><tr><th>GET</th><th>POST</th></tr>
+<tr><td>Data is added to the <b>URL</b> as a query string: <code>/search?q=html&amp;page=2</code></td><td>Data goes in the <b>request body</b>, not visible in the URL</td></tr>
+<tr><td>Limited length; can be bookmarked and cached</td><td>No practical size limit; can carry files</td></tr>
+<tr><td>For fetching data: searches, filters</td><td>For sending or changing data: login, registration, payments</td></tr>
+<tr><td>Not for passwords (they appear in the URL and history)</td><td>Safer for sensitive data (still needs HTTPS)</td></tr></table>
+```run html
+<h4>GET: search</h4>
+<form action="https://www.google.com/search" method="get" target="_blank">
+  <input type="text" name="q" placeholder="Search Google">
+  <input type="submit" value="Search">
+</form>
+
+<h4>POST: login</h4>
+<form action="/login" method="post">
+  Username: <input type="text" name="username"><br>
+  Password: <input type="password" name="password"><br>
+  <input type="submit" value="Login">
+</form>
+```
+<p>Submitting the GET form opens <code>google.com/search?q=your+words</code>: the data is in the URL. A POST form sends <code>username=…&amp;password=…</code> in the body; on the server, Express reads it with <code>express.urlencoded()</code> into <code>req.body</code>, and GET data from <code>req.query</code>.</p>
+
+=== Nxt25 Q24
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; text-align: center; }
+    .board { display: inline-block; padding: 20px 40px; margin: 20px; background: #0b3d0b; color: #fff; border-radius: 10px; }
+    #score { font-size: 48px; font-weight: bold; }
+    button { font-size: 16px; padding: 8px 16px; margin: 4px; border-radius: 6px; border: none; cursor: pointer; }
+    .b1 { background: #90caf9; } .b4 { background: #ffcc80; } .b6 { background: #ef9a9a; }
+    #last { min-height: 1.4em; }
+  </style>
+</head>
+<body>
+  <div class="board">
+    <div>LIVE SCORE</div>
+    <div id="score">0/0</div>
+    <div>Balls: <span id="balls">0</span> (Overs: <span id="overs">0.0</span>)</div>
+    <div>Fours: <span id="fours">0</span> | Sixes: <span id="sixes">0</span></div>
+    <div id="last"></div>
+  </div>
+  <div>
+    <button class="b1" onclick="addRuns(1)">Single</button>
+    <button class="b4" onclick="addRuns(4)">Four</button>
+    <button class="b6" onclick="addRuns(6)">Six</button>
+    <button onclick="reset()">Reset</button>
+  </div>
+
+  <script>
+    var runs = 0, wickets = 0, balls = 0, fours = 0, sixes = 0;
+
+    function addRuns(r) {
+      runs += r;
+      balls++;
+      if (r == 4) fours++;
+      if (r == 6) sixes++;
+      document.getElementById("last").innerHTML = "Last ball: " + (r == 1 ? "Single" : r == 4 ? "FOUR!" : "SIX!");
+      show();
+    }
+
+    function show() {
+      document.getElementById("score").innerHTML = runs + "/" + wickets;
+      document.getElementById("balls").innerHTML = balls;
+      document.getElementById("overs").innerHTML = Math.floor(balls / 6) + "." + (balls % 6);
+      document.getElementById("fours").innerHTML = fours;
+      document.getElementById("sixes").innerHTML = sixes;
+    }
+
+    function reset() {
+      runs = wickets = balls = fours = sixes = 0;
+      document.getElementById("last").innerHTML = "";
+      show();
+    }
+  </script>
+</body>
+</html>
+```
+<ul><li>The score is kept in JavaScript variables; each button calls <code>addRuns()</code> with 1, 4 or 6.</li>
+<li><code>show()</code> rewrites the scoreboard with <code>innerHTML</code> after every click, so the "live score" updates instantly without reloading.</li>
+<li>Overs are balls ÷ 6 written as overs.balls (e.g. 8 balls = 1.2 overs).</li></ul>
