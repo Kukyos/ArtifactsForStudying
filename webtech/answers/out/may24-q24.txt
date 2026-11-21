@@ -1,0 +1,54 @@
+test> use company
+switched to db company
+
+company> db.createCollection("employee")
+{ ok: 1 }
+
+company> db.employee.insertMany([
+...   { name: "Arun", empid: 101, gender: "Male", email: "arun@company.com", phone: "9876543210", experience: 3 },
+...   { name: "Bhavya", empid: 102, gender: "Female", email: "bhavya@company.com", phone: "9876543211", experience: 5 },
+...   { name: "Charles", empid: 103, gender: "Male", email: "charles@company.com", phone: "9876543212", experience: 7.5 },
+...   { name: "Divya", empid: 104, gender: "Female", email: "divya@company.com", phone: "9876543213", experience: 2 },
+...   { name: "Elan", empid: 105, gender: "Male", email: "elan@company.com", phone: "9876543214", experience: 4.5 }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6b022b7b2647c709c578e842'),
+    '1': ObjectId('6b022b7b2647c709c578e843'),
+    '2': ObjectId('6b022b7b2647c709c578e844'),
+    '3': ObjectId('6b022b7b2647c709c578e845'),
+    '4': ObjectId('6b022b7b2647c709c578e846')
+  }
+}
+
+company> db.employee.find({ empid: 103 })
+[
+  {
+    _id: ObjectId('6b022b7b2647c709c578e844'),
+    name: 'Charles',
+    empid: 103,
+    gender: 'Male',
+    email: 'charles@company.com',
+    phone: '9876543212',
+    experience: 7.5
+  }
+]
+
+company> db.employee.updateOne({ empid: 101 }, { $set: { phone: "9000011111" } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+company> db.employee.deleteOne({ empid: 104 })
+{ acknowledged: true, deletedCount: 1 }
+
+company> db.employee.find({ experience: { $gt: 4.5 } }, { _id: 0, name: 1, empid: 1, experience: 1 })
+[
+  { name: 'Bhavya', empid: 102, experience: 5 },
+  { name: 'Charles', empid: 103, experience: 7.5 }
+]

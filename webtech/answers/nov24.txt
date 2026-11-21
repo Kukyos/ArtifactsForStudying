@@ -1,0 +1,543 @@
+=== Nov24 Q1
+<p><code>&lt;meta&gt;</code> gives <b>information about the page</b> (metadata) to the browser and search engines, not shown on the page: character set, description, keywords, author, and the viewport for mobile. E.g. <code>&lt;meta charset="UTF-8"&gt;</code>, <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</code>.</p>
+
+=== Nov24 Q2
+<p><code>$(document).ready(function(){ ... })</code> runs the code only <b>after the HTML (DOM) has fully loaded</b>, so jQuery can safely find and change the elements. Short form: <code>$(function(){ ... })</code>.</p>
+
+=== Nov24 Q3
+<p><b>String</b> (<code>"Ravi"</code>) and <b>Number</b> (<code>25</code>). Boolean, null, object and array are also shared by both.</p>
+
+=== Nov24 Q4
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+<p><b>Two-way data binding</b>: the view and the model stay in sync automatically, so there is no need to write DOM code to update the page when data changes (or read inputs when the user types).</p>
+
+=== Nov24 Q5
+<p><b>var</b> is <b>function-scoped</b>, can be re-declared, and is hoisted (usable before its line, as undefined). <b>let</b> is <b>block-scoped</b> (only inside its <code>{ }</code>) and cannot be re-declared in the same scope. E.g. <code>if (true) { var a = 1; let b = 2; }</code>: <code>a</code> is visible after the block, <code>b</code> is not.</p>
+
+=== Nov24 Q6
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+<p><b>ngRoute</b> is the AngularJS module for <b>routing</b>: it maps URLs (<code>#!/home</code>) to views with <code>$routeProvider</code> and loads them into <code>ng-view</code>, making a single-page application.</p>
+
+=== Nov24 Q7
+<p><b>&lt;img&gt;</b>: <code>&lt;img src="photo.jpg" alt="photo"&gt;</code></p>
+
+=== Nov24 Q8
+<p><code>.container</code> wraps the page content in a <b>responsive fixed-width box</b> that is centred with padding; its max-width changes at each breakpoint. (<code>.container-fluid</code> is always full width.) The grid's rows and columns go inside it.</p>
+
+=== Nov24 Q9
+<p>The <b>fs</b> (file system) module: <code>const fs = require("fs");</code></p>
+
+=== Nov24 Q10
+<p><b>BSON</b> (Binary JSON): documents look like JSON but are stored in a binary form that adds types such as Date and ObjectId.</p>
+
+=== Nov24 Q11
+<p><code>float: left | right</code> takes an element <b>out of the normal flow</b> and pushes it to the left or right of its container; the text and inline content that follow <b>wrap around</b> it. Several floated blocks line up side by side (old way to build columns and nav bars). Side effects: a parent containing only floats collapses to zero height, fixed with <code>clear: both</code> on a following element or <code>overflow: hidden</code> on the parent.</p>
+```run html
+<img src="https://picsum.photos/id/10/120/80" style="float:left;margin-right:10px" alt="img">
+<p>This text wraps around the image because the image is floated left. Floats were used for image wrapping and columns before flexbox.</p>
+<p style="clear:both">clear: both starts below the float.</p>
+```
+
+=== Nov24 Q12
+<table class="tbl"><tr><th>JavaScript</th><th>jQuery</th></tr>
+<tr><td>A programming language built into browsers</td><td>A JavaScript <b>library</b> written in JS (must be included with a script tag)</td></tr>
+<tr><td>Longer code: <code>document.getElementById("x").style.display = "none";</code></td><td>Short, chainable code: <code>$("#x").hide();</code></td></tr>
+<tr><td>Some cross-browser differences handled by hand</td><td>Handles browser differences; ready-made effects and AJAX</td></tr></table>
+<p>The key difference: jQuery is not a separate language; it is a library that simplifies DOM selection, events and effects that plain JavaScript does with more code.</p>
+
+=== Nov24 Q13
+```js
+{
+  "courseName": "Web Technology",
+  "courseCode": "23CS2048",
+  "duration": "12 weeks",
+  "instructor": {
+    "name": "Dr. Priya",
+    "email": "priya@karunya.edu"
+  },
+  "modules": ["HTML & CSS", "JavaScript", "jQuery", "React", "MongoDB", "Node.js"],
+  "fee": 4999,
+  "certificate": true
+}
+```
+<p>Keys are in double quotes; values use JSON types: strings, a number, a boolean, a nested object (instructor) and an array (modules).</p>
+
+=== Nov24 Q14
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+```run html
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<div ng-app="" ng-init="items=[{name:'Pen',price:10},{name:'Notebook',price:45},{name:'Bag',price:650}]">
+  <ul>
+    <li ng-repeat="x in items">{{ $index + 1 }}. {{ x.name }} - Rs.{{ x.price }}</li>
+  </ul>
+</div>
+```
+<p><code>ng-repeat="x in items"</code> creates one <code>&lt;li&gt;</code> per array element; <code>$index</code> is the position.</p>
+
+=== Nov24 Q15
+```js
+const http = require("http");
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end("<h1>Hello from Node.js server</h1>");
+});
+
+server.listen(3000, () => console.log("Server running at http://localhost:3000/"));
+```
+<p><b>Run</b>:</p>
+```out
+@@OUT nov24-q15@@
+```
+<p><code>createServer</code> takes a callback run for every request; <code>writeHead</code> sets the status and type, <code>end</code> sends the body; <code>listen</code> starts it on port 3000.</p>
+
+=== Nov24 Q16
+<table class="tbl"><tr><th>insertOne()</th><th>insertMany()</th></tr>
+<tr><td>Inserts a <b>single</b> document</td><td>Inserts an <b>array</b> of documents in one call</td></tr>
+<tr><td>Returns <code>insertedId</code></td><td>Returns <code>insertedIds</code> (one per document)</td></tr></table>
+```mongo
+db.students.insertOne({ name: "Ravi", dept: "CSE" })
+db.students.insertMany([{ name: "Asha", dept: "IT" }, { name: "John", dept: "ECE" }])
+```
+<p>insertMany is faster for bulk data (one round trip). By default it is ordered: if one document fails (e.g. duplicate _id), the rest after it are not inserted.</p>
+
+=== Nov24 Q17
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Feedback</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f6f9; }
+    form { width: 420px; margin: 20px auto; background: #fff; padding: 20px 24px; border-radius: 8px; box-shadow: 0 2px 8px #0002; }
+    h2 { text-align: center; color: #2c5282; margin-top: 0; }
+    label { display: block; margin: 12px 0 4px; font-weight: bold; }
+    input[type=text], input[type=email], select, textarea { width: 100%; padding: 7px; box-sizing: border-box; border: 1px solid #bbb; border-radius: 4px; }
+    .inline { font-weight: normal; display: inline; margin-right: 12px; }
+    small { color: #666; }
+    .buttons { margin-top: 16px; text-align: center; }
+    button { padding: 8px 20px; margin: 0 6px; border: none; border-radius: 4px; color: #fff; background: #2c5282; cursor: pointer; }
+    button[type=reset] { background: #888; }
+  </style>
+</head>
+<body>
+  <form action="#" method="post">
+    <h2>Feedback Submission</h2>
+
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+
+    <label>Feedback Type</label>
+    <input type="radio" id="pos" name="type" value="Positive" required><label class="inline" for="pos">Positive</label>
+    <input type="radio" id="neu" name="type" value="Neutral"><label class="inline" for="neu">Neutral</label>
+    <input type="radio" id="neg" name="type" value="Negative"><label class="inline" for="neg">Negative</label>
+
+    <label for="cat">Product Category</label>
+    <select id="cat" name="category" required>
+      <option value="">-- Select a category --</option>
+      <option>Electronics</option>
+      <option>Clothing</option>
+      <option>Books</option>
+      <option>Home Appliances</option>
+    </select>
+
+    <label for="comments">Comments</label>
+    <textarea id="comments" name="comments" rows="4" maxlength="250"
+              placeholder="Write your feedback (max 250 characters)"></textarea>
+    <small>Maximum 250 characters.</small>
+
+    <label class="inline"><input type="checkbox" name="terms" required> I agree to the Terms and Conditions</label>
+
+    <div class="buttons">
+      <button type="submit">Submit</button>
+      <button type="reset">Reset</button>
+    </div>
+  </form>
+</body>
+</html>
+```
+<ul><li>Text boxes with placeholders; <code>type="email"</code> checks the format.</li>
+<li>Radio buttons share <code>name="type"</code> so only one feedback type can be picked.</li>
+<li><code>&lt;select&gt;</code> for the category, with an empty first option so <code>required</code> forces a choice.</li>
+<li><code>&lt;textarea maxlength="250"&gt;</code> enforces the character limit and the placeholder/small text explains it.</li>
+<li><code>required</code> on the checkbox means the form cannot be submitted until the terms are accepted.</li>
+<li>Submit sends the form; Reset clears it. The CSS centres the card, gives full-width fields, spacing, rounded corners and coloured buttons.</li></ul>
+
+=== Nov24 Q18a
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    ul.nav {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      background-color: #1e4d8c;
+      display: flex;
+    }
+    ul.nav a {
+      display: block;
+      padding: 14px 22px;
+      color: white;
+      text-decoration: none;
+    }
+    ul.nav a:hover { background-color: #3a7bd5; color: #ffd54f; }
+    ul.nav a.active { background-color: #f9a825; color: #1e4d8c; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <ul class="nav">
+    <li><a href="#" class="active">Home</a></li>
+    <li><a href="#">Courses</a></li>
+    <li><a href="#">Resources</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</body>
+</html>
+```
+<ul><li><code>&lt;ul&gt;</code> structures the links; <code>list-style: none</code> removes bullets.</li>
+<li><code>display: flex</code> on the list lays the links out <b>horizontally</b>.</li>
+<li>Dark blue background (educational theme), <code>padding</code> on each link, <code>:hover</code> changes background and link colour.</li>
+<li>The <code>active</code> class highlights Home as the current page.</li></ul>
+
+=== Nov24 Q18b
+<ul>
+<li><b>Universal selector</b> <code>*</code>: selects <b>every</b> element. Used for resets: <code>* { margin: 0; box-sizing: border-box; }</code></li>
+<li><b>Descendant selector</b> <code>A B</code> (a space): selects B elements anywhere <b>inside</b> A. <code>nav a { color: white; }</code> styles only links inside the nav.</li>
+<li><b>Pseudo-class selector</b> <code>:state</code>: selects elements in a particular <b>state or position</b>: <code>a:hover</code>, <code>input:focus</code>, <code>li:first-child</code>, <code>tr:nth-child(even)</code>.</li>
+</ul>
+```run html
+<style>
+  * { font-family: Arial; margin: 4px; }
+  div p { color: green; }
+  li:first-child { font-weight: bold; }
+  a:hover { color: red; }
+</style>
+<div><p>Green: a p inside a div (descendant)</p></div>
+<p>Not green: this p is outside the div</p>
+<ul><li>First item is bold (first-child)</li><li>Second item</li></ul>
+<a href="#">Hover turns me red</a>
+```
+
+=== Nov24 Q19a
+<ul>
+<li><b>getElementById(id)</b>: finds one element; then <b>innerHTML</b> changes its content.</li>
+<li><b>createElement(tag) + appendChild(node)</b>: builds a new element and adds it to the page.</li>
+<li><b>setAttribute(name, value)</b> / <b>.style</b>: changes an attribute or style; <b>removeChild()</b> / <b>remove()</b> deletes an element.</li>
+</ul>
+```run html
+<h3 id="title">Old title</h3>
+<ul id="list"><li>Item 1</li></ul>
+<img id="pic" src="https://picsum.photos/id/20/80/50" alt="pic">
+<button onclick="go()">Manipulate</button>
+<script>
+  function go() {
+    document.getElementById("title").innerHTML = "New title";             // change content
+    var li = document.createElement("li");                                // create
+    li.innerHTML = "Item 2 (added)";
+    document.getElementById("list").appendChild(li);                      // add
+    document.getElementById("pic").setAttribute("src", "https://picsum.photos/id/30/80/50");  // change attribute
+    document.getElementById("title").style.color = "purple";              // change style
+  }
+</script>
+```
+
+=== Nov24 Q19b
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>table, th, td { border: 1px solid #444; border-collapse: collapse; padding: 5px 12px; }</style>
+</head>
+<body>
+  <h3>Library Book Inventory</h3>
+  <table id="books">
+    <tr><th>Title</th><th>Author</th><th>Genre</th><th>Price</th></tr>
+  </table>
+  <script>
+    var json = '{"books":[' +
+      '{"Title":"Wings of Fire","Author":"A. P. J. Abdul Kalam","Genre":"Autobiography","Price":350},' +
+      '{"Title":"The Alchemist","Author":"Paulo Coelho","Genre":"Fiction","Price":299},' +
+      '{"Title":"Clean Code","Author":"Robert C. Martin","Genre":"Programming","Price":899}' +
+    ']}';
+    var lib = JSON.parse(json);
+    for (var i = 0; i < lib.books.length; i++) {
+      var b = lib.books[i];
+      document.getElementById("books").innerHTML +=
+        "<tr><td>" + b.Title + "</td><td>" + b.Author + "</td><td>" + b.Genre + "</td><td>Rs." + b.Price + "</td></tr>";
+    }
+  </script>
+</body>
+</html>
+```
+<p>The JSON text holds an array of three book objects. <code>JSON.parse()</code> converts it to a JavaScript object; the loop reads each book's fields and adds a table row.</p>
+
+=== Nov24 Q20a
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+</head>
+<body ng-app="spa">
+  <a href="#!dashboard">Dashboard</a> |
+  <a href="#!profile">Profile</a> |
+  <a href="#!settings">Settings</a> |
+  <a href="#!logout">Logout</a>
+  <hr>
+  <div ng-view></div>
+  <script>
+    angular.module("spa", ["ngRoute"]).config(function ($routeProvider) {
+      $routeProvider
+        .when("/dashboard", { template: "<h3>Dashboard</h3><p>Welcome back! You have 3 new messages.</p>" })
+        .when("/profile",   { template: "<h3>Profile</h3><p>Name: Ananya R<br>Dept: CSE</p>" })
+        .when("/settings",  { template: "<h3>Settings</h3><label><input type='checkbox'> Email notifications</label>" })
+        .when("/logout",    { template: "<h3>Logged out</h3><p>You have been logged out.</p>" })
+        .otherwise({ redirectTo: "/dashboard" });
+    });
+  </script>
+</body>
+</html>
+```
+<p>Include <code>angular-route.js</code>, add <code>"ngRoute"</code> as a dependency, map each path with <code>$routeProvider.when()</code>, and place <code>ng-view</code> where the section should appear. Only that part changes on each click: a single-page application.</p>
+
+=== Nov24 Q20b
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body ng-app="shop" ng-controller="listCtrl">
+  <h3>Shopping List</h3>
+  <form ng-submit="addItem()">
+    <input type="text" ng-model="item" placeholder="Add an item" required>
+    <button type="submit">Add</button>
+  </form>
+  <ul>
+    <li ng-repeat="x in items">{{ x }} <button ng-click="removeItem($index)">x</button></li>
+  </ul>
+  <p ng-show="items.length == 0">The list is empty.</p>
+
+  <script>
+    angular.module("shop", []).controller("listCtrl", function ($scope) {
+      $scope.items = ["Milk", "Bread"];
+      $scope.addItem = function () {
+        if ($scope.item) {
+          $scope.items.push($scope.item);
+          $scope.item = "";
+        }
+      };
+      $scope.removeItem = function (i) { $scope.items.splice(i, 1); };
+    });
+  </script>
+</body>
+</html>
+```
+<ul><li>The <b>controller</b> <code>listCtrl</code> holds the array and the add function on <code>$scope</code>.</li>
+<li>The input is bound with <code>ng-model="item"</code>; <code>ng-submit</code> calls <code>addItem()</code>, which pushes it and clears the box.</li>
+<li><code>ng-repeat</code> redraws the list automatically whenever the array changes.</li></ul>
+
+=== Nov24 Q21
+<p><b>login.html</b></p>
+```html
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Login</h2>
+  <form action="/loginResult" method="post">
+    Username: <input type="text" name="username" required><br><br>
+    Password: <input type="password" name="password" required><br><br>
+    <input type="submit" value="Login">
+  </form>
+</body>
+</html>
+```
+<p><b>app.js</b></p>
+```js
+const express = require("express");
+const path = require("path");
+
+const app = express();
+app.use(express.urlencoded({ extended: true }));   // parse form data into req.body
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "login.html"));
+});
+
+app.post("/loginResult", (req, res) => {
+  const { username, password } = req.body;
+  res.send(`
+    <h2>Login Details</h2>
+    <table border="1" cellpadding="6">
+      <tr><th>Username</th><td>${username}</td></tr>
+      <tr><th>Password</th><td>${"*".repeat(password.length)}</td></tr>
+    </table>
+    <p>Login submitted successfully.</p>`);
+});
+
+app.listen(3000, () => console.log("Server running at http://localhost:3000/"));
+```
+<p><b>Run</b> (<code>npm install express</code>, <code>node app.js</code>; the form submitted with curl):</p>
+```out
+@@OUT nov24-q21@@
+```
+<p>The form's <code>action="/loginResult" method="post"</code> sends the browser to <code>http://localhost:3000/loginResult</code>; <code>express.urlencoded</code> puts the fields in <code>req.body</code> and the route replies with a formatted table. The password is masked rather than echoed.</p>
+
+=== Nov24 Q22
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; }
+    .box { width: 300px; padding: 16px; border: 1px solid #999; border-radius: 8px; }
+    input, select { width: 100%; padding: 6px; margin: 6px 0 12px; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h3>Currency Converter</h3>
+    Amount in USD:
+    <input type="number" id="usd" placeholder="Enter amount in USD">
+    Convert to:
+    <select id="cur">
+      <option value="EUR">EUR (Euro)</option>
+      <option value="JPY">JPY (Japanese Yen)</option>
+    </select>
+    <button onclick="convert()">Convert</button>
+    <p id="out"></p>
+  </div>
+  <script>
+    function convert() {
+      var usd = parseFloat(document.getElementById("usd").value);
+      var cur = document.getElementById("cur").value;
+      var out = document.getElementById("out");
+      if (isNaN(usd) || usd < 0) {
+        out.innerHTML = "Please enter a valid amount.";
+        return;
+      }
+      var rate = (cur == "EUR") ? 0.85 : 110.5;
+      var result = usd * rate;
+      out.innerHTML = usd + " USD = <b>" + result.toFixed(2) + " " + cur + "</b>";
+    }
+  </script>
+</body>
+</html>
+```
+<p>The amount is read with <code>parseFloat</code>, the rate is picked from the drop-down (EUR ×0.85, JPY ×110.5), and the result is written to the page with <code>innerHTML</code>, rounded with <code>toFixed(2)</code>. 100 USD gives 85.00 EUR or 11050.00 JPY.</p>
+
+=== Nov24 Q23a
+```run html
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<button id="st">slideToggle</button>
+<button id="ft">fadeTo 0.4</button>
+<button id="anim">queue 5 animations</button>
+<button id="stop">stop</button>
+<div id="faq" style="background:#e3f2fd;padding:10px;margin:8px 0">FAQ answer panel</div>
+<div id="ball" style="width:40px;height:40px;border-radius:50%;background:tomato;position:relative"></div>
+<script>
+  $("#st").click(function () { $("#faq").slideToggle(400); });
+  $("#ft").click(function () { $("#faq").fadeTo(600, 0.4); });
+  $("#anim").click(function () {
+    for (var i = 0; i < 5; i++) $("#ball").animate({ left: 250 }, 800).animate({ left: 0 }, 800);
+  });
+  $("#stop").click(function () { $("#ball").stop(true); });   // true = clear the queue too
+</script>
+```
+<ul>
+<li><b>slideToggle(speed)</b>: slides an element down if hidden and up if visible, with one button. Used for FAQ answers, dropdown menus and "read more" panels; the movement shows the user where content came from.</li>
+<li><b>fadeTo(speed, opacity)</b>: fades to a <b>given opacity</b> (e.g. 0.4) without hiding the element. Used to dim disabled items or show focus. Opacity animations are smooth on most devices, but many simultaneous or long fades can stutter on slow phones, so keep durations short (200 to 600 ms) and fade few elements at once.</li>
+<li><b>stop(clearQueue, jumpToEnd)</b>: stops the running animation. jQuery <b>queues</b> animations: hovering in and out quickly can pile up many, which keep playing long after. <code>stop(true)</code> clears the queue, so the element reacts at once and the browser does less work. Common pattern: <code>$(this).stop().slideDown()</code>.</li>
+</ul>
+<p>Together they give feedback that is smooth but not slow: content changes are visible and quick, and the page never lags behind the user.</p>
+
+=== Nov24 Q23b
+```run html
+<!DOCTYPE html>
+<html>
+<body>
+  <ol type="I" start="10">
+    <li>Tomato
+      <dl>
+        <dt>Tomato:</dt><dd>A red, juicy fruit commonly used in cooking.</dd>
+        <dt>Lycopene:</dt><dd>Tomatoes are rich in lycopene, beneficial for health.</dd>
+      </dl>
+    </li>
+    <li>Carrot
+      <dl>
+        <dt>Carrot:</dt><dd>An orange root vegetable high in beta-carotene.</dd>
+        <dt>Vitamin A:</dt><dd>Carrots are an excellent source of Vitamin A.</dd>
+      </dl>
+    </li>
+    <li>Broccoli
+      <dl>
+        <dt>Broccoli:</dt><dd>A green vegetable rich in vitamins and minerals.</dd>
+        <dt>Fiber:</dt><dd>Broccoli is a good source of dietary fiber.</dd>
+      </dl>
+    </li>
+  </ol>
+</body>
+</html>
+```
+<p>The numbering X, XI, XII needs an ordered list with Roman numerals (<code>type="I"</code>) starting at 10 (<code>start="10"</code>). Each term with its meaning is a <b>definition list</b>: <code>&lt;dt&gt;</code> for the term and <code>&lt;dd&gt;</code> for the description, nested inside each <code>&lt;li&gt;</code>.</p>
+
+=== Nov24 Q24
+```mongo
+// create / switch to the database
+use hospital
+
+// patients collection with three patients
+db.createCollection("patients")
+
+db.patients.insertMany([
+  { name: "Arun", patient_id: "P01", age: 45, gender: "Male", contact: "9876500001", address: "Coimbatore" },
+  { name: "Divya", patient_id: "P02", age: 30, gender: "Female", contact: "9876500002", address: "Chennai" },
+  { name: "Rahul", patient_id: "P03", age: 60, gender: "Male", contact: "9876500003", address: "Madurai" }
+])
+
+// doctors collection with three doctors
+db.createCollection("doctors")
+
+db.doctors.insertMany([
+  { name: "Dr. Meena", doctor_id: "D01", specialization: "Cardiology", contact: "9000000001", availability: "Mon-Fri" },
+  { name: "Dr. Kumar", doctor_id: "D02", specialization: "Neurology", contact: "9000000002", availability: "Tue-Sat" },
+  { name: "Dr. Sara", doctor_id: "D03", specialization: "Orthopedics", contact: "9000000003", availability: "Mon-Wed" }
+])
+
+// specialization of one doctor
+db.doctors.find({ doctor_id: "D02" }, { _id: 0, name: 1, specialization: 1 })
+
+// update a patient's contact
+db.patients.updateOne({ patient_id: "P02" }, { $set: { contact: "9123456789" } })
+
+// assign a doctor to a patient
+db.patients.updateOne({ patient_id: "P01" }, { $set: { doctor_id: "D01" } })
+
+// appointments collection and one appointment
+db.createCollection("appointments")
+
+db.appointments.insertMany([
+  { appointment_id: "A01", patient_id: "P01", doctor_id: "D01", date: new Date("2026-12-05"), status: "scheduled" },
+  { appointment_id: "A02", patient_id: "P03", doctor_id: "D01", date: new Date("2026-12-08"), status: "scheduled" }
+])
+
+// update an appointment's status
+db.appointments.updateOne({ appointment_id: "A02" }, { $set: { status: "completed" } })
+
+// upcoming appointments of a doctor
+db.appointments.find({ doctor_id: "D01", status: "scheduled", date: { $gte: new Date() } })
+```
+<p><b>Output</b> (run in mongosh):</p>
+```out
+@@OUT nov24-q24@@
+```
+<ul><li>Collections are linked by ids (<code>patient_id</code>, <code>doctor_id</code>), the way foreign keys work in SQL; adding <code>doctor_id</code> to a patient with <code>$set</code> assigns the doctor.</li>
+<li>"Upcoming" means status scheduled and a date from now on: <code>{ $gte: new Date() }</code>. A02 was completed, so only A01 is shown.</li></ul>

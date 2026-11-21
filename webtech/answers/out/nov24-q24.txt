@@ -1,0 +1,93 @@
+test> use hospital
+switched to db hospital
+
+hospital> db.createCollection("patients")
+{ ok: 1 }
+
+hospital> db.patients.insertMany([
+...   { name: "Arun", patient_id: "P01", age: 45, gender: "Male", contact: "9876500001", address: "Coimbatore" },
+...   { name: "Divya", patient_id: "P02", age: 30, gender: "Female", contact: "9876500002", address: "Chennai" },
+...   { name: "Rahul", patient_id: "P03", age: 60, gender: "Male", contact: "9876500003", address: "Madurai" }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6b022b7eea1b6d6df50bf869'),
+    '1': ObjectId('6b022b7eea1b6d6df50bf86a'),
+    '2': ObjectId('6b022b7eea1b6d6df50bf86b')
+  }
+}
+
+hospital> db.createCollection("doctors")
+{ ok: 1 }
+
+hospital> db.doctors.insertMany([
+...   { name: "Dr. Meena", doctor_id: "D01", specialization: "Cardiology", contact: "9000000001", availability: "Mon-Fri" },
+...   { name: "Dr. Kumar", doctor_id: "D02", specialization: "Neurology", contact: "9000000002", availability: "Tue-Sat" },
+...   { name: "Dr. Sara", doctor_id: "D03", specialization: "Orthopedics", contact: "9000000003", availability: "Mon-Wed" }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6b022b7f4a52505e0b870e9d'),
+    '1': ObjectId('6b022b7f4a52505e0b870e9e'),
+    '2': ObjectId('6b022b7f4a52505e0b870e9f')
+  }
+}
+
+hospital> db.doctors.find({ doctor_id: "D02" }, { _id: 0, name: 1, specialization: 1 })
+[ { name: 'Dr. Kumar', specialization: 'Neurology' } ]
+
+hospital> db.patients.updateOne({ patient_id: "P02" }, { $set: { contact: "9123456789" } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+hospital> db.patients.updateOne({ patient_id: "P01" }, { $set: { doctor_id: "D01" } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+hospital> db.createCollection("appointments")
+{ ok: 1 }
+
+hospital> db.appointments.insertMany([
+...   { appointment_id: "A01", patient_id: "P01", doctor_id: "D01", date: new Date("2026-12-05"), status: "scheduled" },
+...   { appointment_id: "A02", patient_id: "P03", doctor_id: "D01", date: new Date("2026-12-08"), status: "scheduled" }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6b022b80fe46cac19d76f075'),
+    '1': ObjectId('6b022b80fe46cac19d76f076')
+  }
+}
+
+hospital> db.appointments.updateOne({ appointment_id: "A02" }, { $set: { status: "completed" } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+hospital> db.appointments.find({ doctor_id: "D01", status: "scheduled", date: { $gte: new Date() } })
+[
+  {
+    _id: ObjectId('6b022b80fe46cac19d76f075'),
+    appointment_id: 'A01',
+    patient_id: 'P01',
+    doctor_id: 'D01',
+    date: ISODate('2026-12-05T00:00:00.000Z'),
+    status: 'scheduled'
+  }
+]

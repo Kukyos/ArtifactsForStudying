@@ -1,0 +1,74 @@
+test> use bank
+switched to db bank
+
+bank> db.createCollection("account")
+{ ok: 1 }
+
+bank> db.account.insertMany([
+...   { name: "John", email: "john@gmail.com", phone: "9842146789", accno: 1001, balance: 5000 },
+...   { name: "Mary", email: "mary@gmail.com", phone: "9842146779", accno: 1002, balance: 10000 },
+...   { name: "Shiny", email: "shiny@gmail.com", phone: "9842146569", accno: 1003, balance: 35000 },
+...   { name: "Sarah", email: "sarah@gmail.com", phone: "9941146789", accno: 1004, balance: 12000 }
+... ])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('6b022b77eec7a1553ba13d0f'),
+    '1': ObjectId('6b022b77eec7a1553ba13d10'),
+    '2': ObjectId('6b022b77eec7a1553ba13d11'),
+    '3': ObjectId('6b022b77eec7a1553ba13d12')
+  }
+}
+
+bank> db.account.find({ accno: 1002 }, { name: 1, balance: 1, _id: 0 })
+[ { name: 'Mary', balance: 10000 } ]
+
+bank> db.account.updateOne({ accno: 1002 }, { $inc: { balance: 2000 } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+bank> db.account.updateOne({ accno: 1003, balance: { $gte: 3000 } }, { $inc: { balance: -3000 } })
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+bank> db.account.find({}, { _id: 0 })
+[
+  {
+    name: 'John',
+    email: 'john@gmail.com',
+    phone: '9842146789',
+    accno: 1001,
+    balance: 5000
+  },
+  {
+    name: 'Mary',
+    email: 'mary@gmail.com',
+    phone: '9842146779',
+    accno: 1002,
+    balance: 12000
+  },
+  {
+    name: 'Shiny',
+    email: 'shiny@gmail.com',
+    phone: '9842146569',
+    accno: 1003,
+    balance: 32000
+  },
+  {
+    name: 'Sarah',
+    email: 'sarah@gmail.com',
+    phone: '9941146789',
+    accno: 1004,
+    balance: 12000
+  }
+]

@@ -1,0 +1,18 @@
+$ node app.js
+Server running at http://localhost:2000/
+Connected to MongoDB
+
+$ curl -X POST http://localhost:2000/server -d "name=Ananya&email=ananya@gmail.com&phone=9876543210&state=Kerala"
+<b>Data Saved in MongoDB Database Successfully</b>
+
+$ mongosh company --eval "db.users.find()"
+[
+  {
+    _id: ObjectId('6b022ba3f90ecd629a9b88a8'),
+    name: 'Ananya',
+    email: 'ananya@gmail.com',
+    phone: '9876543210',
+    state: 'Kerala',
+    __v: 0
+  }
+]

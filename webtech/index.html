@@ -299,33 +299,7 @@ var PYQ=[
 ["May24 Q22", "Develop a calculator using HTML and JavaScript as given below. The result should be changed whenever the user clicks the corresponding action button.", "12 marks"],
 ["May24 Q23a", "Describe the following jQuery effects in a HTML webpage with suitable examples.\nHiding and showing effects\nFading effects\nSliding effects\nAnimation effects", "6 marks"],
 ["May24 Q23b", "Explain the following lists with suitable HTML program.\nOrdered List\nUnordered List\nDefinition List", "6 marks"],
-["May24 Q24", "Illustrate the following MongoDB shell operations to manage the employee information such as name, empid, gender, email, phone, experience. \ni) Create a database ‘company’ \nii) Create a collection ‘employee’ \niii) Insert information for 5 employees\niv) Search a particular employee data using empid\nv)  Change the phone of a particular employee \nvi) Delete a particular employee data\nvii) Display all employee details whose experience is greater than 4.5 years", "12 marks"],
-["Nov23 Q1", "Which tag is used to create a paragraph in HTML?", "1 mark"],
-["Nov23 Q2", "Define style sheet.", "1 mark"],
-["Nov23 Q3", "Define DOM.", "1 mark"],
-["Nov23 Q4", "Expand JSON.", "1 mark"],
-["Nov23 Q5", "Identify the purpose of JSON.", "1 mark"],
-["Nov23 Q6", "Is AngularJS a structural framework? Justify it.", "1 mark"],
-["Nov23 Q7", "List any two key features of angularJS.", "1 mark"],
-["Nov23 Q8", "Distinguish between Node.JS and JavaScript.", "1 mark"],
-["Nov23 Q9", "Identify the best database for JSON data.", "1 mark"],
-["Nov23 Q10", "Write the purpose of Name Space in MongoDB.", "1 mark"],
-["Nov23 Q11", "Write a HTML code to display an image in browser.", "3 marks"],
-["Nov23 Q12", "What is a CSS selector?", "3 marks"],
-["Nov23 Q13", "Identify jQuery selector in JavaScript.", "3 marks"],
-["Nov23 Q14", "Write a JavaScript program to convert temperatures from Celsius to Fahrenheit and vice versa.", "3 marks"],
-["Nov23 Q15", "Compare angular JS and JavaScript.", "3 marks"],
-["Nov23 Q16", "List the different types of NoSQL", "3 marks"],
-["Nov23 Q17", "Design the following table layout using HTML5 table tags and populate the rows to display the results of five employees.", "12 marks"],
-["Nov23 Q18a", "Write about the HTML lists: (a) Unordered Lists (b) Ordered Lists (c) Definition Lists", "6 marks"],
-["Nov23 Q18b", "Write JavaScript code to get a message from the user and display it in the browser status bar.", "6 marks"],
-["Nov23 Q19a", "Demonstrate JavaScript function events with suitable example.", "6 marks"],
-["Nov23 Q19b", "Develop an HTML web page with appropriate JavaScript  as per the following design and read the value of A and B, then automatically display the sum of A and B in the result text box.", "6 marks"],
-["Nov23 Q20", "Explain some of the most commonly used directives in the AngularJS application.", "12 marks"],
-["Nov23 Q21", "Explain the following JSON components with examples.\ni)data types  ii)parse iii)stringify iv)objects  v)arrays", "12 marks"],
-["Nov23 Q22", "Examine Event-Driven Programming in Node.js", "12 marks"],
-["Nov23 Q23", "Discuss the Mongoose CRUD Operations with an example.", "12 marks"],
-["Nov23 Q24", "Write JavaScript to validate the following fields of the Registration page. \n1. First Name (Name should contain the alphabet and the length should not be less than 6 characters\n2. Password (Password should not be less than 6 characters in length). \n3. E-mail ID (should not contain any invalid and must follow the standard pattern name@domain.com) \n4. Mobile Number (The phone number should contain 10 digits only). \n5. Last Name and Address (should not be Empty)", "12 marks"]
+["May24 Q24", "Illustrate the following MongoDB shell operations to manage the employee information such as name, empid, gender, email, phone, experience. \ni) Create a database ‘company’ \nii) Create a collection ‘employee’ \niii) Insert information for 5 employees\niv) Search a particular employee data using empid\nv)  Change the phone of a particular employee \nvi) Delete a particular employee data\nvii) Display all employee details whose experience is greater than 4.5 years", "12 marks"]
 ];/* ---------- helpers ---------- */
 var $=function(s,r){return (r||document).querySelector(s)};
 var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
@@ -344,8 +318,10 @@ WIDGETS['.runbox']=function(el){
     f=document.createElement('iframe');
     f.setAttribute('sandbox','allow-scripts allow-modals allow-forms allow-same-origin');  // same-origin only so the frame can be sized; it runs this page's own answer code
     f.title='Rendered output';
-    f.srcdoc=$('pre',el).textContent;
-    f.onload=function(){try{f.style.height=Math.min(640,Math.max(120,f.contentDocument.documentElement.scrollHeight+24))+'px'}catch(e){}};
+    var code=$('pre',el).textContent,fit=function(){try{f.style.height=Math.min(640,Math.max(120,f.contentDocument.documentElement.scrollHeight+24))+'px'}catch(e){}};
+    // write into run.html, not srcdoc/blob: AngularJS hash routing needs a real http URL
+    f.onload=function(){f.onload=fit;var d=f.contentDocument;d.open();d.write(code);d.close();setTimeout(fit,400)};
+    f.src='run.html';
     el.appendChild(f);b.textContent='Hide output';
   };
 };
@@ -380,7 +356,6 @@ var SECS=[
  {id:'s-apr26',t:'End-sem Apr/May 2026',code:'20CS2056',d:'The previous-regulation Web Technology paper (20CS2056). Same pattern and mostly the same topics; it has AngularJS where 23CS2048 has React.',re:/^Apr26 /},
  {id:'s-nov24',t:'End-sem Nov/Dec 2024',code:'20CS2056',d:'Previous-regulation paper (20CS2056).',re:/^Nov24 /},
  {id:'s-may24',t:'End-sem Apr/May 2024',code:'20CS2056',d:'Previous-regulation paper (20CS2056).',re:/^May24 /},
- {id:'s-nov23',t:'End-sem Nov/Dec 2023',code:'20CS2056',d:'Previous-regulation paper (20CS2056).',re:/^Nov23 /},
  {id:'s-nxt25',t:'Nov/Dec 2025 (25CS208)',code:'25CS208',d:'The Web Technology paper for the batch after yours (25CS208), set the same semester. Different pattern: Part A 10 × 2, Part B 5 × 6, Part C five 10-mark questions where Q16–Q23 come in either/or pairs (16 or 17, 18 or 19, …) and Q24 is compulsory. Same subject, so it is good practice.',re:/^Nxt25 /}
 ];
 function natKey(k){return k.toLowerCase().replace(/\d+/g,function(n){return ('0000'+n).slice(-4)})}

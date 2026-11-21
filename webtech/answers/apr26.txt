@@ -1,0 +1,539 @@
+=== Apr26 Q1
+```html
+<a href="https://www.karunya.edu">Visit Karunya</a>
+```
+<p><code>&lt;a&gt;</code> is the anchor tag; <code>href</code> holds the address and the text between the tags is what the user clicks.</p>
+
+=== Apr26 Q2
+<p>The <b>ID selector</b>: <code>#main { color: red; }</code> styles the element with <code>id="main"</code>.</p>
+
+=== Apr26 Q3
+<p><b>alert()</b>, e.g. <code>alert("Hello");</code>. (<code>confirm()</code> and <code>prompt()</code> are the other two pop-up boxes.)</p>
+
+=== Apr26 Q4
+```js
+var data = $(".t1").val();
+```
+
+=== Apr26 Q5
+<p><b>JSON.stringify()</b>, e.g. <code>JSON.stringify({name: "Ravi"})</code> gives <code>'{"name":"Ravi"}'</code>.</p>
+
+=== Apr26 Q6
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+<p><b>ng-model</b> is <b>two-way</b> binding: it ties an input to a scope variable, so typing changes the variable and the variable changes the input. <b>ng-bind</b> is <b>one-way</b>: it only displays a scope value inside an element (like <code>{{ }}</code>).</p>
+
+=== Apr26 Q7
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+<p><b>$valid</b>, <b>$invalid</b>, <b>$dirty</b>, <b>$pristine</b> (also $touched, $untouched).</p>
+
+=== Apr26 Q8
+<p><b>fs.appendFile()</b> (or <code>fs.appendFileSync()</code>): <code>fs.appendFile("notes.txt", "new line\n", err =&gt; {...})</code> adds to the end without erasing the file.</p>
+
+=== Apr26 Q9
+<p>The <b>http</b> module: <code>const http = require("http"); http.createServer(...)</code>.</p>
+
+=== Apr26 Q10
+<p><b>Mongoose</b> is a Node.js library (ODM, Object Data Modeling) for MongoDB. It lets you define a <b>schema</b> and <b>model</b> for documents, validates data, and gives simple methods (<code>save, find, updateOne, deleteOne</code>) to work with the database.</p>
+
+=== Apr26 Q11
+```run html
+<form>
+  <label>a) Course:</label>
+  <select name="course">
+    <option>CSE</option>
+    <option>ECE</option>
+    <option>EEE</option>
+  </select><br><br>
+
+  <label>b) Date of Birth:</label>
+  <input type="date" name="dob"><br><br>
+
+  <label>c) Gender:</label>
+  <input type="radio" name="gender" value="Male"> Male
+  <input type="radio" name="gender" value="Female"> Female
+</form>
+```
+<p><code>&lt;select&gt;</code> with <code>&lt;option&gt;</code>s gives the drop-down; <code>type="date"</code> gives a calendar; radio buttons share the same <code>name</code> so only one can be selected.</p>
+
+=== Apr26 Q12
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body class="p-3">
+  <button class="btn btn-primary">Primary</button>
+  <button class="btn btn-secondary">Secondary</button>
+  <button class="btn btn-success">Success</button>
+  <button class="btn btn-info">Info</button>
+  <button class="btn btn-warning">Warning</button>
+</body>
+</html>
+```
+<p>Every button needs the base class <code>btn</code>; the second class (<code>btn-primary</code>, <code>btn-secondary</code>, …) picks the colour. Bootstrap is linked from its CDN.</p>
+
+=== Apr26 Q13
+```run html
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<button id="down">Slide Down</button>
+<button id="up">Slide Up</button>
+<button id="toggle">Slide Toggle</button>
+<div id="panel" style="display:none;background:#cde;padding:20px;margin-top:8px">
+  Sliding panel
+</div>
+<script>
+  $(document).ready(function () {
+    $("#down").click(function () { $("#panel").slideDown("slow"); });
+    $("#up").click(function () { $("#panel").slideUp("slow"); });
+    $("#toggle").click(function () { $("#panel").slideToggle("slow"); });
+  });
+</script>
+```
+<p><code>slideDown()</code> reveals by increasing height, <code>slideUp()</code> hides by decreasing it, <code>slideToggle()</code> switches between the two. Speed can be "slow", "fast" or milliseconds.</p>
+
+=== Apr26 Q14
+<table class="tbl"><tr><th>Type</th><th>Example</th></tr>
+<tr><td>String (double quotes only)</td><td><code>"name": "Ravi"</code></td></tr>
+<tr><td>Number (integer or decimal)</td><td><code>"age": 20, "cgpa": 8.5</code></td></tr>
+<tr><td>Boolean</td><td><code>"active": true</code></td></tr>
+<tr><td>Null</td><td><code>"middleName": null</code></td></tr>
+<tr><td>Object</td><td><code>"address": { "city": "Coimbatore", "pin": 641114 }</code></td></tr>
+<tr><td>Array</td><td><code>"skills": ["HTML", "CSS", "JS"]</code></td></tr></table>
+<p>JSON has no date, function or undefined type; dates are stored as strings.</p>
+
+=== Apr26 Q15
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+```run html
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<div ng-app="" ng-init="fruits=['Apple','Mango','Banana','Orange']">
+  <ol>
+    <li ng-repeat="f in fruits">{{ f }}</li>
+  </ol>
+</div>
+```
+<p><code>ng-init</code> creates the array, and <code>ng-repeat</code> repeats the <code>&lt;li&gt;</code> once for each element inside the <code>&lt;ol&gt;</code>.</p>
+
+=== Apr26 Q16
+<ul>
+<li><b>updateOne(filter, update)</b>: changes the first document that matches.</li>
+<li><b>updateMany(filter, update)</b>: changes every matching document.</li>
+<li><b>replaceOne(filter, newDoc)</b>: replaces the whole document (except _id).</li>
+<li>Update operators: <code>$set</code> (set a field), <code>$inc</code> (add to a number), <code>$unset</code> (remove a field). Option <code>{ upsert: true }</code> inserts if nothing matches.</li>
+</ul>
+```mongo
+db.students.updateOne({ regno: 101 }, { $set: { cgpa: 9.1 } })
+db.students.updateMany({ dept: "CSE" }, { $inc: { year: 1 } })
+db.students.replaceOne({ regno: 102 }, { regno: 102, name: "Divya", dept: "IT" })
+```
+
+=== Apr26 Q17a
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    table, th, td { border: 1px solid black; border-collapse: collapse; }
+    th, td { padding: 4px 12px; text-align: center; }
+  </style>
+</head>
+<body>
+  <table>
+    <tr><th colspan="6">Time Table</th></tr>
+    <tr>
+      <th rowspan="6">Hours</th>
+      <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th>
+    </tr>
+    <tr><td>Computer</td><td>Maths</td><td>Computer</td><td>Maths</td><td>Arts</td></tr>
+    <tr><td>Arts</td><td>Maths</td><td>Computer</td><td>Arts</td><td>Maths</td></tr>
+    <tr><th colspan="5">LUNCH</th></tr>
+    <tr><td>Arts</td><td>Maths</td><td>Computer</td><td>Arts</td><td>Maths</td></tr>
+    <tr><td>Computer</td><td>Maths</td><td>Computer</td><td>Maths</td><td>Arts</td></tr>
+  </table>
+</body>
+</html>
+```
+<ul>
+<li>"Time Table" spans all six columns: <code>colspan="6"</code>.</li>
+<li>"Hours" covers the day row and all five period rows: <code>rowspan="6"</code>, so the rows after it have only five cells.</li>
+<li>"LUNCH" spans the five day columns: <code>colspan="5"</code>.</li>
+</ul>
+
+=== Apr26 Q17b
+@@SAME May24 Q23b
+
+=== Apr26 Q18a
+<p>The <code>position</code> property, with <code>top / right / bottom / left</code>, decides where an element is placed.</p>
+<table class="tbl"><tr><th>Value</th><th>Placed relative to</th><th>In normal flow?</th></tr>
+<tr><td><b>static</b> (default)</td><td>normal flow; top/left have no effect</td><td>yes</td></tr>
+<tr><td><b>relative</b></td><td>its own normal position</td><td>yes, original space kept</td></tr>
+<tr><td><b>absolute</b></td><td>the nearest positioned ancestor (else the page)</td><td>no</td></tr>
+<tr><td><b>fixed</b></td><td>the browser window; stays put when scrolling</td><td>no</td></tr>
+<tr><td><b>sticky</b></td><td>acts relative until a scroll offset is reached, then sticks like fixed</td><td>yes</td></tr></table>
+```run html
+<style>
+  .box { width: 120px; padding: 8px; color: white; margin: 6px; }
+  .static   { position: static;   background: gray; }
+  .relative { position: relative; left: 40px; background: teal; }
+  .parent   { position: relative; height: 90px; border: 2px dashed #555; }
+  .absolute { position: absolute; right: 10px; bottom: 10px; background: crimson; }
+  .fixed    { position: fixed; top: 10px; right: 10px; background: navy; }
+  .sticky   { position: sticky; top: 0; background: orange; }
+</style>
+<div class="box sticky">sticky</div>
+<div class="box static">static</div>
+<div class="box relative">relative (left 40px)</div>
+<div class="parent">
+  parent (relative)
+  <div class="box absolute">absolute</div>
+</div>
+<div class="box fixed">fixed</div>
+<p style="height:300px">Scroll inside the frame: fixed stays, sticky sticks at the top.</p>
+```
+
+=== Apr26 Q18b
+<p><b>Process</b>: (1) put the links in an unordered list, since a menu is a list of links; (2) remove the bullets and padding; (3) make the items sit side by side (<code>float: left</code> or <code>display: flex</code>); (4) turn each link into a block with padding, colour and no underline; (5) add a <code>:hover</code> colour, and an <code>active</code> class for the current page (Contact in the picture).</p>
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #333;
+      width: 600px;
+    }
+    li { float: left; }
+    li a {
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 30px;
+      text-decoration: none;
+    }
+    li a:hover, li a.active { background-color: #777; }
+  </style>
+</head>
+<body>
+  <ul>
+    <li><a href="#home">Home</a></li>
+    <li><a href="#news">News</a></li>
+    <li><a href="#contact" class="active">Contact</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+  </ul>
+</body>
+</html>
+```
+
+=== Apr26 Q19a
+```run html
+<!DOCTYPE html>
+<html>
+<body>
+  <b>Calculator</b><br><br>
+  Number1: <input type="text" id="n1" value="3"><br><br>
+  Number2: <input type="text" id="n2" value="2"><br><br>
+  Select Operation(+,-,*,/):
+  <select id="op" onchange="calculate()">
+    <option>+</option>
+    <option>-</option>
+    <option>*</option>
+    <option>/</option>
+  </select>
+  <p><b>Result: <span id="res"></span></b></p>
+
+  <script>
+    function calculate() {
+      var a = parseFloat(document.getElementById("n1").value);
+      var b = parseFloat(document.getElementById("n2").value);
+      var op = document.getElementById("op").value;
+      var r;
+      if (op == "+") r = a + b;
+      else if (op == "-") r = a - b;
+      else if (op == "*") r = a * b;
+      else r = (b == 0) ? "Cannot divide by zero" : a / b;
+      document.getElementById("res").innerHTML = r;
+    }
+    calculate();
+  </script>
+</body>
+</html>
+```
+<p>The <code>onchange</code> event on the drop-down calls <code>calculate()</code> every time a different operator is chosen, so the result updates immediately. <code>parseFloat</code> converts the text inputs to numbers (otherwise + would join them as strings: "3"+"2" = "32").</p>
+
+=== Apr26 Q19b
+@@SAME May24 Q19a
+
+=== Apr26 Q20a
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+  <button id="add">Add Textbox</button>
+  <button id="remove">Remove Textbox</button>
+  <div id="boxes"></div>
+
+  <script>
+    $(document).ready(function () {
+      $("#add").click(function () {
+        $("#boxes").append('<p class="field">Enter Data: <input type="text"></p>');
+      });
+      $("#remove").click(function () {
+        $("#boxes .field").last().remove();
+      });
+    });
+  </script>
+</body>
+</html>
+```
+<p><code>append()</code> adds a new paragraph holding a label and text box at the end of the <code>#boxes</code> div. <code>.last().remove()</code> deletes the most recently added one; if none are left, nothing happens.</p>
+
+=== Apr26 Q20b
+@@SAME May24 Q23a
+
+=== Apr26 Q21a
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 4px 10px; }
+  </style>
+</head>
+<body>
+  <h3>Accounts with balance above Rs.10000</h3>
+  <table id="tbl">
+    <tr><th>Account Name</th><th>Account No.</th><th>Balance</th><th>Phone No.</th><th>Location</th></tr>
+  </table>
+
+  <script>
+    // JSON text (as it would arrive from a server or file)
+    var text = '[' +
+      '{"name":"John","accno":"56738992334","balance":5000,"phone":"9842146789","location":"Chennai"},' +
+      '{"name":"Mary","accno":"56738992336","balance":10000,"phone":"9842146779","location":"Mumbai"},' +
+      '{"name":"Shiny","accno":"56738992337","balance":35000,"phone":"9842146569","location":"Chennai"},' +
+      '{"name":"Sarah","accno":"56738992338","balance":12000,"phone":"9941146789","location":"Hydrabad"},' +
+      '{"name":"Jones","accno":"56738992339","balance":75000,"phone":"8842146789","location":"Delhi"}' +
+    ']';
+
+    var accounts = JSON.parse(text);   // JSON string -> JavaScript array of objects
+
+    for (var i = 0; i < accounts.length; i++) {
+      var a = accounts[i];
+      if (a.balance > 10000) {
+        document.getElementById("tbl").innerHTML +=
+          "<tr><td>" + a.name + "</td><td>" + a.accno + "</td><td>" + a.balance +
+          "</td><td>" + a.phone + "</td><td>" + a.location + "</td></tr>";
+      }
+    }
+  </script>
+</body>
+</html>
+```
+<p><code>JSON.parse()</code> turns the text into an array of objects; each value is read with dot notation (<code>a.balance</code>, <code>a.name</code>). Only Shiny, Sarah and Jones are shown: Mary's 10000 is not <i>greater</i> than 10000. Account and phone numbers are kept as strings because they are identifiers, not amounts.</p>
+
+=== Apr26 Q21b
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+<p>AngularJS checks each field automatically and gives it state flags. With <code>novalidate</code> on the form (to switch off the browser's own pop-ups), the flags <code>myForm.field.$error.required</code> and <code>$error.email</code> show the matching message with <code>ng-show</code>. <code>$touched</code> waits until the user has left the field.</p>
+```run html
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<style>.err { color: red; font-size: 13px; }</style>
+<div ng-app="">
+  <form name="myForm" novalidate>
+    Name:<br>
+    <input type="text" name="uname" ng-model="uname" required>
+    <span class="err" ng-show="myForm.uname.$touched && myForm.uname.$error.required">Name is required.</span>
+    <br><br>
+    Email:<br>
+    <input type="email" name="email" ng-model="email" required>
+    <span class="err" ng-show="myForm.email.$touched && myForm.email.$error.required">Email is required.</span>
+    <span class="err" ng-show="myForm.email.$error.email">Enter a valid email address.</span>
+    <br><br>
+    <button ng-disabled="myForm.$invalid">Submit</button>
+    <p>Form valid: {{ myForm.$valid }}</p>
+  </form>
+</div>
+```
+<ul><li><b>required</b>: <code>$error.required</code> is true while the field is empty.</li>
+<li><b>type="email"</b>: <code>$error.email</code> is true when the text is not in name@domain form.</li>
+<li><code>ng-disabled="myForm.$invalid"</code> keeps Submit disabled until every rule passes.</li></ul>
+
+=== Apr26 Q22a
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body ng-app="emiApp" ng-controller="emiCtrl">
+  <b>Loan EMI Calculator</b><br><br>
+  Loan Amount(Rs): <input type="number" ng-model="p"><br><br>
+  Annual Interest(%): <input type="number" ng-model="rate"><br><br>
+  Tenure(Months): <input type="number" ng-model="n"><br><br>
+  <button ng-click="calculate()">Calculate EMI</button>
+
+  <div ng-show="emi">
+    <p><b>EMI: Rs.{{ emi }} per month<br>
+    Total Repayment: Rs.{{ total }}<br>
+    Total Interest: Rs.{{ interest }}</b></p>
+  </div>
+
+  <script>
+    angular.module("emiApp", []).controller("emiCtrl", function ($scope) {
+      $scope.p = 100000; $scope.rate = 10.99; $scope.n = 12;
+      $scope.calculate = function () {
+        var r = $scope.rate / 12 / 100;               // monthly rate
+        var x = Math.pow(1 + r, $scope.n);
+        $scope.emi = Math.round($scope.p * r * x / (x - 1));   // E = p*r*(1+r)^n / ((1+r)^n - 1)
+        $scope.total = $scope.emi * $scope.n;
+        $scope.interest = $scope.total - $scope.p;
+      };
+    });
+  </script>
+</body>
+</html>
+```
+<p>The inputs are bound to scope variables with <code>ng-model</code>. <code>ng-click</code> runs <code>calculate()</code>, which converts the yearly rate to a monthly rate r and applies the formula. The EMI is rounded to whole rupees (as in the paper's sample); total repayment = EMI × n and total interest = total − principal. With the paper's input (Rs.100000, 10.99%, 12 months) it gives exactly the sample: EMI Rs.8838, total Rs.106056, interest Rs.6056.</p>
+
+=== Apr26 Q22b
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+<p><b>Routing</b> makes a single-page application (SPA): the page loads once, and only the part inside <code>ng-view</code> is swapped when a link is clicked. It needs the <b>ngRoute</b> module (<code>angular-route.js</code>), which is added as a dependency. <code>$routeProvider.when(path, {template or templateUrl})</code> maps each URL path to a view, and <code>otherwise()</code> is the default. Links use <code>#!/path</code>.</p>
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+</head>
+<body ng-app="myApp">
+  <h2>Home Page</h2>
+  <a href="#!login">Login</a> |
+  <a href="#!signup">New User Sign Up</a>
+  <hr>
+  <div ng-view></div>
+
+  <script>
+    var app = angular.module("myApp", ["ngRoute"]);
+    app.config(function ($routeProvider) {
+      $routeProvider
+        .when("/login", {
+          template: "<h3>Login</h3>Username: <input><br>Password: <input type='password'><br><button>Login</button>"
+        })
+        .when("/signup", {
+          template: "<h3>New User Sign Up</h3>Name: <input><br>Email: <input type='email'><br><button>Sign Up</button>"
+        })
+        .otherwise({
+          template: "<p>Welcome! Choose Login or Sign Up above.</p>"
+        });
+    });
+  </script>
+</body>
+</html>
+```
+<p>In a real project each view is usually its own file, given with <code>templateUrl: "login.html"</code>.</p>
+
+=== Apr26 Q23
+<p>Express serves the form on <code>/</code> and receives it on <code>/server</code>; Mongoose saves it to the <code>users</code> collection of the <code>company</code> database. Setup: <code>npm install express mongoose</code>, start MongoDB, run <code>node app.js</code>.</p>
+<p><b>index.html</b></p>
+```html
+<!DOCTYPE html>
+<html>
+<body>
+  <h3>New User Registration</h3>
+  <form action="/server" method="post">
+    Name: <input type="text" name="name" required><br><br>
+    Email: <input type="email" name="email" required><br><br>
+    Phone: <input type="text" name="phone" required><br><br>
+    State:
+    <select name="state">
+      <option>Kerala</option>
+      <option>Tamil Nadu</option>
+      <option>Karnataka</option>
+    </select><br><br>
+    <input type="submit" value="Register">
+  </form>
+</body>
+</html>
+```
+<p><b>app.js</b></p>
+```js
+const express = require("express");
+const mongoose = require("mongoose");
+const path = require("path");
+
+const app = express();
+app.use(express.urlencoded({ extended: true }));   // read form data
+
+mongoose.connect("mongodb://127.0.0.1:27017/company")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.log(err.message));
+
+const userSchema = new mongoose.Schema({
+  name: String, email: String, phone: String, state: String
+});
+const User = mongoose.model("User", userSchema, "users");   // collection "users"
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.post("/server", async (req, res) => {
+  try {
+    await new User(req.body).save();
+    res.send("<b>Data Saved in MongoDB Database Successfully</b>");
+  } catch (err) {
+    res.status(500).send("Error saving data: " + err.message);
+  }
+});
+
+app.listen(2000, () => console.log("Server running at http://localhost:2000/"));
+```
+<p><b>Run</b> (the form submitted with curl, then the database checked in mongosh):</p>
+```out
+@@OUT apr26-q23@@
+```
+<p><code>express.urlencoded()</code> parses the POSTed form into <code>req.body</code>, whose keys are the inputs' <code>name</code> attributes. The third argument to <code>mongoose.model</code> fixes the collection name to <code>users</code>.</p>
+
+=== Apr26 Q24
+```mongo
+// i) database
+use bank
+
+// ii) collection
+db.createCollection("account")
+
+// iii) four customers
+db.account.insertMany([
+  { name: "John", email: "john@gmail.com", phone: "9842146789", accno: 1001, balance: 5000 },
+  { name: "Mary", email: "mary@gmail.com", phone: "9842146779", accno: 1002, balance: 10000 },
+  { name: "Shiny", email: "shiny@gmail.com", phone: "9842146569", accno: 1003, balance: 35000 },
+  { name: "Sarah", email: "sarah@gmail.com", phone: "9941146789", accno: 1004, balance: 12000 }
+])
+
+// iv) balance of one account
+db.account.find({ accno: 1002 }, { name: 1, balance: 1, _id: 0 })
+
+// v) deposit 2000 into 1002
+db.account.updateOne({ accno: 1002 }, { $inc: { balance: 2000 } })
+
+// vi) withdraw 3000 from 1003, only if the balance is enough
+db.account.updateOne({ accno: 1003, balance: { $gte: 3000 } }, { $inc: { balance: -3000 } })
+
+// vii) all accounts
+db.account.find({}, { _id: 0 })
+```
+<p><b>Output</b> (run in mongosh):</p>
+```out
+@@OUT apr26-q24@@
+```
+<ul><li><b>$inc</b> adds to a number: a positive value deposits, a negative value withdraws.</li>
+<li>The withdrawal filter <code>balance: { $gte: 3000 }</code> stops the balance going negative: if it is too low nothing matches and <code>modifiedCount</code> is 0.</li>
+<li>The projection <code>{ name: 1, balance: 1, _id: 0 }</code> shows just the name and balance.</li></ul>

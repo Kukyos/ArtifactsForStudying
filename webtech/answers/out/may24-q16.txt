@@ -1,0 +1,4 @@
+$ node read.js
+Welcome to Node.js
+This file was read with fs.readFile
+

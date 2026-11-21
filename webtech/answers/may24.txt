@@ -1,0 +1,530 @@
+=== May24 Q1
+@@SAME Apr26 Q1
+
+=== May24 Q2
+<p><b>padding</b>, e.g. <code>padding: 10px;</code> (margin is the space outside the border).</p>
+
+=== May24 Q3
+<p>The <b>onclick</b> event: <code>&lt;button onclick="show()"&gt;Click&lt;/button&gt;</code>.</p>
+
+=== May24 Q4
+<p><b>fadeToggle()</b>: <code>$("#box").fadeToggle();</code> fades in if hidden, fades out if visible.</p>
+
+=== May24 Q5
+```js
+var emp = { "name": "Ravi", "age": 30, "designation": "Manager" };
+```
+
+=== May24 Q6
+<p><b>JSON.parse()</b>: <code>var obj = JSON.parse('{"name":"Ravi"}');</code></p>
+
+=== May24 Q7
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+<p><b>$pristine</b> is true while the user has <b>not yet changed</b> the field; <b>$dirty</b> becomes true once the user <b>has changed</b> it. They are opposites.</p>
+
+=== May24 Q8
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+```html
+<div ng-app="" ng-init="num=10">{{ num }}</div>
+```
+<p>(or <code>&lt;div ng-init="num=10" ng-bind="num"&gt;&lt;/div&gt;</code>). It displays 10.</p>
+
+=== May24 Q9
+@@SAME Apr26 Q9
+
+=== May24 Q10
+<p><b>db.createCollection()</b>: <code>db.createCollection("employee")</code>.</p>
+
+=== May24 Q11
+<ul>
+<li><b>&lt;audio&gt;</b> plays sound: <code>&lt;audio src="song.mp3" controls&gt;&lt;/audio&gt;</code></li>
+<li><b>&lt;video&gt;</b> plays video: <code>&lt;video src="movie.mp4" width="320" controls autoplay muted&gt;&lt;/video&gt;</code></li>
+<li><b>&lt;iframe&gt;</b> embeds another page, a YouTube video or a Google Map: <code>&lt;iframe src="https://www.youtube.com/embed/VIDEO_ID" width="400" height="250"&gt;&lt;/iframe&gt;</code></li>
+</ul>
+<p><code>controls</code> shows play/pause/volume; <code>&lt;source&gt;</code> tags inside audio/video can give several formats for different browsers.</p>
+
+=== May24 Q12
+```run html
+<style>
+  div {
+    width: 200px;
+    padding: 20px;
+    background-color: lightblue;
+    color: black;
+  }
+  div:hover {
+    background-color: navy;
+    color: white;
+  }
+</style>
+<div>Move the cursor over me</div>
+```
+<p>The <code>:hover</code> pseudo-class applies only while the mouse is over the div.</p>
+
+=== May24 Q13
+```run html
+<button onclick="alert('This is an alert box')">Alert</button>
+<button onclick="ask()">Confirm</button>
+<button onclick="askName()">Prompt</button>
+<p id="out"></p>
+<script>
+  function ask() {
+    var ok = confirm("Do you want to continue?");
+    document.getElementById("out").innerHTML = ok ? "You pressed OK" : "You pressed Cancel";
+  }
+  function askName() {
+    var name = prompt("Enter your name:", "");
+    document.getElementById("out").innerHTML = "Hello " + name;
+  }
+</script>
+```
+<ul><li><b>alert()</b>: shows a message with an OK button; returns nothing.</li>
+<li><b>confirm()</b>: OK / Cancel; returns <code>true</code> or <code>false</code>.</li>
+<li><b>prompt()</b>: asks for input; returns the text typed (or <code>null</code> on Cancel).</li></ul>
+
+=== May24 Q14
+@@SAME Apr26 Q14
+
+=== May24 Q15
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+```run html
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<div ng-app="" ng-init="d='2023-04-12'; price=1000; name='alice'">
+  <p>a) Date: {{ d | date:'dd/MM/yyyy' }}</p>
+  <p>b) Price: {{ price | currency:'₹' }}</p>
+  <p>c) Name: {{ name | uppercase }}</p>
+</div>
+```
+<p>Filters are applied with the pipe <code>|</code>: <code>date</code> formats a date, <code>currency</code> adds the symbol and thousands separator, <code>uppercase</code> capitalises. (currency also shows .00; <code>currency:'₹':0</code> hides the decimals.)</p>
+
+=== May24 Q16
+```js
+const fs = require("fs");
+
+fs.readFile("data.txt", "utf8", (err, data) => {
+  if (err) {
+    console.log("Error: " + err.message);
+    return;
+  }
+  console.log(data);
+});
+```
+<p><b>Output</b> (data.txt holds two lines):</p>
+```out
+@@OUT may24-q16@@
+```
+<p><code>readFile</code> is asynchronous: Node continues and calls the callback with the contents when reading finishes. <code>"utf8"</code> returns text instead of a raw Buffer.</p>
+
+=== May24 Q17
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    form { width: 340px; border: 1px solid black; padding: 0 8px 8px; font-family: serif; }
+    .req { color: darkred; }
+    p { margin: 14px 0; }
+  </style>
+</head>
+<body>
+  <form action="#" method="post">
+    <h2>Survey Form</h2>
+    <hr>
+    <p>First name:<span class="req">*</span>
+      <input type="text" name="fname" placeholder="first name" required></p>
+    <p>Last name:<span class="req">*</span>
+      <input type="text" name="lname" placeholder="last name" required></p>
+    <p>Date:<span class="req">*</span>
+      <input type="date" name="date" required></p>
+    <p>Email:<span class="req">*</span>
+      <input type="email" name="email" placeholder="xxxx@gmail.com" required></p>
+    <p>Mobile<span class="req">*</span>
+      <input type="tel" name="mobile" placeholder="9988776655" pattern="[0-9]{10}"
+             title="Enter a 10-digit mobile number" required></p>
+    <p>Gender:<span class="req">*</span>
+      <input type="radio" name="gender" value="Male" required> Male
+      <input type="radio" name="gender" value="Female"> Female</p>
+    <p>Age:<span class="req">*</span>
+      <input type="number" name="age" placeholder="18-25" min="18" max="25" required></p>
+    <p>Which game you like?<span class="req">*</span><br>
+      <input type="checkbox" name="game" value="League of Legends"> League of Legends<br>
+      <input type="checkbox" name="game" value="CrossFire"> CrossFire<br>
+      <input type="checkbox" name="game" value="Fortnite Battle Royale"> Fortnite Battle Royale<br>
+      <input type="checkbox" name="game" value="Minecraft"> Minecraft</p>
+    <hr>
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>
+```
+<table class="tbl"><tr><th>Requirement</th><th>Attribute used</th></tr>
+<tr><td>All fields mandatory</td><td><code>required</code> on every input (on one radio of a group is enough)</td></tr>
+<tr><td>Placeholders</td><td><code>placeholder="first name"</code> etc., as in the picture</td></tr>
+<tr><td>Age 18 to 25</td><td><code>type="number" min="18" max="25"</code></td></tr>
+<tr><td>10-digit mobile</td><td><code>pattern="[0-9]{10}"</code>; <code>title</code> gives the message shown</td></tr>
+<tr><td>Email format</td><td><code>type="email"</code></td></tr></table>
+<p>HTML cannot make "at least one checkbox" required on its own; that needs a few lines of JavaScript (check that one of them is <code>checked</code> on submit).</p>
+
+=== May24 Q18a
+@@SAME Apr26 Q18b
+
+=== May24 Q18b
+<p>A <b>selector</b> picks which elements a CSS rule applies to.</p>
+```run html
+<style>
+  * { font-family: Arial; }                 /* 1. universal: every element */
+  p { color: navy; }                        /* 2. element (type): all <p> */
+  #title { font-size: 22px; }               /* 3. id: the one element with id="title" */
+  .note { background: lightyellow; }        /* 4. class: every element with class="note" */
+  h3, h4 { color: green; }                  /* 5. group: several selectors, one rule */
+  div p { font-style: italic; }             /* 6. descendant: <p> anywhere inside a <div> */
+  a:hover { color: red; }                   /* 7. pseudo-class: a state */
+  input[type="text"] { border: 2px solid orange; }   /* 8. attribute */
+</style>
+<p id="title">Id selector</p>
+<p class="note">Class selector</p>
+<h3>Grouped h3</h3><h4>Grouped h4</h4>
+<div><p>Descendant: p inside div</p></div>
+<a href="#">Hover me</a><br>
+<input type="text" value="attribute selector">
+```
+<table class="tbl"><tr><th>Selector</th><th>Syntax</th><th>Selects</th></tr>
+<tr><td>Universal</td><td><code>*</code></td><td>all elements</td></tr>
+<tr><td>Element</td><td><code>p</code></td><td>all elements of that tag</td></tr>
+<tr><td>ID</td><td><code>#title</code></td><td>the element with that id (unique)</td></tr>
+<tr><td>Class</td><td><code>.note</code></td><td>all elements with that class</td></tr>
+<tr><td>Grouping</td><td><code>h3, h4</code></td><td>each listed selector</td></tr>
+<tr><td>Descendant</td><td><code>div p</code></td><td>p inside div at any depth (<code>div &gt; p</code> = direct child only)</td></tr>
+<tr><td>Pseudo-class</td><td><code>a:hover</code></td><td>an element in a state (hover, first-child, visited)</td></tr>
+<tr><td>Attribute</td><td><code>input[type="text"]</code></td><td>elements with that attribute value</td></tr></table>
+
+=== May24 Q19a
+<p>The <b>DOM</b> (Document Object Model) represents the page as a tree of objects; JavaScript uses the <code>document</code> object to find elements and change them.</p>
+<table class="tbl"><tr><th>Method</th><th>Returns</th></tr>
+<tr><td><code>document.getElementById("id")</code></td><td>the single element with that id</td></tr>
+<tr><td><code>document.getElementsByClassName("c")</code></td><td>a collection of elements with that class</td></tr>
+<tr><td><code>document.getElementsByTagName("p")</code></td><td>a collection of all elements with that tag</td></tr>
+<tr><td><code>document.getElementsByName("n")</code></td><td>elements with that name attribute (radio groups)</td></tr>
+<tr><td><code>document.querySelector("css")</code></td><td>the first element matching a CSS selector</td></tr>
+<tr><td><code>document.querySelectorAll("css")</code></td><td>all elements matching a CSS selector</td></tr></table>
+<p>After finding an element: <code>innerHTML</code> / <code>innerText</code> change its content, <code>.style.color</code> its style, <code>.value</code> a form field's value, <code>setAttribute()</code> an attribute.</p>
+```run html
+<h3 id="head">Heading</h3>
+<p class="info">Para 1</p>
+<p class="info">Para 2</p>
+<input type="text" name="city" value="Coimbatore">
+<ul><li>One</li><li>Two</li></ul>
+<button onclick="run()">Run DOM methods</button>
+<script>
+  function run() {
+    document.getElementById("head").innerHTML = "Changed by getElementById";
+    var infos = document.getElementsByClassName("info");
+    for (var i = 0; i < infos.length; i++) infos[i].style.color = "blue";
+    document.getElementsByTagName("li")[0].innerText = "Changed by getElementsByTagName";
+    alert("City: " + document.getElementsByName("city")[0].value);
+    document.querySelector("ul").style.border = "1px solid red";
+    document.querySelectorAll("li").forEach(function (li) { li.style.fontWeight = "bold"; });
+  }
+</script>
+```
+
+=== May24 Q19b
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 4px 12px; text-align: center; }
+  </style>
+</head>
+<body>
+  <table id="emp">
+    <tr><th>name</th><th>empid</th><th>gender</th><th>location</th><th>salary</th></tr>
+  </table>
+
+  <script>
+    var json = '{ "employees": [' +
+      '{"name":"David","empid":897,"gender":"male","location":"chennai","salary":20000},' +
+      '{"name":"Vimal","empid":682,"gender":"male","location":"coimbatore","salary":35000},' +
+      '{"name":"Raj","empid":901,"gender":"male","location":"bangalore","salary":40000},' +
+      '{"name":"Lee","empid":354,"gender":"female","location":"hyderbad","salary":30000},' +
+      '{"name":"Tia","empid":789,"gender":"female","location":"kolkata","salary":15000}' +
+    '] }';
+
+    var obj = JSON.parse(json);          // JSON text -> JavaScript object
+    var rows = "";
+    obj.employees.forEach(function (e) {
+      rows += "<tr><td>" + e.name + "</td><td>" + e.empid + "</td><td>" + e.gender +
+              "</td><td>" + e.location + "</td><td>" + e.salary + "</td></tr>";
+    });
+    document.getElementById("emp").innerHTML += rows;
+  </script>
+</body>
+</html>
+```
+<p>The JSON object holds an array <code>employees</code> of five objects. <code>JSON.parse()</code> converts it; <code>forEach</code> walks the array and builds one table row per employee, added to the table with <code>innerHTML</code>.</p>
+
+=== May24 Q20a
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+</head>
+<body ng-app="spa">
+  <h2>Student Profile</h2>
+  <a href="#!personal">Personal Details</a> |
+  <a href="#!academic">Academic Details</a> |
+  <a href="#!internship">Internship Details</a>
+  <hr>
+  <div ng-view></div>
+
+  <script>
+    angular.module("spa", ["ngRoute"]).config(function ($routeProvider) {
+      $routeProvider
+        .when("/personal",   { template: "<h3>Personal Details</h3><p>Name: Ananya R<br>DOB: 12-05-2006<br>City: Coimbatore</p>" })
+        .when("/academic",   { template: "<h3>Academic Details</h3><p>B.Tech CSE, CGPA 8.7</p>" })
+        .when("/internship", { template: "<h3>Internship Details</h3><p>Web Developer Intern, 2 months</p>" })
+        .otherwise({ redirectTo: "/personal" });
+    });
+  </script>
+</body>
+</html>
+```
+<p>The <b>ngRoute</b> module maps each <code>#!/path</code> to a view; only the <code>ng-view</code> div changes when a link is clicked, so the page never reloads. In a real project each view would be a separate file given with <code>templateUrl</code>.</p>
+
+=== May24 Q20b
+<p class="callout">Old syllabus (AngularJS, 20CS2056). 23CS2048 teaches React instead.</p>
+<table class="tbl"><tr><th>Directive</th><th>Purpose</th></tr>
+<tr><td>ng-app</td><td>marks the root of the AngularJS application; Angular starts here</td></tr>
+<tr><td>ng-model</td><td>two-way binds an input to a scope variable</td></tr>
+<tr><td>ng-init</td><td>gives initial values to variables</td></tr>
+<tr><td>ng-bind</td><td>one-way: shows a variable's value in an element</td></tr>
+<tr><td>ng-controller</td><td>attaches a controller (a JS function that sets up $scope)</td></tr>
+<tr><td>ng-click</td><td>runs an expression or function when clicked</td></tr></table>
+```run html
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<div ng-app="demo" ng-controller="ctrl" ng-init="count=0">
+  Name: <input ng-model="name">
+  <p>Hello <span ng-bind="name"></span></p>
+  <button ng-click="count = count + 1">Clicked {{ count }} times</button>
+  <p>{{ greeting }}</p>
+</div>
+<script>
+  angular.module("demo", []).controller("ctrl", function ($scope) {
+    $scope.name = "Ravi";
+    $scope.greeting = "Set by ng-controller";
+  });
+</script>
+```
+
+=== May24 Q21
+<p>Uses only Node's built-in <b>http</b>, <b>fs</b> and <b>querystring</b> modules: GET <code>/</code> sends payment.html; the form POSTs to <code>/payment</code>, where the body is collected chunk by chunk, parsed, and shown back.</p>
+<p><b>payment.html</b></p>
+```html
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Payment Gateway</h2>
+  <form action="/payment" method="post">
+    <table>
+      <tr><td>Card Number</td><td><input type="text" name="card"></td></tr>
+      <tr><td>Amount</td><td><input type="text" name="amount"></td></tr>
+      <tr><td>Account Number</td><td><input type="text" name="accno"></td></tr>
+      <tr><td></td><td><br><input type="submit" value="Transfer"></td></tr>
+    </table>
+  </form>
+</body>
+</html>
+```
+<p><b>server.js</b></p>
+```js
+const http = require("http");
+const fs = require("fs");
+const qs = require("querystring");
+
+http.createServer((req, res) => {
+  if (req.method === "GET" && req.url === "/") {
+    fs.readFile("payment.html", (err, data) => {
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.end(data);
+    });
+  } else if (req.method === "POST" && req.url === "/payment") {
+    let body = "";
+    req.on("data", (chunk) => { body += chunk; });     // collect the posted data
+    req.on("end", () => {
+      const f = qs.parse(body);                        // "card=..&amount=.." -> object
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.end("<div style='border:1px solid black;padding:6px;width:320px'>" +
+              "<b>The Transaction Details are:</b><br>" +
+              "Card Number: " + f.card + "<br>" +
+              "Amount: " + f.amount + "<br>" +
+              "Account Number: " + f.accno + "</div>");
+    });
+  } else {
+    res.writeHead(404);
+    res.end("Not found");
+  }
+}).listen(2000, () => console.log("Server running at http://localhost:2000/"));
+```
+<p><b>Run</b> (the form submitted with curl):</p>
+```out
+@@OUT may24-q21@@
+```
+<p>Without Express there is no body parser: the request body arrives as a stream, so <code>req.on("data")</code> collects it and <code>req.on("end")</code> parses it with <code>querystring.parse</code>.</p>
+
+=== May24 Q22
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    td { padding: 3px; font-size: 20px; }
+    button { width: 40px; margin: 4px; }
+  </style>
+</head>
+<body>
+  <table>
+    <tr><td>Num1</td><td><input type="text" id="n1"></td></tr>
+    <tr><td>Num2</td><td><input type="text" id="n2"></td></tr>
+    <tr><td>Result</td><td><input type="text" id="res" readonly style="background:#ddd"></td></tr>
+  </table>
+  <button onclick="calc('+')">+</button>
+  <button onclick="calc('-')">-</button>
+  <button onclick="calc('*')">x</button>
+  <button onclick="calc('/')">/</button>
+
+  <script>
+    function calc(op) {
+      var a = parseFloat(document.getElementById("n1").value);
+      var b = parseFloat(document.getElementById("n2").value);
+      var r;
+      if (isNaN(a) || isNaN(b)) {
+        r = "Enter both numbers";
+      } else if (op == "+") r = a + b;
+      else if (op == "-") r = a - b;
+      else if (op == "*") r = a * b;
+      else r = (b == 0) ? "Cannot divide by 0" : a / b;
+      document.getElementById("res").value = r;
+    }
+  </script>
+</body>
+</html>
+```
+<ul><li>Each button calls the same function <code>calc()</code> with its operator, so the result changes on every click.</li>
+<li><code>parseFloat</code> converts the text to numbers; <code>isNaN</code> catches empty or non-numeric input; division by zero is handled.</li>
+<li>The Result box is <code>readonly</code> (grey, as in the picture) and is filled through its <code>value</code>.</li></ul>
+
+=== May24 Q23a
+```run html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <style>#box { width: 120px; height: 60px; background: teal; color: white; padding: 8px; position: relative; margin-top: 10px; }</style>
+</head>
+<body>
+  <button id="hide">hide</button><button id="show">show</button><button id="toggle">toggle</button><br>
+  <button id="fin">fadeIn</button><button id="fout">fadeOut</button><button id="fto">fadeTo 0.3</button><br>
+  <button id="sup">slideUp</button><button id="sdown">slideDown</button><br>
+  <button id="anim">animate</button>
+  <div id="box">Box</div>
+  <script>
+    $(function () {
+      $("#hide").click(function () { $("#box").hide(500); });
+      $("#show").click(function () { $("#box").show(500); });
+      $("#toggle").click(function () { $("#box").toggle(); });
+      $("#fin").click(function () { $("#box").fadeIn(); });
+      $("#fout").click(function () { $("#box").fadeOut(); });
+      $("#fto").click(function () { $("#box").fadeTo("slow", 0.3); });
+      $("#sup").click(function () { $("#box").slideUp(); });
+      $("#sdown").click(function () { $("#box").slideDown(); });
+      $("#anim").click(function () {
+        $("#box").animate({ left: "200px", width: "180px", opacity: 0.6 }, 1000)
+                 .animate({ left: "0px", width: "120px", opacity: 1 }, 1000);
+      });
+    });
+  </script>
+</body>
+</html>
+```
+<table class="tbl"><tr><th>Group</th><th>Methods</th><th>What happens</th></tr>
+<tr><td>Hide / show</td><td><code>hide(), show(), toggle()</code></td><td>change display; with a speed they shrink/grow</td></tr>
+<tr><td>Fading</td><td><code>fadeIn(), fadeOut(), fadeToggle(), fadeTo(speed, opacity)</code></td><td>change opacity gradually; fadeTo stops at a given opacity</td></tr>
+<tr><td>Sliding</td><td><code>slideDown(), slideUp(), slideToggle()</code></td><td>change height gradually</td></tr>
+<tr><td>Animation</td><td><code>animate({css}, speed)</code>, <code>stop()</code></td><td>animates any numeric CSS property; calls can be chained into a queue</td></tr></table>
+<p>All accept an optional speed (<code>"slow"</code>, <code>"fast"</code> or ms) and a callback that runs when the effect ends.</p>
+
+=== May24 Q23b
+<p>HTML has three kinds of list:</p>
+<ul>
+<li><b>Ordered list</b> <code>&lt;ol&gt;</code>: numbered items <code>&lt;li&gt;</code>. Attribute <code>type</code> = 1, A, a, I, i and <code>start</code> sets the first number.</li>
+<li><b>Unordered list</b> <code>&lt;ul&gt;</code>: bulleted items; CSS <code>list-style-type</code> = disc, circle, square or none.</li>
+<li><b>Definition (description) list</b> <code>&lt;dl&gt;</code>: terms <code>&lt;dt&gt;</code> each followed by a description <code>&lt;dd&gt;</code>.</li>
+</ul>
+```run html
+<!DOCTYPE html>
+<html>
+<body>
+  <h4>Ordered List</h4>
+  <ol type="A">
+    <li>HTML</li>
+    <li>CSS</li>
+    <li>JavaScript</li>
+  </ol>
+
+  <h4>Unordered List</h4>
+  <ul style="list-style-type: square">
+    <li>Apple</li>
+    <li>Mango</li>
+    <li>Banana</li>
+  </ul>
+
+  <h4>Definition List</h4>
+  <dl>
+    <dt>HTML</dt>
+    <dd>Markup language that structures a web page.</dd>
+    <dt>CSS</dt>
+    <dd>Style sheet language that styles the page.</dd>
+  </dl>
+</body>
+</html>
+```
+<p>Lists can be nested by putting a full <code>&lt;ul&gt;</code> or <code>&lt;ol&gt;</code> inside an <code>&lt;li&gt;</code>.</p>
+
+=== May24 Q24
+```mongo
+// i) database
+use company
+
+// ii) collection
+db.createCollection("employee")
+
+// iii) five employees
+db.employee.insertMany([
+  { name: "Arun", empid: 101, gender: "Male", email: "arun@company.com", phone: "9876543210", experience: 3 },
+  { name: "Bhavya", empid: 102, gender: "Female", email: "bhavya@company.com", phone: "9876543211", experience: 5 },
+  { name: "Charles", empid: 103, gender: "Male", email: "charles@company.com", phone: "9876543212", experience: 7.5 },
+  { name: "Divya", empid: 104, gender: "Female", email: "divya@company.com", phone: "9876543213", experience: 2 },
+  { name: "Elan", empid: 105, gender: "Male", email: "elan@company.com", phone: "9876543214", experience: 4.5 }
+])
+
+// iv) search by empid
+db.employee.find({ empid: 103 })
+
+// v) change the phone of an employee
+db.employee.updateOne({ empid: 101 }, { $set: { phone: "9000011111" } })
+
+// vi) delete an employee
+db.employee.deleteOne({ empid: 104 })
+
+// vii) experience greater than 4.5 years
+db.employee.find({ experience: { $gt: 4.5 } }, { _id: 0, name: 1, empid: 1, experience: 1 })
+```
+<p><b>Output</b> (run in mongosh):</p>
+```out
+@@OUT may24-q24@@
+```
+<p><code>$gt</code> is "greater than", so Elan with exactly 4.5 years is <b>not</b> listed (use <code>$gte</code> to include him). Other comparison operators: <code>$lt, $lte, $eq, $ne, $in</code>.</p>
