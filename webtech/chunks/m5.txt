@@ -1,0 +1,118 @@
+=== 5.1
+Q: Nov24 Q10
+<h2>What MongoDB is</h2>
+<p><b>MongoDB</b> is a <b>NoSQL document database</b>. Instead of tables with fixed columns it stores flexible, JSON-like <b>documents</b> (saved as <b>BSON</b>, binary JSON, which adds types like Date and ObjectId).</p>
+<table class="tbl"><tr><th>SQL</th><th>MongoDB</th></tr>
+<tr><td>database</td><td>database</td></tr>
+<tr><td>table</td><td><b>collection</b></td></tr>
+<tr><td>row</td><td><b>document</b></td></tr>
+<tr><td>column</td><td>field</td></tr>
+<tr><td>primary key</td><td><code>_id</code> (added automatically as an ObjectId)</td></tr>
+<tr><td>fixed schema</td><td>schema-less: documents in one collection may differ</td></tr>
+<tr><td>JOIN</td><td>embedded documents, or references by id (and <code>$lookup</code>)</td></tr></table>
+```js
+{
+  _id: ObjectId("6b01fd2c5d1980c4c465b3b9"),
+  name: "Arun Kumar",
+  age: 45,
+  department: "Cardiology",
+  address: { city: "Coimbatore", pin: 641114 },   // embedded document
+  phones: ["9876500001", "9876500002"]            // array
+}
+```
+<p><b>Why use it</b>: flexible schema, data shaped like the JavaScript objects the app already uses, easy to scale horizontally (sharding), fast for reads and writes. The full name of a collection is the <b>namespace</b> <code>database.collection</code> (e.g. <code>hospitalDB.patients</code>).</p>
+<p><b>Tools</b>: the server <code>mongod</code>; the shell <b>mongosh</b> (<code>mongosh "mongodb://127.0.0.1:27017"</code>); the GUI <b>Compass</b>; Atlas (cloud).</p>
+
+=== 5.2
+Q: Nov25 Q9, Nov25 Q15, Nov25 Q23, Apr26 Q16, Apr26 Q24, May24 Q10, May24 Q24, Nov24 Q16, Nov24 Q24
+<h2>Databases and collections</h2>
+```mongo
+show dbs                        // list databases
+use hospitalDB                  // switch to (and later create) a database
+db.createCollection("patients") // create a collection (an insert also creates it)
+show collections
+db.patients.drop()              // delete a collection
+db.dropDatabase()               // delete the current database
+```
+<h2>CRUD</h2>
+<table class="tbl"><tr><th>Operation</th><th>Methods</th></tr>
+<tr><td><b>C</b>reate</td><td><code>insertOne({...})</code> → insertedId; <code>insertMany([{...}, {...}])</code> → insertedIds</td></tr>
+<tr><td><b>R</b>ead</td><td><code>find(filter, projection)</code> → all matches (a cursor); <code>findOne(filter)</code> → first match or null</td></tr>
+<tr><td><b>U</b>pdate</td><td><code>updateOne(filter, {$set: {...}})</code>, <code>updateMany(...)</code>, <code>replaceOne(filter, doc)</code>; option <code>{upsert: true}</code></td></tr>
+<tr><td><b>D</b>elete</td><td><code>deleteOne(filter)</code> → first match; <code>deleteMany(filter)</code>; <code>deleteMany({})</code> empties the collection</td></tr></table>
+```mongo
+db.students.insertOne({ regno: 101, name: "Asha", dept: "CSE", cgpa: 8.9 })
+db.students.insertMany([
+  { regno: 102, name: "John", dept: "ECE", cgpa: 7.6 },
+  { regno: 103, name: "Divya", dept: "CSE", cgpa: 9.2 }
+])
+db.students.find()                                  // all
+db.students.find({ dept: "CSE" })                   // filter
+db.students.findOne({ regno: 102 })                 // one
+db.students.updateOne({ regno: 102 }, { $set: { cgpa: 8.0 } })
+db.students.updateMany({}, { $set: { year: 2 } })   // add a field to all
+db.students.deleteOne({ regno: 103 })
+```
+<p>Update operators: <code>$set</code> (set/add a field), <code>$unset</code> (remove), <code>$inc</code> (add a number: deposits and withdrawals), <code>$push</code> / <code>$pull</code> (array add/remove), <code>$rename</code>. An update result shows <code>matchedCount</code> and <code>modifiedCount</code>; a delete shows <code>deletedCount</code>.</p>
+<p>For the 12-mark "illustrate the following operations" questions: write one command per part, number them like the question, and show realistic sample data. The worked answers show real mongosh output.</p>
+
+=== 5.3
+Q: Nov25 Q23, Apr26 Q24, May24 Q24, Nov24 Q24
+<h2>Query operators</h2>
+<table class="tbl"><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr>
+<tr><td><code>$eq, $ne</code></td><td>equal, not equal</td><td><code>{ status: { $ne: "discharged" } }</code></td></tr>
+<tr><td><code>$gt, $gte, $lt, $lte</code></td><td>&gt; ≥ &lt; ≤</td><td><code>{ experience: { $gt: 4.5 } }</code></td></tr>
+<tr><td><code>$in, $nin</code></td><td>in / not in a list</td><td><code>{ dept: { $in: ["CSE", "IT"] } }</code></td></tr>
+<tr><td><code>$and, $or, $not</code></td><td>logic</td><td><code>{ $or: [{ age: { $lt: 18 } }, { age: { $gt: 60 } }] }</code></td></tr>
+<tr><td><code>$exists</code></td><td>field present</td><td><code>{ email: { $exists: true } }</code></td></tr>
+<tr><td><code>$regex</code></td><td>pattern</td><td><code>{ name: { $regex: "^A" } }</code></td></tr></table>
+<p>Several fields in one filter are ANDed: <code>{ dept: "CSE", cgpa: { $gte: 8 } }</code>.</p>
+<h2>Shaping the result</h2>
+```mongo
+db.students.find({}, { name: 1, cgpa: 1, _id: 0 })     // projection: only these fields
+db.students.find().sort({ cgpa: -1 })                  // 1 ascending, -1 descending
+db.students.find().sort({ cgpa: -1 }).limit(3)         // top 3
+db.students.find().skip(10).limit(10)                  // page 2
+db.students.countDocuments({ dept: "CSE" })            // count
+db.students.distinct("dept")                           // unique values
+db.students.aggregate([{ $group: { _id: "$dept", avg: { $avg: "$cgpa" } } }])   // group and average
+```
+<p>Indexes speed up searches on a field: <code>db.students.createIndex({ regno: 1 }, { unique: true })</code> also stops duplicate register numbers.</p>
+
+=== 5.4
+Q: Apr26 Q10, Nov25 Q24, Apr26 Q23, RAS Q3
+<h2>Mongoose</h2>
+<p><b>Mongoose</b> is an <b>ODM</b> (Object Data Modeling) library for using MongoDB from Node.js. It adds a <b>schema</b> (field types, required, defaults, validation) on top of schema-less MongoDB, and gives a <b>model</b> with simple async methods. Install with <code>npm install mongoose</code>.</p>
+```js
+const mongoose = require("mongoose");
+
+// 1. connect
+mongoose.connect("mongodb://127.0.0.1:27017/collegeDB")
+  .then(() => console.log("Connected"))
+  .catch(err => console.log(err.message));
+
+// 2. schema: shape and rules
+const studentSchema = new mongoose.Schema({
+  name:  { type: String, required: true, unique: true },
+  dept:  { type: String, enum: ["CSE", "ECE", "IT"] },
+  cgpa:  { type: Number, min: 0, max: 10 },
+  joined: { type: Date, default: Date.now }
+});
+
+// 3. model: the collection ("students")
+const Student = mongoose.model("Student", studentSchema);
+
+// 4. CRUD (inside an async function)
+await Student.create({ name: "Asha", dept: "CSE", cgpa: 8.9 });     // or new Student({...}).save()
+const all = await Student.find({ dept: "CSE" });
+const one = await Student.findOne({ name: "Asha" });
+await Student.updateOne({ name: "Asha" }, { cgpa: 9.1 });
+await Student.findOneAndUpdate({ name: "Asha" }, { cgpa: 9.2 }, { new: true });   // returns the updated doc
+await Student.deleteOne({ name: "Asha" });
+```
+<table class="tbl"><tr><th>Error</th><th>When</th><th>Send</th></tr>
+<tr><td><code>err.name === "ValidationError"</code></td><td>a schema rule fails (required, min/max, enum)</td><td>400</td></tr>
+<tr><td><code>err.code === 11000</code></td><td>a <code>unique</code> field is duplicated</td><td>409</td></tr>
+<tr><td>other</td><td>database down, bad id</td><td>500</td></tr></table>
+<p><code>{ new: true }</code> makes <code>findOneAndUpdate</code> return the updated document; the newest Mongoose versions prefer <code>{ returnDocument: "after" }</code> and print a deprecation warning for <code>new</code>, but both work.</p>
+<p>The model name "Student" becomes the collection <code>students</code> (lower-case plural) unless a third argument names it.</p>

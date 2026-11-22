@@ -1,0 +1,142 @@
+=== 6.1
+Q: Apr26 Q9, May24 Q9, Nxt25 Q9, RJS Q16
+<h2>What Node.js is</h2>
+<p><b>Node.js</b> is a <b>runtime environment</b> that runs JavaScript <b>outside the browser</b>, on the server, using Chrome's V8 engine. It is used for web servers, APIs, command-line tools and real-time apps (chat).</p>
+<ul>
+<li><b>Single-threaded, event-driven, non-blocking I/O</b>: slow work (files, network, database) is handed off, and Node keeps serving other requests; when the work finishes, its callback is queued.</li>
+<li>Same language on the front end and back end; a huge package ecosystem (<b>npm</b>).</li>
+<li>No DOM or <code>window</code>; instead <code>require</code>, <code>process</code>, <code>__dirname</code> and built-in modules.</li>
+</ul>
+<h2>The event loop</h2>
+<p>Node runs your code once, top to bottom. Asynchronous calls (<code>setTimeout</code>, <code>fs.readFile</code>, database queries, incoming requests) register a callback and return immediately. The <b>event loop</b> keeps checking the queue and runs each callback when its work is done. This is why one thread can serve thousands of connections.</p>
+```js
+console.log("This is the first statement");
+setTimeout(() => console.log("This is the timeout callback"), 0);
+console.log("This is the second statement");
+// first, second, then the timeout callback (it waits for the call stack to empty)
+```
+<p><b>Synchronous vs asynchronous</b>: <code>fs.readFileSync()</code> blocks until done; <code>fs.readFile(…, callback)</code> does not. Prefer async on servers. Modern style: Promises with <code>async/await</code> (<code>await fs.promises.readFile(...)</code>).</p>
+<h2>Modules and npm</h2>
+<table class="tbl"><tr><th>Kind</th><th>Example</th></tr>
+<tr><td>Built-in (core)</td><td><code>http, fs, path, os, url, events, querystring</code>: <code>const fs = require("fs");</code></td></tr>
+<tr><td>Your own (user-defined)</td><td><code>module.exports = { add };</code> in math.js → <code>const { add } = require("./math");</code></td></tr>
+<tr><td>Third-party (npm)</td><td><code>npm install express</code> → <code>require("express")</code>; listed in package.json; files in node_modules</td></tr></table>
+<p><code>npm init -y</code> creates package.json. ES-module syntax (<code>import</code> / <code>export</code>) also works with <code>"type": "module"</code>.</p>
+<p><b>Events module</b>: <code>const EventEmitter = require("events"); const e = new EventEmitter(); e.on("greet", n =&gt; console.log("Hi " + n)); e.emit("greet", "Ravi");</code>. This is event-driven programming in miniature.</p>
+
+=== 6.2
+Q: Nov25 Q16, Apr26 Q8, Nov24 Q9, Nov24 Q15, May24 Q16, May24 Q21
+<h2>The http module: a web server</h2>
+```js
+const http = require("http");
+
+http.createServer((req, res) => {          // runs for every request
+  if (req.url === "/") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end("<h1>Home</h1>");
+  } else {
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Not found");
+  }
+}).listen(3000, () => console.log("http://localhost:3000"));
+```
+<ul>
+<li><code>req</code>: the request: <code>req.url</code>, <code>req.method</code>, <code>req.headers</code>.</li>
+<li><code>res</code>: the response: <code>writeHead(status, headers)</code>, <code>write()</code>, <code>end()</code>.</li>
+<li><b>Reading a POSTed form</b> without Express: the body arrives in chunks: <code>req.on("data", c =&gt; body += c)</code>, then <code>req.on("end", …)</code> and <code>querystring.parse(body)</code>. To serve an HTML file, <code>fs.readFile("form.html", …)</code> and send it.</li>
+</ul>
+<h2>The fs module: files</h2>
+<table class="tbl"><tr><th>Task</th><th>Async (callback)</th><th>Sync</th></tr>
+<tr><td>Read</td><td><code>fs.readFile("a.txt", "utf8", (err, data) =&gt; …)</code></td><td><code>fs.readFileSync("a.txt", "utf8")</code></td></tr>
+<tr><td>Write (replace)</td><td><code>fs.writeFile("a.txt", "Hello", err =&gt; …)</code></td><td><code>fs.writeFileSync</code></td></tr>
+<tr><td>Append</td><td><code>fs.appendFile("a.txt", "more\n", err =&gt; …)</code></td><td><code>fs.appendFileSync</code></td></tr>
+<tr><td>Delete / rename</td><td><code>fs.unlink</code>, <code>fs.rename</code></td><td><code>fs.unlinkSync</code>…</td></tr>
+<tr><td>Exists / folder</td><td></td><td><code>fs.existsSync</code>, <code>fs.mkdirSync</code></td></tr></table>
+<p>Callbacks receive the error first (<code>err</code>), the Node convention; always check it.</p>
+
+=== 6.3
+Q: Nov25 Q10, Nov24 Q21, Nxt25 Q23, RJS Q34
+<h2>Express</h2>
+<p><b>Express</b> is a minimal web framework for Node.js (<code>npm install express</code>). It adds <b>routing</b>, <b>middleware</b> and easy request/response helpers on top of the http module.</p>
+```js
+const express = require("express");
+const app = express();
+
+app.use(express.json());                          // middleware: parse JSON bodies
+app.use(express.urlencoded({ extended: true }));  // parse HTML form bodies
+app.use(express.static("public"));                // serve files from /public
+
+app.get("/", (req, res) => res.sendFile(__dirname + "/index.html"));
+app.get("/hello/:name", (req, res) => res.send("Hello " + req.params.name));   // route parameter
+app.get("/search", (req, res) => res.json({ q: req.query.q }));               // ?q=... query string
+app.post("/login", (req, res) => res.send("Welcome " + req.body.username));   // form / JSON body
+
+app.listen(3000, () => console.log("Server running on port 3000"));
+```
+<table class="tbl"><tr><th>Where data comes from</th><th>Read with</th></tr>
+<tr><td>URL path <code>/students/:id</code></td><td><code>req.params.id</code></td></tr>
+<tr><td>Query string <code>?page=2</code> (GET forms)</td><td><code>req.query.page</code></td></tr>
+<tr><td>Body (POST/PUT forms, JSON)</td><td><code>req.body</code> (needs urlencoded / json middleware)</td></tr></table>
+<p>Responses: <code>res.send()</code>, <code>res.json()</code>, <code>res.status(404).json(…)</code>, <code>res.sendFile()</code>, <code>res.redirect("/x")</code>. <b>Middleware</b> = a function <code>(req, res, next)</code> that runs before the route handler (logging, parsing, authentication) and calls <code>next()</code>.</p>
+<h2>REST APIs</h2>
+<table class="tbl"><tr><th>Method</th><th>Route</th><th>Action</th><th>Success code</th></tr>
+<tr><td>GET</td><td><code>/api/students</code></td><td>list all</td><td>200</td></tr>
+<tr><td>GET</td><td><code>/api/students/:id</code></td><td>one</td><td>200 (404 if missing)</td></tr>
+<tr><td>POST</td><td><code>/api/students</code></td><td>create</td><td>201</td></tr>
+<tr><td>PUT / PATCH</td><td><code>/api/students/:id</code></td><td>update</td><td>200</td></tr>
+<tr><td>DELETE</td><td><code>/api/students/:id</code></td><td>delete</td><td>200 / 204</td></tr></table>
+<p>Errors: 400 bad input, 404 not found, 409 conflict (duplicate), 500 server error. Test APIs with <b>Postman</b> (choose the method, URL, Body → raw → JSON) or <code>curl</code>.</p>
+
+=== 6.4
+Q: Nov25 Q24, Apr26 Q23, RAS Q3
+<h2>The full-stack pattern (the compulsory Q24)</h2>
+<p>Every "Node + Express + MongoDB" question has the same skeleton. Learn it once:</p>
+<ol class="steps">
+<li><b>Setup</b>: <code>npm init -y</code>, <code>npm install express mongoose</code>, start MongoDB.</li>
+<li><b>Imports and middleware</b>: <code>express()</code>, <code>express.json()</code> (APIs) and/or <code>express.urlencoded()</code> (HTML forms).</li>
+<li><b>Connect</b>: <code>mongoose.connect("mongodb://127.0.0.1:27017/dbName")</code>.</li>
+<li><b>Schema and model</b> with the fields the question lists, plus <code>required</code> / <code>unique</code> / <code>min</code> / <code>max</code>.</li>
+<li><b>Routes</b>, exactly as named in the question, each <code>async</code> with <code>try/catch</code>.</li>
+<li><b>Validation and errors</b>: 400 for bad input, 409 for duplicates (check with <code>findOne</code> first, and catch error 11000), 404 for not found, 500 otherwise.</li>
+<li><code>app.listen(port)</code>, then show how to test it (Postman or curl) with sample requests and responses.</li>
+</ol>
+```js
+const express = require("express");
+const mongoose = require("mongoose");
+const app = express();
+app.use(express.json());
+
+mongoose.connect("mongodb://127.0.0.1:27017/libraryDB");
+
+const Book = mongoose.model("Book", new mongoose.Schema({
+  title: { type: String, required: true, unique: true },
+  author: { type: String, required: true },
+  available: { type: Boolean, default: true }
+}));
+
+app.post("/api/books", async (req, res) => {
+  try {
+    if (await Book.findOne({ title: req.body.title }))
+      return res.status(409).json({ message: "Book already exists" });
+    res.status(201).json(await Book.create(req.body));
+  } catch (err) {
+    res.status(err.name === "ValidationError" ? 400 : 500).json({ message: err.message });
+  }
+});
+
+app.get("/api/books", async (req, res) => res.json(await Book.find()));
+
+app.put("/api/books/:title/issue", async (req, res) => {
+  const b = await Book.findOneAndUpdate({ title: req.params.title }, { available: false }, { new: true });
+  b ? res.json(b) : res.status(404).json({ message: "Not found" });
+});
+
+app.delete("/api/books/:title", async (req, res) => {
+  const r = await Book.deleteOne({ title: req.params.title });
+  r.deletedCount ? res.json({ message: "Deleted" }) : res.status(404).json({ message: "Not found" });
+});
+
+app.listen(3000, () => console.log("Library API on port 3000"));
+```
+<p>This is the Library Book Management system from the Module 6 slides in compact form. The worked answers below (student records, user registration, course management) follow the same skeleton and were run against a real MongoDB, with the responses shown.</p>
+<p><b>Serving an HTML form instead of JSON</b> (Apr26 Q23 style): <code>app.get("/")</code> sends the form with <code>res.sendFile</code>, the form posts to a route, <code>express.urlencoded()</code> fills <code>req.body</code>, the route saves it and replies with a message.</p>
