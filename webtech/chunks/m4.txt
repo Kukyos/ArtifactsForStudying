@@ -1,0 +1,181 @@
+=== 4.1
+Q: Nov25 Q8
+<h2>What React is</h2>
+<p><b>React</b> is a JavaScript <b>library for building user interfaces</b> from <b>components</b>, made by Meta. Key ideas:</p>
+<ul>
+<li><b>Components</b>: reusable pieces of UI, written as functions that return what to show.</li>
+<li><b>JSX</b>: HTML-like syntax inside JavaScript.</li>
+<li><b>Virtual DOM</b>: React keeps a lightweight copy of the DOM, works out what changed, and updates only those parts of the real DOM, which is fast.</li>
+<li><b>One-way data flow</b>: data goes from parent to child through props.</li>
+<li><b>Single-page applications</b>: the page is built and updated by React instead of being reloaded.</li>
+</ul>
+<p>Create a project: <code>npm create vite@latest myapp -- --template react</code>, then <code>npm install</code> and <code>npm run dev</code> (older: <code>npx create-react-app myapp</code>). The app starts at <code>main.jsx</code>, which renders <code>&lt;App /&gt;</code> into <code>&lt;div id="root"&gt;</code>.</p>
+<h2>JSX rules</h2>
+<ul>
+<li>Return <b>one</b> parent element (or a fragment <code>&lt;&gt;…&lt;/&gt;</code>).</li>
+<li><code>className</code> instead of <code>class</code>; <code>htmlFor</code> instead of <code>for</code>; every tag must be closed (<code>&lt;img /&gt;</code>, <code>&lt;br /&gt;</code>).</li>
+<li>JavaScript expressions go in braces: <code>{name}</code>, <code>{2 + 3}</code>, <code>{isLoggedIn ? "Hi" : "Login"}</code>.</li>
+<li>Inline styles are objects: <code>style={{ color: "red", fontSize: "20px" }}</code>.</li>
+<li>Component names start with a <b>capital letter</b>.</li>
+</ul>
+<h2>Components</h2>
+```run html
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script type="text/babel">
+  function Greet() {
+    return <p>Hi there!</p>;
+  }
+
+  function Student(props) {                     // props = data from the parent
+    return <li>{props.name} - {props.dept}</li>;
+  }
+
+  function App() {
+    const list = [{ id: 1, name: "Asha", dept: "CSE" }, { id: 2, name: "John", dept: "ECE" }];
+    return (
+      <div>
+        <Greet />
+        <ul>
+          {list.map(s => <Student key={s.id} name={s.name} dept={s.dept} />)}
+        </ul>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+```
+<p>Lists are rendered with <code>array.map()</code>; each item needs a unique <code>key</code>. (This preview loads React and Babel from a CDN so it runs in the browser; in a real project Vite compiles the JSX.) Older code uses <b>class components</b>: <code>class Greet extends React.Component { render() { return &lt;p&gt;Hi&lt;/p&gt;; } }</code>.</p>
+
+=== 4.2
+<h2>Props</h2>
+<p><b>Props</b> pass data <b>into</b> a component from its parent, like function arguments: <code>&lt;Student name="Asha" /&gt;</code> → <code>props.name</code> (or destructured: <code>function Student({ name })</code>). Props are <b>read-only</b>.</p>
+<h2>State with useState</h2>
+<p><b>State</b> is data that belongs to a component and can change; changing it with the setter makes React re-render.</p>
+```js
+const [count, setCount] = useState(0);   // current value, setter, initial value
+setCount(count + 1);                     // never change count directly
+```
+<h2>Event handling</h2>
+<p>Events are camelCase and take a <b>function</b>, not a string: <code>onClick={handleClick}</code> or <code>onClick={() =&gt; setCount(count + 1)}</code>. Others: <code>onChange</code>, <code>onSubmit</code> (call <code>e.preventDefault()</code>), <code>onMouseOver</code>.</p>
+```run html
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script type="text/babel">
+  const { useState } = React;
+
+  function Counter({ step }) {
+    const [count, setCount] = useState(0);
+    return (
+      <div>
+        <h3>Count: {count}</h3>
+        <button onClick={() => setCount(count + step)}>+{step}</button>
+        <button onClick={() => setCount(0)}>Reset</button>
+        {count >= 10 && <p style={{ color: "green" }}>Reached 10!</p>}
+      </div>
+    );
+  }
+
+  function Toggle() {
+    const [dark, setDark] = useState(false);
+    return (
+      <button onClick={() => setDark(!dark)}
+              style={{ background: dark ? "#222" : "#eee", color: dark ? "#fff" : "#000" }}>
+        {dark ? "Dark" : "Light"} mode
+      </button>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<div><Counter step={2} /><Toggle /></div>);
+</script>
+```
+<table class="tbl"><tr><th>Props</th><th>State</th></tr>
+<tr><td>passed in by the parent</td><td>owned by the component</td></tr>
+<tr><td>read-only inside the component</td><td>changed with its setter</td></tr>
+<tr><td>like function arguments</td><td>like the component's memory</td></tr></table>
+<p><b>Conditional rendering</b>: <code>{cond ? &lt;A /&gt; : &lt;B /&gt;}</code> or <code>{cond &amp;&amp; &lt;A /&gt;}</code>. <b>useEffect</b> runs code after rendering (fetching data, timers): <code>useEffect(() =&gt; { … }, [deps])</code>.</p>
+
+=== 4.3
+<h2>Controlled form inputs</h2>
+<p>In React a form field's value is kept in <b>state</b>: <code>value={x}</code> plus <code>onChange={e =&gt; setX(e.target.value)}</code>. This is a <b>controlled component</b>: React always knows the current value.</p>
+<h2>Example: simple interest calculator (the class demo)</h2>
+```run html
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<script type="text/babel">
+  const { useState } = React;
+
+  function InterestCalculator() {
+    const [p, setP] = useState("");
+    const [r, setR] = useState("");
+    const [t, setT] = useState("");
+    const [si, setSi] = useState(null);
+
+    function handleSubmit(e) {
+      e.preventDefault();                       // stop the page reloading
+      if (!p || !r || !t) { setSi("Fill all fields"); return; }
+      setSi((Number(p) * Number(r) * Number(t)) / 100);
+    }
+
+    return (
+      <form onSubmit={handleSubmit}>
+        <h3>Simple Interest</h3>
+        Principal: <input type="number" value={p} onChange={e => setP(e.target.value)} /><br /><br />
+        Rate (%): <input type="number" value={r} onChange={e => setR(e.target.value)} /><br /><br />
+        Time (yrs): <input type="number" value={t} onChange={e => setT(e.target.value)} /><br /><br />
+        <button type="submit">Calculate</button>
+        <button type="button" onClick={() => { setP(""); setR(""); setT(""); setSi(null); }}>Clear</button>
+        {si !== null && <p><b>Simple Interest: {typeof si === "number" ? "Rs. " + si.toFixed(2) : si}</b></p>}
+      </form>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<InterestCalculator />);
+</script>
+```
+<p>SI = P × R × T / 100. Each input is controlled by its own state; <code>onSubmit</code> calculates and stores the result in state, and the result line appears only once there is a value.</p>
+<h2>Structure of a small React app</h2>
+<ul>
+<li>Split the page into components (Header, List, Item, Form), each in its own <code>.jsx</code> file with <code>export default</code> and <code>import</code>.</li>
+<li>Keep shared state in the nearest common parent and pass it down as props; pass <b>functions</b> down as props so children can update it ("lifting state up").</li>
+<li>Talk to a backend (Express) with <code>fetch</code> in <code>useEffect</code> or an event handler.</li>
+</ul>
+
+=== 4.4
+Q: Apr26 Q6, Apr26 Q7, Apr26 Q15, Apr26 Q21b, Apr26 Q22a, Apr26 Q22b, May24 Q7, May24 Q8, May24 Q15, May24 Q20a, May24 Q20b, Nov24 Q4, Nov24 Q6, Nov24 Q14, Nov24 Q20a, Nov24 Q20b
+<p class="callout">AngularJS is <b>not in 23CS2048</b>, which has React in its place. It is here only because the older 20CS2056 papers ask about it. Skip this page unless you are using those papers for practice.</p>
+<h2>AngularJS in one page</h2>
+<p><b>AngularJS</b> (1.x) is a structural JavaScript framework for single-page apps. It extends HTML with <b>directives</b> and keeps the view and data in sync with <b>two-way data binding</b>, following the MVC pattern.</p>
+<table class="tbl"><tr><th>Directive</th><th>Role</th></tr>
+<tr><td><code>ng-app</code></td><td>root of the app</td></tr>
+<tr><td><code>ng-model</code></td><td>two-way binds an input to a variable</td></tr>
+<tr><td><code>ng-bind</code>, <code>{{ }}</code></td><td>show a value (one-way)</td></tr>
+<tr><td><code>ng-init</code></td><td>initial values</td></tr>
+<tr><td><code>ng-controller</code></td><td>attach a controller ($scope)</td></tr>
+<tr><td><code>ng-repeat</code></td><td>repeat an element per array item</td></tr>
+<tr><td><code>ng-click</code>, <code>ng-submit</code></td><td>events</td></tr>
+<tr><td><code>ng-show</code>, <code>ng-hide</code>, <code>ng-if</code>, <code>ng-disabled</code></td><td>conditional display</td></tr>
+<tr><td><code>ng-view</code> + <code>ngRoute</code> / <code>$routeProvider</code></td><td>routing (single-page app)</td></tr></table>
+<p><b>Filters</b>: <code>{{ x | uppercase }}</code>, <code>lowercase</code>, <code>currency</code>, <code>date:'dd/MM/yyyy'</code>, <code>number:2</code>, <code>orderBy</code>, <code>filter</code>. <b>Form states</b>: <code>$pristine / $dirty</code>, <code>$valid / $invalid</code>, <code>$touched / $untouched</code>, <code>$error.required</code>, <code>$error.email</code>.</p>
+```run html
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<div ng-app="app" ng-controller="c">
+  Name: <input ng-model="name"> <p>Hello {{ name | uppercase }}</p>
+  <ul><li ng-repeat="x in items">{{ x }}</li></ul>
+  <button ng-click="items.push('Item ' + (items.length + 1))">Add</button>
+</div>
+<script>
+  angular.module("app", []).controller("c", function ($scope) {
+    $scope.name = "ravi";
+    $scope.items = ["Item 1"];
+  });
+</script>
+```
+<p>Every AngularJS question in the old papers is answered with a running example; use the links below.</p>

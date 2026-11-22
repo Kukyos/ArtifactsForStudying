@@ -1,0 +1,101 @@
+=== 3.1
+Q: Nov24 Q2, Nov24 Q12, Apr26 Q4, RPQ Q4, RPQ Q6, RPQ Q13
+<h2>What jQuery is</h2>
+<p><b>jQuery</b> is a small JavaScript <b>library</b> ("write less, do more"). It makes DOM selection, events, effects and AJAX shorter and handles browser differences. It is not a separate language: jQuery code is JavaScript.</p>
+```html
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>   <!-- from a CDN -->
+<script src="js/jquery.min.js"></script>                             <!-- or a downloaded copy -->
+```
+<h2>Syntax</h2>
+<p><code>$(selector).action()</code>: <code>$</code> is the jQuery function; the selector uses CSS syntax; the action is a jQuery method. Methods can be <b>chained</b>: <code>$("#box").css("color","red").slideUp().slideDown();</code></p>
+```js
+$(document).ready(function () {      // run after the DOM has loaded
+  // all jQuery code here
+});
+$(function () { /* short form */ });
+```
+<h2>Selectors</h2>
+<table class="tbl"><tr><th>Selector</th><th>Selects</th></tr>
+<tr><td><code>$("*")</code></td><td>all elements</td></tr>
+<tr><td><code>$("p")</code>, <code>$("#id")</code>, <code>$(".cls")</code></td><td>by tag, id, class</td></tr>
+<tr><td><code>$(this)</code></td><td>the element the event happened on</td></tr>
+<tr><td><code>$("ul li")</code>, <code>$("div &gt; p")</code>, <code>$("h1, h2")</code></td><td>descendant, child, group</td></tr>
+<tr><td><code>$("input[type='text']")</code>, <code>$("[href]")</code></td><td>attribute</td></tr>
+<tr><td><code>$("li:first")</code>, <code>:last</code>, <code>:even</code>, <code>:odd</code>, <code>:eq(2)</code>, <code>:checked</code>, <code>:visible</code>, <code>:hidden</code></td><td>filters</td></tr></table>
+<h2>Events</h2>
+<p><code>click, dblclick, mouseenter, mouseleave, hover, keyup, keydown, change, submit, focus, blur</code>; general form <code>$(sel).on("click", fn)</code>.</p>
+```run html
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<p class="t">Click me</p><p class="t">Or me</p>
+<input id="name" placeholder="type"> <span id="echo"></span>
+<script>
+  $(function () {
+    $(".t").click(function () { $(this).css("color", "crimson"); });
+    $("#name").keyup(function () { $("#echo").text($(this).val()); });
+    $("p").on("dblclick", function () { $(this).hide(); });
+  });
+</script>
+```
+<p><b>jQuery vs JavaScript</b>: <code>$("#x").hide()</code> vs <code>document.getElementById("x").style.display = "none"</code>. jQuery is shorter and chainable and has effects built in; plain JS needs no extra download and is faster.</p>
+
+=== 3.2
+Q: Nov25 Q6, Apr26 Q4, Apr26 Q20a, RV1 Q8, RPQ Q13, RPQ Q15
+<h2>Get and set content</h2>
+<table class="tbl"><tr><th>Method</th><th>Get</th><th>Set</th></tr>
+<tr><td><code>text()</code></td><td>text content</td><td><code>.text("Hi")</code> (tags shown as text)</td></tr>
+<tr><td><code>html()</code></td><td>content with tags</td><td><code>.html("&lt;b&gt;Hi&lt;/b&gt;")</code></td></tr>
+<tr><td><code>val()</code></td><td>a form field's value</td><td><code>.val("Ravi")</code></td></tr>
+<tr><td><code>attr()</code></td><td><code>.attr("href")</code></td><td><code>.attr("href", "x.html")</code></td></tr>
+<tr><td><code>css()</code></td><td><code>.css("color")</code></td><td><code>.css({"color":"red","font-size":"20px"})</code></td></tr></table>
+<p>Setters can take a callback: <code>$("p").text(function (i, old) { return old + "!"; });</code></p>
+<h2>Adding and removing</h2>
+<table class="tbl"><tr><th>Method</th><th>Effect</th></tr>
+<tr><td><code>append()</code> / <code>prepend()</code></td><td>insert at the end / start <b>inside</b> the element</td></tr>
+<tr><td><code>after()</code> / <code>before()</code></td><td>insert after / before the element</td></tr>
+<tr><td><code>remove()</code> / <code>empty()</code></td><td>delete the element / delete its children</td></tr>
+<tr><td><code>addClass()</code>, <code>removeClass()</code>, <code>toggleClass()</code></td><td>change classes</td></tr>
+<tr><td><code>width()</code>, <code>height()</code></td><td>dimensions</td></tr></table>
+<h2>Traversing</h2>
+<p>Up: <code>parent()</code>, <code>parents()</code>, <code>parentsUntil()</code>. Down: <code>children()</code>, <code>find()</code>. Sideways: <code>siblings()</code>, <code>next()</code>, <code>prev()</code>, <code>nextAll()</code>. Filtering: <code>first()</code>, <code>last()</code>, <code>eq(i)</code>, <code>filter()</code>, <code>not()</code>.</p>
+```run html
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<input id="v" placeholder="item"> <button id="add">append</button> <button id="del">remove last</button>
+<ul id="l"><li>first</li></ul>
+<script>
+  $(function () {
+    $("#add").click(function () { $("#l").append("<li>" + ($("#v").val() || "new") + "</li>"); $("#v").val(""); });
+    $("#del").click(function () { $("#l li").last().remove(); });
+    $("#l").on("click", "li", function () { $(this).toggleClass("done").css("text-decoration", $(this).hasClass("done") ? "line-through" : "none"); });
+  });
+</script>
+```
+<p><code>$("#l").on("click", "li", fn)</code> is <b>event delegation</b>: it also works for items added later.</p>
+
+=== 3.3
+Q: Nov25 Q21, Apr26 Q13, Apr26 Q20b, May24 Q4, May24 Q23a, Nov24 Q23a, RV1 Q5, RPQ Q10
+<h2>Effects</h2>
+<table class="tbl"><tr><th>Group</th><th>Methods</th></tr>
+<tr><td>Hide / show</td><td><code>hide(), show(), toggle()</code></td></tr>
+<tr><td>Fade</td><td><code>fadeIn(), fadeOut(), fadeToggle(), fadeTo(speed, opacity)</code></td></tr>
+<tr><td>Slide</td><td><code>slideDown(), slideUp(), slideToggle()</code></td></tr>
+<tr><td>Animate</td><td><code>animate({css}, speed, callback)</code>: any numeric property (left, width, opacity, font-size…)</td></tr>
+<tr><td>Control</td><td><code>stop()</code> ends the current animation; <code>stop(true)</code> also clears the queue; <code>delay(ms)</code></td></tr></table>
+<p>Every effect takes an optional <b>speed</b> ("slow" = 600 ms, "fast" = 200 ms, or a number) and a <b>callback</b> that runs when it finishes. Effects on the same element run in a <b>queue</b>, one after another.</p>
+```run html
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<button id="a">toggle</button><button id="b">fadeToggle</button><button id="c">slideToggle</button><button id="d">animate</button><button id="e">stop</button>
+<div id="box" style="width:120px;height:60px;background:teal;color:#fff;position:relative;margin-top:8px;padding:6px">box</div>
+<script>
+  $(function () {
+    $("#a").click(function () { $("#box").toggle("slow"); });
+    $("#b").click(function () { $("#box").fadeToggle(); });
+    $("#c").click(function () { $("#box").slideToggle(); });
+    $("#d").click(function () {
+      $("#box").animate({ left: "220px", opacity: 0.5 }, 800)
+               .animate({ left: "0px", opacity: 1 }, 800, function () { $(this).text("done"); });
+    });
+    $("#e").click(function () { $("#box").stop(true); });
+  });
+</script>
+```
+<p><b>Exam tip</b>: for "show and hide product images / descriptions" questions, start the elements with <code>display: none</code> in CSS, then give each button one effect inside <code>$(document).ready</code>.</p>

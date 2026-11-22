@@ -1,0 +1,232 @@
+=== 2.1
+Q: Nov25 Q5, Apr26 Q3, Nov24 Q5, May24 Q13, Nxt25 Q7, Nxt25 Q10, RPQ Q1, RPQ Q2, RPQ Q12, RJS Q1, RJS Q2, RJS Q5, RJS Q6, RJS Q9, RJS Q18, RJS Q19, RJS Q39
+<h2>What JavaScript is</h2>
+<p><b>JavaScript</b> is the programming language of the web: it runs inside every browser (its <b>JavaScript engine</b>, e.g. V8 in Chrome) and makes pages interactive. It is interpreted/JIT-compiled, dynamically typed and event-driven, and with Node.js it also runs on servers. It is <b>not</b> related to Java apart from the name.</p>
+<table class="tbl"><tr><th>Where</th><th>How</th></tr>
+<tr><td>Internal</td><td><code>&lt;script&gt; … &lt;/script&gt;</code> in head or body (end of body is best, so the HTML exists first)</td></tr>
+<tr><td>External</td><td><code>&lt;script src="app.js"&gt;&lt;/script&gt;</code></td></tr>
+<tr><td>Inline event</td><td><code>&lt;button onclick="show()"&gt;</code></td></tr></table>
+
+<h2>Showing output</h2>
+<table class="tbl"><tr><th>Method</th><th>Where it appears</th></tr>
+<tr><td><code>element.innerHTML = "…"</code></td><td>inside an HTML element (the usual way)</td></tr>
+<tr><td><code>document.write("…")</code></td><td>into the page while loading (erases the page if called later)</td></tr>
+<tr><td><code>alert("…")</code></td><td>pop-up box with OK</td></tr>
+<tr><td><code>console.log("…")</code></td><td>browser console (F12) / Node terminal</td></tr>
+<tr><td><code>input.value = …</code></td><td>inside a text box</td></tr></table>
+<p><b>Pop-up boxes</b>: <code>alert(msg)</code>; <code>confirm(msg)</code> returns true/false; <code>prompt(msg, default)</code> returns the typed text or null.</p>
+
+<h2>Variables and data types</h2>
+<table class="tbl"><tr><th></th><th>var</th><th>let</th><th>const</th></tr>
+<tr><td>Scope</td><td>function</td><td>block</td><td>block</td></tr>
+<tr><td>Re-declare</td><td>yes</td><td>no</td><td>no</td></tr>
+<tr><td>Re-assign</td><td>yes</td><td>yes</td><td>no</td></tr></table>
+<p>Primitive types: <b>Number, String, Boolean, Undefined, Null, BigInt, Symbol</b>; reference type: <b>Object</b> (arrays and functions are objects). <code>typeof x</code> tells the type. Identifiers start with a letter, _ or $, and are case-sensitive.</p>
+
+<h2>Operators and conversions</h2>
+<ul>
+<li>Arithmetic <code>+ - * / % **</code>; <code>++ --</code>; assignment <code>= += -=</code>.</li>
+<li>Comparison: <code>==</code> compares after converting types (<code>"5" == 5</code> is true), <code>===</code> compares value <b>and</b> type (<code>"5" === 5</code> is false); <code>!= !== &gt; &lt; &gt;= &lt;=</code>.</li>
+<li>Logical <code>&amp;&amp; || !</code>; ternary <code>cond ? a : b</code>.</li>
+<li><code>+</code> with a string concatenates: <code>"2" + 3</code> = "23". Input box values are strings, so convert with <code>Number()</code>, <code>parseInt()</code> or <code>parseFloat()</code>. <b>NaN</b> = an invalid number; test with <code>isNaN()</code>.</li>
+<li>Template literals: <code>`Hello ${name}`</code>.</li>
+</ul>
+```js
+let a = "10", b = 5;
+console.log(a + b);            // "105"  (string)
+console.log(Number(a) + b);    // 15
+console.log(parseInt("42px")); // 42
+console.log("5" == 5, "5" === 5, typeof null, typeof [], isNaN("abc"));
+```
+
+=== 2.2
+Q: Nov25 Q14, Nov25 Q20, Apr26 Q19a, May24 Q22, Nov24 Q22, Nxt25 Q9, Nxt25 Q14, Nxt25 Q15, Nxt25 Q22, RV1 Q11, RPQ Q5, RPQ Q9, RJS Q3, RJS Q8, RJS Q11, RJS Q13, RJS Q14, RJS Q15, RJS Q16, RJS Q20, RJS Q22, RJS Q25, RJS Q26, RJS Q28, RJS Q29, RJS Q30, RJS Q32, RJS Q35, RJS Q41
+<h2>Control flow</h2>
+```js
+// if / else if / else
+if (marks >= 90) grade = "A";
+else if (marks >= 75) grade = "B";
+else grade = "C";
+
+// switch
+switch (op) {
+  case "+": r = a + b; break;
+  case "-": r = a - b; break;
+  default: r = "invalid";
+}
+
+// loops
+for (let i = 1; i <= 5; i++) { }
+while (n > 0) { n--; }
+do { } while (false);
+for (const x of [1, 2, 3]) { }      // values of an array
+for (const k in obj) { }            // keys of an object
+```
+<p><code>break</code> leaves a loop; <code>continue</code> skips to the next turn.</p>
+
+<h2>Functions</h2>
+<table class="tbl"><tr><th>Kind</th><th>Syntax</th><th>Notes</th></tr>
+<tr><td>Declaration</td><td><code>function add(a, b) { return a + b; }</code></td><td>hoisted: can be called before it is written</td></tr>
+<tr><td>Expression</td><td><code>const add = function (a, b) { return a + b; };</code></td><td>not hoisted</td></tr>
+<tr><td>Arrow</td><td><code>const add = (a, b) =&gt; a + b;</code></td><td>short; common as callbacks</td></tr></table>
+<p>Parameters can have defaults (<code>function f(x = 1)</code>). A <b>callback</b> is a function passed to another function to call later (event handlers, <code>setTimeout</code>, <code>forEach</code>). Built-in functions: <code>parseInt, isNaN, alert, Math.max, Math.round, Math.random…</code></p>
+<p><b>Timers</b>: <code>setTimeout(fn, ms)</code> runs once after a delay; <code>setInterval(fn, ms)</code> repeats; stop with <code>clearTimeout / clearInterval</code>.</p>
+
+<h2>Arrays and objects</h2>
+```js
+let marks = [80, 92, 75];
+marks.push(88); marks.pop(); marks.unshift(70); marks.shift();
+marks.length; marks.indexOf(92); marks.includes(75);
+marks.sort((a, b) => a - b); marks.reverse(); marks.join(", ");
+marks.slice(0, 2);                         // copy part
+marks.map(m => m + 5);                     // new array, changed
+marks.filter(m => m >= 80);                // keep some
+marks.reduce((sum, m) => sum + m, 0);      // one value: total
+marks.forEach(m => console.log(m));
+
+let s = { name: "Ravi", dept: "CSE" };
+s.cgpa = 8.6; s["dept"] = "IT"; delete s.cgpa;
+Object.keys(s); Object.values(s);
+```
+<p>Strings have methods too: <code>length, toUpperCase(), toLowerCase(), trim(), split(""), indexOf(), slice(), replace()</code>. Math: <code>Math.round, floor, ceil, pow, sqrt, max, min, random</code>.</p>
+
+<h2>The standard programs</h2>
+<p>All these are answered with a working page in the revision sets: palindrome, even/odd (<code>n % 2</code>), leap year (<code>(y%4==0 &amp;&amp; y%100!=0) || y%400==0</code>), largest, positive/negative/zero, prime (try divisors up to √n), factorial, Fibonacci, sum of an array, calculators, unit and currency converters, electricity bill slabs.</p>
+<p><b>Pattern for "HTML page with embedded JavaScript" questions</b>: inputs with ids → a button with <code>onclick="calc()"</code> → in <code>calc()</code> read <code>.value</code>, convert with <code>parseFloat</code>, validate with <code>isNaN</code>, compute, write the result to an element's <code>innerHTML</code>.</p>
+
+<h2>Synchronous vs asynchronous</h2>
+<p><b>Synchronous</b> code runs line by line; each line waits for the previous one. <b>Asynchronous</b> code starts a slow job (timer, file, network, database) and continues; the result arrives later through a <b>callback</b>, a <b>Promise</b> (<code>.then()</code>) or <b>async/await</b>. This keeps pages and servers responsive.</p>
+```js
+console.log("1");
+setTimeout(() => console.log("3: after the delay"), 0);
+console.log("2");
+// prints 1, 2, 3
+
+async function load() {
+  const res = await fetch("https://api.example.com/data");   // waits without blocking the page
+  const data = await res.json();
+}
+```
+
+=== 2.3
+Q: Apr26 Q19b, May24 Q3, May24 Q19a, Nov24 Q19a, Nxt25 Q8, Nxt25 Q24, RAS Q2, RJS Q4, RJS Q7, RJS Q10, RJS Q17, RJS Q21, RJS Q36, RJS Q37, RJS Q38, RJS Q40, RJS Q42, RJS Q43, RJS Q44, RJS Q45, RJS Q46, RJS Q47
+<h2>The DOM</h2>
+<p>The <b>Document Object Model</b> is the page as a tree of objects (nodes); <code>document</code> is the root. JavaScript changes the page by finding nodes and changing them.</p>
+<table class="tbl"><tr><th>Task</th><th>Methods / properties</th></tr>
+<tr><td>Find</td><td><code>getElementById, getElementsByClassName, getElementsByTagName, getElementsByName, querySelector, querySelectorAll</code></td></tr>
+<tr><td>Content</td><td><code>innerHTML</code> (with tags), <code>innerText / textContent</code> (text only), <code>value</code> (form fields)</td></tr>
+<tr><td>Attributes and style</td><td><code>setAttribute, getAttribute, el.src, el.style.color, classList.add / remove / toggle</code></td></tr>
+<tr><td>Create / add / remove</td><td><code>createElement, createTextNode, appendChild, insertBefore, remove, removeChild</code></td></tr>
+<tr><td>Tables</td><td><code>table.insertRow(), row.insertCell(), table.rows, row.cells</code></td></tr>
+<tr><td>Navigate</td><td><code>parentElement, children, firstChild, nextElementSibling</code></td></tr></table>
+
+<h2>Events</h2>
+<table class="tbl"><tr><th>Event</th><th>Fires when</th></tr>
+<tr><td>click, dblclick</td><td>element clicked</td></tr>
+<tr><td>mouseover, mouseout</td><td>pointer enters / leaves</td></tr>
+<tr><td>keydown, keyup, input</td><td>typing</td></tr>
+<tr><td>change</td><td>select/checkbox/input value changed</td></tr>
+<tr><td>submit, reset</td><td>form submitted / reset</td></tr>
+<tr><td>focus, blur</td><td>field gains / loses focus</td></tr>
+<tr><td>load</td><td>page finished loading</td></tr></table>
+<p>Attach a handler with an attribute (<code>onclick="f()"</code>), a property (<code>el.onclick = f</code>) or <code>el.addEventListener("click", f)</code> (several handlers allowed). The handler receives an <b>event object</b>: <code>e.target</code>, <code>e.key</code>, <code>e.preventDefault()</code> (stop a form submitting), <code>e.stopPropagation()</code> (stop bubbling up to parents).</p>
+```run html
+<input id="item" placeholder="New task"> <button id="add">Add</button>
+<ul id="list"></ul>
+<p id="count">0 tasks</p>
+<script>
+  document.getElementById("add").addEventListener("click", function () {
+    var text = document.getElementById("item").value.trim();
+    if (!text) return;
+    var li = document.createElement("li");
+    li.textContent = text + " ";
+    var del = document.createElement("button");
+    del.textContent = "x";
+    del.onclick = function () { li.remove(); update(); };
+    li.appendChild(del);
+    document.getElementById("list").appendChild(li);
+    document.getElementById("item").value = "";
+    update();
+  });
+  function update() {
+    document.getElementById("count").innerHTML = document.querySelectorAll("#list li").length + " tasks";
+  }
+</script>
+```
+<p><b>Score-tracker pattern</b> (cricket, kabaddi, volleyball, basketball): keep the score in variables → each button calls a function that updates them → one <code>show()</code> function rewrites the scoreboard with <code>innerHTML</code>.</p>
+
+=== 2.4
+Q: Nov25 Q20, RAS Q1, RJS Q33, May24 Q17
+<h2>Why validate in the browser</h2>
+<p>Client-side validation gives instant feedback and stops obviously bad data before it is sent. It does <b>not</b> replace server-side checks (a user can bypass the browser).</p>
+<h2>Two layers</h2>
+<ul>
+<li><b>HTML5 attributes</b>: <code>required, type="email", minlength, min/max, pattern</code> (see 1.3).</li>
+<li><b>JavaScript</b>: <code>&lt;form onsubmit="return validate()"&gt;</code>. The function checks each field and returns <code>false</code> to block submission, showing a message next to the field.</li>
+</ul>
+<h2>Useful checks</h2>
+<table class="tbl"><tr><th>Rule</th><th>Check</th></tr>
+<tr><td>Not empty</td><td><code>v.trim() == ""</code></td></tr>
+<tr><td>Length</td><td><code>v.length &lt; 6</code></td></tr>
+<tr><td>Only letters</td><td><code>/^[A-Za-z]+$/.test(v)</code></td></tr>
+<tr><td>Letters and digits</td><td><code>/^[A-Za-z0-9]+$/</code></td></tr>
+<tr><td>Exactly 10 digits</td><td><code>/^[0-9]{10}$/</code></td></tr>
+<tr><td>Email</td><td><code>/^[^\s@]+@[^\s@]+\.[^\s@]+$/</code></td></tr>
+<tr><td>Has a digit</td><td><code>/[0-9]/.test(v)</code></td></tr>
+<tr><td>Number in range</td><td><code>!isNaN(v) &amp;&amp; v &gt;= 0 &amp;&amp; v &lt;= 100</code></td></tr>
+<tr><td>Passwords match</td><td><code>p1 === p2</code></td></tr></table>
+<p>Regex reminders: <code>^</code> start, <code>$</code> end, <code>[...]</code> one of, <code>{n}</code> exactly n times, <code>+</code> one or more, <code>\d</code> a digit, <code>\s</code> a space; <code>regex.test(string)</code> returns true or false.</p>
+```run html
+<form onsubmit="return validate()">
+  Name: <input id="n"> <span id="en" style="color:red"></span><br><br>
+  Mobile: <input id="m"> <span id="em" style="color:red"></span><br><br>
+  <input type="submit">
+</form>
+<p id="ok" style="color:green"></p>
+<script>
+  function validate() {
+    var ok = true;
+    var n = document.getElementById("n").value.trim(), m = document.getElementById("m").value.trim();
+    document.getElementById("en").innerHTML = /^[A-Za-z ]{3,}$/.test(n) ? "" : (ok = false, "Letters only, 3+");
+    document.getElementById("em").innerHTML = /^[0-9]{10}$/.test(m) ? "" : (ok = false, "10 digits");
+    document.getElementById("ok").innerHTML = ok ? "Valid" : "";
+    return false;   // demo: stay on the page
+  }
+</script>
+```
+
+=== 2.5
+Q: Nov25 Q22, Apr26 Q5, Apr26 Q14, Apr26 Q21a, May24 Q5, May24 Q6, May24 Q14, May24 Q19b, Nov24 Q3, Nov24 Q13, Nov24 Q19b, RV1 Q6, RPQ Q8, RPQ Q11, RPQ Q14
+<h2>JSON</h2>
+<p><b>JSON</b> (JavaScript Object Notation) is a lightweight, text-based format for storing and exchanging data, language-independent but based on JS object syntax. Used by APIs, config files and MongoDB.</p>
+<ul>
+<li>Data in <b>name/value pairs</b>; keys must be in <b>double quotes</b>; objects in <code>{ }</code>, arrays in <code>[ ]</code>.</li>
+<li>Value types: <b>string</b> (double quotes), <b>number</b>, <b>boolean</b>, <b>null</b>, <b>object</b>, <b>array</b>. No functions, dates, undefined or comments.</li>
+<li>Why JSON: smaller and easier to read than XML, parsed directly into objects.</li>
+</ul>
+```js
+{
+  "name": "Ravi",
+  "age": 20,
+  "active": true,
+  "middleName": null,
+  "address": { "city": "Coimbatore", "pin": 641114 },
+  "skills": ["HTML", "CSS", "JS"]
+}
+```
+<h2>Converting</h2>
+<table class="tbl"><tr><th>Direction</th><th>Method</th><th>Name</th></tr>
+<tr><td>object → JSON text</td><td><code>JSON.stringify(obj)</code></td><td>serialization (to store or send)</td></tr>
+<tr><td>JSON text → object</td><td><code>JSON.parse(text)</code></td><td>deserialization (to use the data)</td></tr></table>
+```run html
+<table id="t" border="1" cellpadding="4"><tr><th>Name</th><th>Marks</th></tr></table>
+<script>
+  var text = '[{"name":"Asha","marks":91},{"name":"John","marks":78}]';   // JSON text
+  var list = JSON.parse(text);                                            // -> array of objects
+  list.forEach(function (s) {
+    document.getElementById("t").innerHTML += "<tr><td>" + s.name + "</td><td>" + s.marks + "</td></tr>";
+  });
+  console.log(JSON.stringify(list[0]));   // back to text
+</script>
+```
+<p><b>JS object vs JSON</b>: an object literal is live code (keys may be unquoted, values may be functions); JSON is just a string in a strict format. Access parsed data with dot or bracket notation: <code>obj.address.city</code>, <code>obj.skills[1]</code>.</p>
