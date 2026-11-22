@@ -1,0 +1,341 @@
+=== 1.1
+Q: Nov25 Q1, Nov25 Q2, Nov25 Q11, Nov24 Q1, Nov24 Q7, Nxt25 Q11, RV1 Q9, RPQ Q17
+<h2>Internet, web and web technology</h2>
+<ul>
+<li>The <b>Internet</b> is the global network of connected computers. The <b>World Wide Web</b> is one service on it: pages linked by hyperlinks, fetched with <b>HTTP/HTTPS</b>, addressed by <b>URLs</b>.</li>
+<li><b>How it works</b>: the browser (client) sends an HTTP <b>request</b> for a URL → DNS turns the domain into an IP address → the <b>web server</b> sends back a <b>response</b> (HTML, CSS, JS, images) → the browser renders it.</li>
+<li><b>Web technology</b> = the languages and tools for building this: HTML (structure), CSS (presentation), JavaScript (behaviour) on the <b>client side</b>; Node.js, Express and databases like MongoDB on the <b>server side</b>.</li>
+</ul>
+<table class="tbl"><tr><th>Web page</th><th>Website</th><th>Web app</th></tr>
+<tr><td>one HTML document</td><td>a collection of related pages under one domain</td><td>interactive software in the browser (Gmail, online banking)</td></tr></table>
+<p><b>Static</b> sites send the same files to everyone; <b>dynamic</b> sites build pages per request from a database.</p>
+
+<h2>HTML document structure</h2>
+<p><b>HTML</b> (HyperText Markup Language) describes the <b>structure</b> of a page using <b>tags</b>. Current version: HTML5.</p>
+```run html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My First Page</title>
+</head>
+<body>
+  <h1>Hello World!</h1>
+  <p>This is a paragraph.</p>
+</body>
+</html>
+```
+<table class="tbl"><tr><th>Part</th><th>Role</th></tr>
+<tr><td><code>&lt;!DOCTYPE html&gt;</code></td><td>tells the browser this is HTML5</td></tr>
+<tr><td><code>&lt;html&gt;</code></td><td>root element; <code>lang</code> gives the language</td></tr>
+<tr><td><code>&lt;head&gt;</code></td><td>information about the page, not shown: title, meta, links to CSS, scripts</td></tr>
+<tr><td><code>&lt;meta&gt;</code></td><td>metadata: charset, viewport (mobile), description, keywords</td></tr>
+<tr><td><code>&lt;title&gt;</code></td><td>text on the browser tab</td></tr>
+<tr><td><code>&lt;body&gt;</code></td><td>everything visible</td></tr></table>
+<p><b>Syntax</b>: an <b>element</b> = start tag + content + end tag: <code>&lt;p&gt;text&lt;/p&gt;</code>. <b>Attributes</b> go in the start tag as name="value": <code>&lt;img src="a.jpg" alt="..."&gt;</code>. <b>Empty</b> elements have no end tag: <code>&lt;br&gt;</code>, <code>&lt;hr&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;meta&gt;</code>. Comments: <code>&lt;!-- ... --&gt;</code>.</p>
+
+<h2>Basic tags</h2>
+<table class="tbl"><tr><th>Tag</th><th>Use</th></tr>
+<tr><td><code>&lt;h1&gt;</code> … <code>&lt;h6&gt;</code></td><td>headings, h1 largest</td></tr>
+<tr><td><code>&lt;p&gt;</code></td><td>paragraph</td></tr>
+<tr><td><code>&lt;br&gt;</code>, <code>&lt;hr&gt;</code></td><td>line break, horizontal rule</td></tr>
+<tr><td><code>&lt;img src alt width height&gt;</code></td><td>image; alt is shown if it fails and read by screen readers</td></tr>
+<tr><td><code>&lt;div&gt;</code> / <code>&lt;span&gt;</code></td><td>generic block / inline container, used for styling</td></tr></table>
+<p><b>Text formatting</b>: <code>&lt;b&gt;</code> bold, <code>&lt;strong&gt;</code> important (bold), <code>&lt;i&gt;</code> italic, <code>&lt;em&gt;</code> emphasis, <code>&lt;u&gt;</code> underline, <code>&lt;mark&gt;</code> highlight, <code>&lt;small&gt;</code>, <code>&lt;del&gt;</code> struck out, <code>&lt;ins&gt;</code> inserted, <code>&lt;sup&gt;</code> superscript (A²), <code>&lt;sub&gt;</code> subscript (H₂O), <code>&lt;pre&gt;</code> keeps spacing, <code>&lt;code&gt;</code>, <code>&lt;blockquote&gt;</code>.</p>
+
+<h2>Block vs inline elements</h2>
+<table class="tbl"><tr><th>Block</th><th>Inline</th></tr>
+<tr><td>starts on a new line, takes full width</td><td>stays in the line, takes only its content's width</td></tr>
+<tr><td>width/height/margins apply</td><td>width/height ignored</td></tr>
+<tr><td><code>div, p, h1–h6, ul, ol, li, table, form, section</code></td><td><code>span, a, b, i, strong, img, input, label</code></td></tr></table>
+<p>CSS <code>display</code> can change either (see 1.6).</p>
+
+<h2>Semantic HTML5 elements</h2>
+<p>Tags that say what their content <b>is</b>: <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;aside&gt;</code>, <code>&lt;footer&gt;</code>, <code>&lt;figure&gt;</code> + <code>&lt;figcaption&gt;</code>. They help search engines and screen readers, and make code readable, unlike a plain <code>&lt;div&gt;</code>.</p>
+
+=== 1.2
+Q: Nov25 Q13, Nov25 Q18a, Nov25 Q19b, Apr26 Q1, Apr26 Q17a, Apr26 Q17b, May24 Q1, May24 Q11, May24 Q23b, Nov24 Q23b, Nxt25 Q1, Nxt25 Q2, Nxt25 Q17, RV1 Q1, RPQ Q16, RPQ Q20, RM1 Q5
+<h2>Lists</h2>
+<table class="tbl"><tr><th>List</th><th>Tags</th><th>Options</th></tr>
+<tr><td>Ordered (numbered)</td><td><code>&lt;ol&gt;&lt;li&gt;</code></td><td><code>type</code> = 1, A, a, I, i; <code>start="10"</code>; <code>reversed</code></td></tr>
+<tr><td>Unordered (bullets)</td><td><code>&lt;ul&gt;&lt;li&gt;</code></td><td>CSS <code>list-style-type</code>: disc, circle, square, none</td></tr>
+<tr><td>Description / definition</td><td><code>&lt;dl&gt;&lt;dt&gt;term&lt;/dt&gt;&lt;dd&gt;meaning&lt;/dd&gt;</code></td><td></td></tr></table>
+<p><b>Nesting</b>: put the inner list <b>inside</b> an <code>&lt;li&gt;</code>, before its <code>&lt;/li&gt;</code>. That is what the exam pictures (Coffee / Tea / Green tea) test.</p>
+```run html
+<ol type="I" start="10">
+  <li>Tea
+    <ul><li>Green tea</li><li>Black tea</li></ul>
+  </li>
+  <li>Coffee</li>
+</ol>
+<dl><dt>HTML</dt><dd>structures a page</dd></dl>
+```
+
+<h2>Links</h2>
+<p><code>&lt;a href="URL"&gt;text&lt;/a&gt;</code>. <code>target="_blank"</code> opens a new tab.</p>
+<table class="tbl"><tr><th>Link</th><th>href</th></tr>
+<tr><td>External site</td><td><code>https://www.karunya.edu</code></td></tr>
+<tr><td>Another page of the site</td><td><code>about.html</code> (relative path)</td></tr>
+<tr><td>Bookmark on the same page</td><td><code>#contact</code>, pointing to <code>id="contact"</code></td></tr>
+<tr><td>Email</td><td><code>mailto:admin@karunya.edu</code></td></tr>
+<tr><td>Phone</td><td><code>tel:+919876543210</code></td></tr>
+<tr><td>Image as a link</td><td><code>&lt;a href="..."&gt;&lt;img src="..."&gt;&lt;/a&gt;</code></td></tr></table>
+
+<h2>Images and media</h2>
+<ul>
+<li><code>&lt;img src="pic.jpg" alt="text" width="300"&gt;</code>; with a caption: <code>&lt;figure&gt;&lt;img&gt;&lt;figcaption&gt;…&lt;/figcaption&gt;&lt;/figure&gt;</code>.</li>
+<li><code>&lt;audio src="a.mp3" controls&gt;</code>, <code>&lt;video src="v.mp4" width="320" controls autoplay muted loop&gt;</code>; several formats with <code>&lt;source src type&gt;</code> inside.</li>
+<li><code>&lt;iframe src="..."&gt;</code> embeds another page: YouTube (<code>/embed/ID</code>), Google Maps.</li>
+</ul>
+
+<h2>Tables</h2>
+<table class="tbl"><tr><th>Tag / attribute</th><th>Meaning</th></tr>
+<tr><td><code>&lt;table&gt;</code>, <code>&lt;tr&gt;</code>, <code>&lt;th&gt;</code>, <code>&lt;td&gt;</code></td><td>table, row, header cell (bold, centred), data cell</td></tr>
+<tr><td><code>&lt;caption&gt;</code></td><td>title above the table</td></tr>
+<tr><td><code>&lt;thead&gt;</code>, <code>&lt;tbody&gt;</code>, <code>&lt;tfoot&gt;</code></td><td>group header, body and footer rows</td></tr>
+<tr><td><code>colspan="n"</code></td><td>cell spans n <b>columns</b> (merged across)</td></tr>
+<tr><td><code>rowspan="n"</code></td><td>cell spans n <b>rows</b> (merged down)</td></tr>
+<tr><td>CSS <code>border</code>, <code>border-collapse: collapse</code>, <code>padding</code></td><td>borders, single lines, space in cells (older attributes: border, cellpadding, cellspacing)</td></tr></table>
+<p><b>Method for "draw this table" questions</b>: count the real columns first. Write the rows top to bottom. A cell with <code>rowspan</code> takes up space in the rows below it, so those rows get <b>one fewer</b> <code>&lt;td&gt;</code>. Check that every row adds up to the same number of columns.</p>
+```run html
+<style>table,th,td{border:1px solid #000;border-collapse:collapse;padding:4px 10px;text-align:center}</style>
+<table>
+  <caption>Seminar</caption>
+  <tr><th rowspan="2">Day</th><th colspan="2">Sessions</th></tr>
+  <tr><th>Morning</th><th>Afternoon</th></tr>
+  <tr><td>Mon</td><td>HTML</td><td>CSS</td></tr>
+  <tr><td>Tue</td><td colspan="2">Project work</td></tr>
+</table>
+```
+
+=== 1.3
+Q: Nov25 Q17, Apr26 Q11, May24 Q17, Nov24 Q17, Nxt25 Q16, Nxt25 Q23, RV1 Q2, RM1 Q2, RJS Q34, RAS Q1
+<h2>The form element</h2>
+<p><code>&lt;form action="/register" method="post"&gt;</code> collects input and sends it to the server.</p>
+<table class="tbl"><tr><th>Attribute</th><th>Meaning</th></tr>
+<tr><td><code>action</code></td><td>URL that receives the data</td></tr>
+<tr><td><code>method</code></td><td><b>GET</b>: data in the URL (<code>?name=ravi</code>), for searches; <b>POST</b>: data in the request body, for logins and registrations</td></tr>
+<tr><td><code>target</code></td><td>_self (default), _blank (new tab)</td></tr>
+<tr><td><code>enctype="multipart/form-data"</code></td><td>required for file uploads (with POST)</td></tr>
+<tr><td><code>autocomplete</code>, <code>novalidate</code></td><td>browser autofill on/off; switch off built-in validation</td></tr></table>
+
+<h2>Input types and controls</h2>
+<table class="tbl"><tr><th>Need</th><th>Control</th></tr>
+<tr><td>Text, email, password</td><td><code>&lt;input type="text|email|password"&gt;</code></td></tr>
+<tr><td>Number, range, date, time, color, tel, url, search</td><td><code>type="number" min max step</code>, <code>type="date"</code>, …</td></tr>
+<tr><td>One of several</td><td><code>type="radio"</code>, all with the <b>same name</b></td></tr>
+<tr><td>Several of several</td><td><code>type="checkbox"</code></td></tr>
+<tr><td>Drop-down</td><td><code>&lt;select&gt;&lt;option&gt;</code> (<code>multiple</code> allows several; <code>&lt;optgroup&gt;</code> groups)</td></tr>
+<tr><td>Multi-line text</td><td><code>&lt;textarea rows cols maxlength&gt;</code></td></tr>
+<tr><td>File upload</td><td><code>type="file" accept=".pdf,.jpg"</code></td></tr>
+<tr><td>Buttons</td><td><code>type="submit"</code>, <code>type="reset"</code>, <code>&lt;button&gt;</code></td></tr>
+<tr><td>Hidden value</td><td><code>type="hidden"</code></td></tr>
+<tr><td>Suggestions</td><td><code>&lt;input list="x"&gt;&lt;datalist id="x"&gt;</code></td></tr></table>
+<p><b>Labels and grouping</b>: <code>&lt;label for="id"&gt;</code> ties text to a field (click focuses it; screen readers read it). <code>&lt;fieldset&gt;</code> + <code>&lt;legend&gt;</code> group related fields.</p>
+
+<h2>HTML5 validation attributes</h2>
+<table class="tbl"><tr><th>Attribute</th><th>Checks</th></tr>
+<tr><td><code>required</code></td><td>field must not be empty</td></tr>
+<tr><td><code>type="email"</code>, <code>type="url"</code></td><td>format</td></tr>
+<tr><td><code>minlength</code>, <code>maxlength</code></td><td>text length</td></tr>
+<tr><td><code>min</code>, <code>max</code>, <code>step</code></td><td>number/date range (age 18–25: <code>min="18" max="25"</code>)</td></tr>
+<tr><td><code>pattern="[0-9]{10}"</code></td><td>regular expression (10-digit mobile); <code>title</code> gives the hint</td></tr>
+<tr><td><code>placeholder</code></td><td>grey hint text (not validation)</td></tr>
+<tr><td><code>readonly</code>, <code>disabled</code>, <code>autofocus</code>, <code>checked</code>, <code>selected</code></td><td>state</td></tr></table>
+```run html
+<form onsubmit="alert('valid!'); return false;">
+  <fieldset><legend>Register</legend>
+    <label for="n">Name</label> <input id="n" name="name" placeholder="Full name" required><br><br>
+    <label for="e">Email</label> <input id="e" type="email" name="email" required><br><br>
+    <label for="m">Mobile</label> <input id="m" type="tel" pattern="[0-9]{10}" title="10 digits" required><br><br>
+    Mode: <input type="radio" name="mode" value="Online" required> Online
+          <input type="radio" name="mode" value="Offline"> Offline<br><br>
+    <select name="dept" required><option value="">-- Dept --</option><option>CSE</option><option>ECE</option></select><br><br>
+    <input type="checkbox" required> I agree<br><br>
+    <button type="submit">Submit</button> <button type="reset">Reset</button>
+  </fieldset>
+</form>
+```
+<p>For the 12-mark form questions: use every control the question names, put a <code>&lt;label&gt;</code> on each, add <code>required</code> and the right types, and finish with a short table saying which tag does what.</p>
+
+=== 1.4
+Q: Nov25 Q12, Apr26 Q2, May24 Q12, May24 Q18b, Nov24 Q18b, Nxt25 Q3, Nxt25 Q6, RV1 Q3, RM1 Q3, RPQ Q18
+<h2>CSS and how to add it</h2>
+<p><b>CSS</b> (Cascading Style Sheets) controls presentation: colours, fonts, spacing, layout. A rule = <b>selector</b> + <b>declaration block</b>: <code>h1 { color: maroon; font-size: 24px; }</code>. Each declaration is <code>property: value;</code>.</p>
+<table class="tbl"><tr><th>Method</th><th>How</th><th>Use</th></tr>
+<tr><td>Inline</td><td><code>&lt;p style="color:red"&gt;</code></td><td>one element, quick tests</td></tr>
+<tr><td>Internal (embedded)</td><td><code>&lt;style&gt;…&lt;/style&gt;</code> in the head</td><td>one page</td></tr>
+<tr><td>External</td><td><code>&lt;link rel="stylesheet" href="style.css"&gt;</code></td><td>whole site, one file to change</td></tr></table>
+<p><b>Cascade</b>: when rules conflict, the more <b>specific</b> selector wins (inline &gt; id &gt; class/attribute/pseudo-class &gt; element); for equal specificity, the <b>later</b> rule wins; <code>!important</code> overrides both. Inline beats internal and external styles.</p>
+
+<h2>Selectors</h2>
+<table class="tbl"><tr><th>Selector</th><th>Example</th><th>Selects</th></tr>
+<tr><td>Universal</td><td><code>*</code></td><td>every element</td></tr>
+<tr><td>Element (type)</td><td><code>p</code></td><td>all &lt;p&gt;</td></tr>
+<tr><td>ID</td><td><code>#menu</code></td><td>the element with id="menu" (unique)</td></tr>
+<tr><td>Class</td><td><code>.card</code></td><td>all elements with class="card"</td></tr>
+<tr><td>Grouping</td><td><code>h1, h2</code></td><td>each listed</td></tr>
+<tr><td>Descendant</td><td><code>div p</code></td><td>p anywhere inside div</td></tr>
+<tr><td>Child</td><td><code>div &gt; p</code></td><td>p directly inside div</td></tr>
+<tr><td>Adjacent sibling</td><td><code>h2 + p</code></td><td>the p right after an h2</td></tr>
+<tr><td>General sibling</td><td><code>h2 ~ p</code></td><td>every p after an h2 (same parent)</td></tr>
+<tr><td>Attribute</td><td><code>input[type="text"]</code></td><td>by attribute value</td></tr>
+<tr><td>Pseudo-class</td><td><code>a:hover</code>, <code>li:first-child</code>, <code>tr:nth-child(even)</code>, <code>input:focus</code></td><td>by state or position</td></tr>
+<tr><td>Pseudo-element</td><td><code>p::first-letter</code>, <code>p::first-line</code>, <code>::before</code>, <code>::after</code></td><td>part of an element</td></tr></table>
+<p>Link states, in this order: <code>a:link</code>, <code>a:visited</code>, <code>a:hover</code>, <code>a:active</code>.</p>
+```run html
+<style>
+  * { font-family: Arial; }
+  #title { color: crimson; }
+  .note { background: lightyellow; }
+  div > p { border-left: 3px solid teal; padding-left: 6px; }
+  h3 + p { font-weight: bold; }
+  li:nth-child(even) { color: gray; }
+  p::first-letter { font-size: 1.4em; }
+  a:hover { color: red; }
+</style>
+<h2 id="title">ID selector</h2>
+<h3>Heading</h3><p class="note">Adjacent to h3, and has class note</p>
+<div><p>Direct child of div</p></div>
+<ul><li>one</li><li>two</li><li>three</li><li>four</li></ul>
+<a href="#">hover me</a>
+```
+
+=== 1.5
+Q: Nov25 Q3, Nov25 Q4, Nov25 Q19a, May24 Q2, Nxt25 Q18, RV1 Q10, RV1 Q12, RV1 Q13, RM1 Q1, RJS Q23, Nxt25 Q21
+<h2>The box model</h2>
+<p>Every element is a box: <b>content</b> → <b>padding</b> (inside the border, takes the background) → <b>border</b> → <b>margin</b> (outside, transparent).</p>
+<p><b>Total width</b> = width + padding-left + padding-right + border-left + border-right (margin is extra space around it). E.g. width 350, padding 15, border 4 → 350 + 30 + 8 = <b>388px</b>. With <code>box-sizing: border-box</code>, <code>width</code> already includes padding and border.</p>
+```run html
+<style>
+  .box { width: 200px; padding: 15px; border: 4px solid #c62828; margin: 20px; background: #fff8e1; }
+</style>
+<div class="box">content 200 + padding 30 + border 8 = 238px wide</div>
+```
+<p>Shorthand order is <b>top right bottom left</b> (clockwise): <code>margin: 10px 20px 10px 20px</code>; two values = top/bottom, left/right. <code>margin: 0 auto</code> centres a block with a width.</p>
+
+<h2>Borders</h2>
+<p><code>border: 2px solid black</code> = width, style, colour. Styles: <code>dotted, dashed, solid, double, groove, ridge, inset, outset, none, hidden</code>; four values set each side: <code>border-style: dotted dashed solid double</code>. <code>border-radius</code> rounds corners (50% = circle).</p>
+
+<h2>Backgrounds and gradients</h2>
+<ul>
+<li><code>background-color</code>; <code>background-image: url("bg.jpg")</code></li>
+<li><code>background-repeat</code>: repeat, repeat-x, repeat-y, no-repeat</li>
+<li><code>background-size</code>: cover (fill, may crop), contain (fit whole image), or px/%</li>
+<li><code>background-position</code>: center top, right bottom, …; <code>background-attachment: fixed</code> (stays when scrolling)</li>
+<li>Gradients: <code>linear-gradient(to right, red, yellow)</code>, <code>radial-gradient(circle, white, blue)</code>, <code>repeating-linear-gradient(...)</code></li>
+</ul>
+
+<h2>Colour, text and fonts</h2>
+<table class="tbl"><tr><th>Property</th><th>Example</th></tr>
+<tr><td>color</td><td><code>red</code>, <code>#ff0000</code>, <code>rgb(255,0,0)</code>, <code>rgba(255,0,0,0.5)</code>, <code>hsl()</code></td></tr>
+<tr><td>font-family, font-size, font-weight, font-style</td><td><code>Arial, sans-serif</code>; <code>16px / 1.2em / 120%</code>; <code>bold</code>; <code>italic</code></td></tr>
+<tr><td>text-align, text-transform, text-decoration</td><td><code>center</code>; <code>uppercase</code>; <code>underline / line-through / none</code></td></tr>
+<tr><td>line-height, letter-spacing, word-spacing, text-shadow, text-indent</td><td><code>1.5</code>; <code>2px</code>; <code>2px 2px 4px gray</code></td></tr>
+<tr><td>opacity</td><td>0 (invisible) to 1 (solid); applies to the whole element</td></tr>
+<tr><td>list-style-type</td><td>disc, circle, square, decimal, none</td></tr></table>
+<p>Units: <b>px</b> fixed; <b>em</b> relative to the parent's font size; <b>rem</b> to the root's; <b>%</b> of the parent; <b>vw / vh</b> 1% of the viewport.</p>
+
+<h2>Transitions and animations</h2>
+```run html
+<style>
+  .btn { background: #1565c0; color: #fff; padding: 10px 20px; border: none; transition: all 0.3s ease; }
+  .btn:hover { background: #ffb300; color: #000; font-size: 18px; }
+  .ball { width: 30px; height: 30px; border-radius: 50%; background: tomato; animation: move 2s linear infinite alternate; }
+  @keyframes move { from { transform: translateX(0); } to { transform: translateX(250px); } }
+</style>
+<button class="btn">Hover me (transition)</button><br><br>
+<div class="ball"></div>
+```
+<p><b>transition</b> animates a property change (e.g. on <code>:hover</code>) and reverses smoothly. <b>animation</b> + <b>@keyframes</b> runs on its own: name, duration, timing (linear/ease), iteration count (infinite), direction (alternate). <b>transform</b>: translate, rotate, scale.</p>
+
+=== 1.6
+Q: Nov25 Q18b, Apr26 Q18a, Apr26 Q18b, May24 Q18a, Nov24 Q11, Nov24 Q18a, Nxt25 Q4, Nxt25 Q5, Nxt25 Q12, Nxt25 Q13, Nxt25 Q19, RV1 Q4, RPQ Q3, RPQ Q19, RM1 Q4
+<h2>position</h2>
+<table class="tbl"><tr><th>Value</th><th>Offsets (top/left…) measured from</th><th>Keeps its space?</th><th>Typical use</th></tr>
+<tr><td>static (default)</td><td>no effect</td><td>yes</td><td>normal flow</td></tr>
+<tr><td>relative</td><td>its own normal place</td><td>yes</td><td>nudging; container for absolute children</td></tr>
+<tr><td>absolute</td><td>nearest positioned ancestor (else the page)</td><td>no</td><td>badges, tooltips</td></tr>
+<tr><td>fixed</td><td>the browser window; ignores scrolling</td><td>no</td><td>fixed headers, banners, help buttons</td></tr>
+<tr><td>sticky</td><td>relative until the scroll offset is reached, then sticks</td><td>yes</td><td>sticky menus, table headers</td></tr></table>
+<p><b>z-index</b> sets the stacking order of positioned elements (higher = on top).</p>
+
+<h2>display, float and flexbox</h2>
+<ul>
+<li><code>display: block | inline | inline-block | none | flex | grid</code>. <code>none</code> removes the element (unlike <code>visibility: hidden</code>, which keeps its space).</li>
+<li><code>float: left | right</code>: pushes an element to one side and lets text wrap around it; <code>clear: both</code> stops the wrapping. This was the old way to make columns and nav bars.</li>
+<li><b>Flexbox</b> (one direction): <code>display: flex</code> on the parent; <code>flex-direction</code> (row/column), <code>justify-content</code> (main axis: flex-start, center, space-between, space-around), <code>align-items</code> (cross axis), <code>flex-wrap: wrap</code>, <code>gap</code>; children use <code>flex: 1</code> to share space.</li>
+<li><b>Grid</b> (two directions): <code>display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;</code>; a child spans cells with <code>grid-column: span 2; grid-row: span 2</code>.</li>
+</ul>
+
+<h2>Navigation bar (a favourite 6-mark question)</h2>
+```run html
+<style>
+  ul.nav { list-style: none; margin: 0; padding: 0; background: #333; display: flex; }
+  ul.nav a { display: block; color: white; padding: 14px 24px; text-decoration: none; }
+  ul.nav a:hover, ul.nav a.active { background: #777; }
+</style>
+<ul class="nav">
+  <li><a href="#" class="active">Home</a></li><li><a href="#">News</a></li>
+  <li><a href="#">Contact</a></li><li><a href="#">About</a></li>
+</ul>
+```
+<p>Steps: links in a <code>&lt;ul&gt;</code> → remove bullets and padding → put items side by side (<code>display: flex</code> on the ul, or <code>float: left</code> on the li) → make each link a block with padding and no underline → add <code>:hover</code> and an <code>.active</code> class.</p>
+
+<h2>Responsive design</h2>
+<ul>
+<li>The viewport meta tag: <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</code>.</li>
+<li><b>Media queries</b> apply rules only on some screens: <code>@media (max-width: 600px) { … }</code>. The widths where the layout changes are <b>breakpoints</b>. Also <code>@media (orientation: portrait|landscape)</code>.</li>
+<li>Flexible sizes (%, fr, max-width: 100% on images) and flex/grid wrapping.</li>
+</ul>
+```run html
+<style>
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cols div { background: #e3f2fd; padding: 10px; }
+  @media (max-width: 500px) { .cols { grid-template-columns: 1fr; } }
+</style>
+<div class="cols"><div>Column 1</div><div>Column 2</div></div>
+<p>Two columns, one column below 500px.</p>
+```
+
+=== 1.7
+Q: Nov25 Q7, Apr26 Q12, Nov24 Q8, RV1 Q7, RPQ Q7
+<h2>What Bootstrap is</h2>
+<p><b>Bootstrap</b> is a free CSS (and JS) framework of ready-made classes for <b>responsive</b>, mobile-first pages: you add class names instead of writing CSS. Advantages: fast development, consistent look, responsive grid, works across browsers. Include it from a CDN:</p>
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+```
+
+<h2>Containers and the grid</h2>
+<ul>
+<li><code>.container</code>: responsive fixed-width, centred box; <code>.container-fluid</code>: always full width.</li>
+<li>Grid: <code>.row</code> holds <code>.col-*</code> columns; each row has <b>12</b> units. <code>col-md-4</code> = 4/12 wide from the md breakpoint up (stacked on smaller screens). Breakpoints: sm 576, md 768, lg 992, xl 1200, xxl 1400 px. Plain <code>.col</code> = equal widths.</li>
+</ul>
+```run html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-sm-4 bg-primary text-white p-2">col-sm-4</div>
+    <div class="col-sm-8 bg-success text-white p-2">col-sm-8</div>
+  </div>
+  <button class="btn btn-primary mt-3">Primary</button>
+  <button class="btn btn-outline-danger mt-3">Outline danger</button>
+  <div class="alert alert-warning mt-3">alert alert-warning</div>
+</div>
+```
+
+<h2>Common classes</h2>
+<table class="tbl"><tr><th>Group</th><th>Classes</th></tr>
+<tr><td>Buttons</td><td><code>btn</code> + <code>btn-primary / secondary / success / danger / warning / info / light / dark / link</code>; <code>btn-outline-*</code>; sizes <code>btn-lg / btn-sm</code></td></tr>
+<tr><td>Colours</td><td>text <code>text-primary, text-danger…</code>; background <code>bg-success, bg-dark…</code></td></tr>
+<tr><td>Spacing</td><td><code>m-3, mt-2, mb-4, p-2, px-3, mx-auto</code> (m/p + side t b s e x y + size 0–5)</td></tr>
+<tr><td>Text</td><td><code>text-center, text-end, fw-bold, text-uppercase</code></td></tr>
+<tr><td>Borders</td><td><code>border, border-primary, rounded, rounded-circle</code></td></tr>
+<tr><td>Alerts</td><td><code>alert alert-warning</code> etc.</td></tr>
+<tr><td>Tables</td><td><code>table table-striped table-bordered table-hover</code></td></tr>
+<tr><td>Images</td><td><code>img-fluid</code> (responsive), <code>rounded</code></td></tr>
+<tr><td>Forms</td><td><code>form-control, form-label, form-select, form-check</code></td></tr>
+<tr><td>Navbar</td><td><code>navbar navbar-expand-lg navbar-dark bg-dark, navbar-brand, navbar-toggler, collapse navbar-collapse, navbar-nav, nav-item, nav-link</code></td></tr>
+<tr><td>Others</td><td><code>card, card-body, badge, dropdown, pagination, d-none / d-flex</code></td></tr></table>
