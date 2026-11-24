@@ -1,0 +1,1 @@
+B = B† ✓  eigenvalues: {3: 1, -1: 1}  eigenvectors: [[-sqrt(2)*I/2, sqrt(2)/2], [sqrt(2)*I/2, sqrt(2)/2]]
