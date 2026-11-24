@@ -1,0 +1,5 @@
+Ψ⁺, outcome 10: Bob holds 3/5|0⟩ + 4/5|1⟩ ; X then Z → 4/5|0⟩ - 3/5|1⟩
+Ψ⁺ outcome 00: Bob -3/5|0⟩ + 4/5|1⟩  fixed by X
+Ψ⁺ outcome 01: Bob 4/5|0⟩ - 3/5|1⟩  fixed by I
+Ψ⁺ outcome 10: Bob 3/5|0⟩ + 4/5|1⟩  fixed by ZX
+Ψ⁺ outcome 11: Bob 4/5|0⟩ + 3/5|1⟩  fixed by Z

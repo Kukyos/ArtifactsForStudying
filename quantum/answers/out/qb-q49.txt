@@ -1,0 +1,1 @@
+Steane: X on qubit 6 → syndrome 110 = binary 6

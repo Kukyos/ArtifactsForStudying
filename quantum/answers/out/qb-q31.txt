@@ -1,0 +1,1 @@
+f = x1: input register after final H: |100⟩

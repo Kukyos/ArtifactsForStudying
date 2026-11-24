@@ -1,0 +1,4 @@
+input |01⟩
+CNOT q0→q1: |01⟩
+CNOT q1→q0: |11⟩
+CNOT q0→q1: |10⟩

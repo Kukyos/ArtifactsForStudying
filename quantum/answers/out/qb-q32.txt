@@ -1,0 +1,1 @@
+s = 101: input register after final H: |101⟩

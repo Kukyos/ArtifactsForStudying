@@ -1,0 +1,1 @@
+f = x2⊕x3: input register after final H: |0110⟩

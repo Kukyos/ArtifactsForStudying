@@ -1,0 +1,1 @@
+after oracle [-1/2, 1/2, 1/2, 1/2]  mean 1/4  after diffusion [1, 0, 0, 0]
