@@ -1,0 +1,4 @@
+θ = 1/4: after QFT⁻¹ the register is |011⟩ → reads 01 → θ = 1/4
+θ = 3/4: after QFT⁻¹ the register is |111⟩ → reads 11 → θ = 3/4
+θ = 1/2: after QFT⁻¹ the register is |101⟩ → reads 10 → θ = 2/4
+Shor N=15, a=7: powers [7, 4, 13, 1] → r = 4; gcd(7^2−1, 15) = 3, gcd(7^2+1, 15) = 5

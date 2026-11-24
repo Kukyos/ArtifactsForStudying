@@ -1,0 +1,4 @@
+(i) initial |000⟩|1⟩
+(ii) after H on all four qubits: (1/√8) Σ_x |x⟩ ⊗ |−⟩
+(iii) after oracle, input amplitudes ×√8: ['1', '-1', '1', '-1', '-1', '1', '-1', '1']
+(iv) after the final Hadamards: |1011⟩

@@ -1,0 +1,261 @@
+=== Apr26 Q1
+<p><b>Quantum entanglement</b> is a correlation between two or more qubits such that the joint state <b>cannot be written as a tensor product</b> of the individual qubit states. Measuring one qubit instantly fixes the outcome of the other, however far apart they are. Example: the Bell state |Φ⁺⟩ = (|00⟩ + |11⟩)/√2.</p>
+
+=== Apr26 Q2
+<p>Alice <b>measures her two qubits</b> (her unknown qubit and her half of the Bell pair) in the Bell basis (CNOT, then H, then measure). The measurement collapses Bob's qubit into one of four known versions of |ψ⟩ and gives Alice <b>two classical bits</b> that tell Bob which correction (I, X, Z or ZX) to apply.</p>
+
+=== Apr26 Q3
+<p>|ψ⟩ = (√3/2)|0⟩ + (1/2)|1⟩. By the Born rule, P(1) = |β|² = (1/2)² = <b>1/4</b> (and P(0) = 3/4; 3/4 + 1/4 = 1 ✓).</p>
+
+=== Apr26 Q4
+<p>The classical state set of a compound system (X, Y) is the <b>Cartesian product</b> Σ = Σ_X × Σ_Y: all ordered pairs (a, b) with a a state of X and b a state of Y. Example: two bits give {0,1} × {0,1} = {00, 01, 10, 11}, so |Σ| = |Σ_X|·|Σ_Y|.</p>
+
+=== Apr26 Q5
+<p>An entangled two-qubit state is one that <b>cannot be factored</b> as |a⟩ ⊗ |b⟩. The qubits have no individual state of their own; only the pair has a state, and their measurement results are correlated. E.g. in (|00⟩ + |11⟩)/√2 both qubits always give the same result.</p>
+
+=== Apr26 Q6
+<p>Alice's measurement gives <b>2 classical bits</b>, which she sends to Bob over an ordinary channel. Without them Bob's qubit is just a random mixture; with them he knows which Pauli correction (I, X, Z, ZX) recovers |ψ⟩. Because these bits travel no faster than light, <b>teleportation cannot send information faster than light</b>.</p>
+
+=== Apr26 Q7
+<p>The Bernstein–Vazirani algorithm finds a <b>hidden n-bit string s</b> in the function f(x) = s·x (mod 2) using <b>only one query</b> to the oracle. A classical computer needs n queries.</p>
+
+=== Apr26 Q8
+<p>In Simon's problem, f is 2-to-1 with f(x) = f(x ⊕ s). The <b>hidden string s</b> is the period: the XOR-mask that maps every input to the other input with the same output. Each run gives a y with y·s = 0 (mod 2). About n − 1 independent y's let you solve the linear equations for s.</p>
+
+=== Apr26 Q9
+<p>After the controlled-U<sup>2ᵏ</sup> gates, the phase θ sits in the <b>relative phases</b> of the counting register: (1/√2ⁿ) Σ e^{2πiθk}|k⟩. This is exactly the QFT of the number 2ⁿθ, so the <b>inverse QFT</b> turns those phases into a <b>basis state |2ⁿθ⟩</b> that can be measured and read as the binary digits of θ.</p>
+
+=== Apr26 Q10
+<p>Adiabatic quantum computation encodes the answer to an <b>optimisation problem</b> as the ground state of a Hamiltonian H_P. The system starts in the easy ground state of H_B and H is changed slowly; by the <b>adiabatic theorem</b> it stays in the ground state, so it ends in the solution. It is needed for problems such as scheduling and routing (QUBO/Ising form) that gate-model circuits do not handle naturally, and it is what quantum annealers (D-Wave) run.</p>
+
+=== Apr26 Q11
+<p>For |ψ⟩ = α|0⟩ + β|1⟩, with α and β complex:</p>
+<ul>
+<li><b>Normalization condition:</b> |α|² + |β|² = 1, because the probabilities of all possible outcomes must add up to 1.</li>
+<li><b>Meaning of α and β:</b> they are <b>probability amplitudes</b>. Measuring in the computational basis gives |0⟩ with probability |α|² and |1⟩ with probability |β|².</li>
+<li>Their <b>relative phase</b> (arg β − arg α) has no effect on these probabilities, but it matters in interference (e.g. |+⟩ and |−⟩ have the same probabilities, yet H sends them to |0⟩ and |1⟩).</li>
+</ul>
+<p>Example: α = 3/5, β = 4/5 gives 9/25 + 16/25 = 1, so P(0) = 0.36 and P(1) = 0.64.</p>
+
+=== Apr26 Q12
+<p>CNOT has a <b>control</b> X and a <b>target</b> Y. It flips the target exactly when the control is 1: |x, y⟩ → |x, y ⊕ x⟩.</p>
+<table class="tbl"><tr><th>Input (X Y)</th><th>Output (X, Y⊕X)</th></tr>
+<tr><td>|00⟩</td><td>|00⟩</td></tr><tr><td>|01⟩</td><td>|01⟩</td></tr><tr><td>|10⟩</td><td>|11⟩</td></tr><tr><td>|11⟩</td><td>|10⟩</td></tr></table>
+```gbox
+        | 1 0 0 0 |
+CNOT =  | 0 1 0 0 |
+        | 0 0 0 1 |
+        | 0 0 1 0 |
+```
+<p>The control never changes. CNOT is reversible (it is its own inverse). With the control in superposition it creates entanglement: CNOT(|+⟩|0⟩) = (|00⟩ + |11⟩)/√2.</p>
+
+=== Apr26 Q13
+<p><b>Quantum teleportation</b> sends an unknown qubit state |ψ⟩ = α|0⟩ + β|1⟩ from Alice to Bob using <b>one shared Bell pair + two classical bits</b>, without sending the qubit itself.</p>
+<ol class="steps">
+<li><b>Shared resource:</b> Alice and Bob share |Φ⁺⟩ = (|00⟩ + |11⟩)/√2.</li>
+<li><b>Alice</b> applies CNOT (her |ψ⟩ as control, her Bell half as target), then H on |ψ⟩'s qubit, and measures both her qubits, getting m₁m₂.</li>
+<li>She sends m₁m₂ to Bob over a classical channel.</li>
+<li><b>Bob</b> applies X if m₂ = 1, then Z if m₁ = 1 (00 → I, 01 → X, 10 → Z, 11 → ZX). His qubit is now exactly |ψ⟩.</li>
+</ol>
+<p>Alice's original is destroyed by her measurement, so no copy is made (consistent with no-cloning).</p>
+
+=== Apr26 Q14
+<p>Problem: f(x) = s·x mod 2 for a hidden n-bit string s. Find s.</p>
+<ol class="steps">
+<li>Start with |0⟩^⊗n |1⟩ and apply H to every qubit, giving (1/√2ⁿ) Σₓ|x⟩ ⊗ |−⟩.</li>
+<li>The oracle U_f|x⟩|y⟩ = |x⟩|y ⊕ f(x)⟩ acting on |−⟩ produces a <b>phase kickback</b>: (1/√2ⁿ) Σₓ (−1)^{s·x}|x⟩.</li>
+<li>Apply H^⊗n again. Since H^⊗n|s⟩ = (1/√2ⁿ) Σₓ(−1)^{s·x}|x⟩, the result is exactly <b>|s⟩</b>.</li>
+<li>Measure and read s directly.</li>
+</ol>
+<p>That takes <b>1 query</b>, against n queries classically (the classical method asks f(100…0), f(010…0), … to get one bit each time).</p>
+
+=== Apr26 Q15
+<p>In QPE, U|u⟩ = e^{2πiθ}|u⟩. The control qubit is put in |+⟩ by H, and the target holds the eigenvector |u⟩:</p>
+```gbox
+H on control:     (|0⟩ + |1⟩)/√2 ⊗ |u⟩
+controlled-U:     (|0⟩|u⟩ + |1⟩U|u⟩)/√2 = (|0⟩ + e^{2πiθ}|1⟩)/√2 ⊗ |u⟩
+```
+<p>The eigenvalue is <b>kicked back</b> onto the control as a relative phase, while the target is unchanged. With n control qubits, the k-th controls U^{2ᵏ} and picks up e^{2πiθ·2ᵏ}. The register then holds the QFT of θ, and an inverse QFT reads θ out.</p>
+
+=== Apr26 Q16
+<p>The <b>Gottesman–Knill theorem</b>: a circuit built only from <b>Clifford gates</b> (H, S, CNOT, Paulis), starting from computational-basis states and measured in that basis, can be <b>simulated efficiently on a classical computer</b> (using the stabilizer formalism).</p>
+<p>Significance: entanglement alone does not give a quantum speed-up, because Bell and GHZ states are Clifford states. A universal, advantage-giving quantum computer needs a <b>non-Clifford gate such as T</b>. The theorem also explains why stabilizer error-correcting codes are easy to analyse.</p>
+
+=== Apr26 Q17a
+<p><b>(i) Spin states in matrix form.</b> A spin-½ particle measured along z has two states, spin up and spin down, which act as a qubit:</p>
+```gbox
+|↑⟩ = |0⟩ = [1]      |↓⟩ = |1⟩ = [0]      S_z = (ħ/2) σ_z = (ħ/2) [1  0]
+            [0]                  [1]                             [0 -1]
+```
+<p>The eigenvalues of S_z are +ħ/2 (for |↑⟩) and −ħ/2 (for |↓⟩). A general state is |ψ⟩ = α|↑⟩ + β|↓⟩.</p>
+<p><b>(ii) Measurement probabilities</b> (Born rule): P(+ħ/2) = |⟨↑|ψ⟩|² = |α|² and P(−ħ/2) = |β|², with |α|² + |β|² = 1. The expectation value is ⟨S_z⟩ = (ħ/2)(|α|² − |β|²). Example: α = 3/5, β = 4i/5 gives P = 9/25 and 16/25, so ⟨S_z⟩ = −7ħ/50.</p>
+<p><b>(iii) Collapse:</b> after the measurement the state becomes the eigenstate of the result: |↑⟩ if +ħ/2 was seen, |↓⟩ if −ħ/2. Measuring S_z again immediately gives the same result with certainty. The superposition (and its phase) is lost, and the measurement is irreversible.</p>
+
+=== Apr26 Q17b
+<p>|ψ⟩ = cos(θ/2)|0⟩ + e^{iφ} sin(θ/2)|1⟩ is a point on the unit sphere with Bloch vector (x, y, z) = (sinθ cosφ, sinθ sinφ, cosθ).</p>
+<p><b>(i) θ and φ.</b> θ (0 to π) is the <b>polar angle</b> from the +z axis. It sets the probabilities: P(0) = cos²(θ/2) and P(1) = sin²(θ/2). φ (0 to 2π) is the <b>azimuthal angle</b> around the z axis. It is the <b>relative phase</b> between |0⟩ and |1⟩. It does not change the z-basis probabilities, but it decides interference. The half-angle θ/2 appears because orthogonal states (|0⟩ and |1⟩) must sit at opposite poles, 180° apart.</p>
+<p><b>(ii) Superpositions geometrically.</b> The poles are the basis states. Every other point on the sphere is a superposition: the latitude gives the mixing proportion, and the longitude gives the phase. Points on the equator (θ = π/2) are equal superpositions (|0⟩ + e^{iφ}|1⟩)/√2. Gates are rotations: X is a 180° rotation about x, Z a 180° rotation about z, and H a 180° rotation about the axis (x+z)/√2.</p>
+<p><b>(iii) Special cases.</b></p>
+<table class="tbl"><tr><th>State</th><th>θ, φ</th><th>Bloch vector</th><th>Where</th></tr>
+<tr><td>|0⟩</td><td>θ = 0</td><td>(0, 0, 1)</td><td>north pole</td></tr>
+<tr><td>|1⟩</td><td>θ = π</td><td>(0, 0, −1)</td><td>south pole</td></tr>
+<tr><td>|+⟩ = (|0⟩+|1⟩)/√2</td><td>θ = π/2, φ = 0</td><td>(1, 0, 0)</td><td>equator, +x axis</td></tr></table>
+<p>(For comparison, |−⟩ is at −x, and (|0⟩ ± i|1⟩)/√2 are at ±y.)</p>
+
+=== Apr26 Q18a
+<p>Convention: q0 is the left bit and the control; q1 is the right bit, with X then the CNOT target. |ψ⟩ = |01⟩ means q0 = 0, q1 = 1.</p>
+<p><b>(i) After X on q1:</b> X|1⟩ = |0⟩, so |0⟩ ⊗ |0⟩ = <b>|00⟩</b>.</p>
+<p><b>(ii) Final state:</b> the CNOT control q0 = 0, so the target is not flipped: <b>|00⟩</b>.</p>
+<p><b>(iii) Truth-table check:</b> CNOT: |x, y⟩ → |x, x ⊕ y⟩. Input (0, 0) → (0, 0 ⊕ 0) = (0, 0). ✓</p>
+```out
+@@OUT apr26-18a@@
+```
+
+=== Apr26 Q18b
+<p>For several classical systems, the combined state set is the <b>Cartesian product</b> of the individual sets: list every ordered tuple, one entry from each system.</p>
+<p>Three bits X, Y, Z, each in {0, 1}:</p>
+```gbox
+Σ = {0,1} × {0,1} × {0,1}
+  = {(0,0,0), (0,0,1), (0,1,0), (0,1,1), (1,0,0), (1,0,1), (1,1,0), (1,1,1)}
+  = {000, 001, 010, 011, 100, 101, 110, 111}        |Σ| = 2 × 2 × 2 = 8
+```
+<p>Steps: fix X = 0 and list all Y, Z pairs (00, 01, 10, 11); then repeat for X = 1. The order is <b>alphabetical (lexicographic)</b>, which is the order of the basis vectors |000⟩ … |111⟩ in the 8-dimensional state vector. For independent systems, joint probabilities multiply: p(x, y, z) = p(x)·p(y)·p(z).</p>
+
+=== Apr26 Q19a
+<p>q0 is the left bit (top wire). Circuit: H(q0), CNOT q0→q1, CNOT q1→q2, H(q1), T(q2).</p>
+<p><b>(i)</b> |ψ₀⟩ = |0⟩⊗|0⟩⊗|0⟩ = <b>|000⟩</b>.</p>
+<p><b>(ii)</b> H on q0: (|000⟩ + |100⟩)/√2. CNOT q0→q1 flips q1 when q0 = 1: <b>(|000⟩ + |110⟩)/√2</b>.</p>
+<p><b>(iii)</b> CNOT q1→q2: (|000⟩ + |111⟩)/√2 (a GHZ state). H on q1 (|0⟩ → (|0⟩+|1⟩)/√2, |1⟩ → (|0⟩−|1⟩)/√2):</p>
+```gbox
+½(|000⟩ + |010⟩ + |101⟩ − |111⟩)
+```
+<p>T on q2 multiplies terms with q2 = 1 by e^{iπ/4}. The final state is</p>
+```gbox
+|ψ_f⟩ = ½ ( |000⟩ + |010⟩ + e^{iπ/4}|101⟩ − e^{iπ/4}|111⟩ )
+```
+<p>Each outcome has probability 1/4.</p>
+<p><b>(iv)</b> If q0 is measured as 1, keep the terms with first bit 1 (|101⟩, |111⟩). P(q0 = 1) = 1/4 + 1/4 = 1/2. Renormalize by dividing by √(1/2):</p>
+```gbox
+(½e^{iπ/4}|101⟩ − ½e^{iπ/4}|111⟩) / √(1/2)  =  (e^{iπ/4}/√2)(|101⟩ − |111⟩)
+```
+<p>So q1 q2 are left in (e^{iπ/4}/√2)(|01⟩ − |11⟩) = e^{iπ/4} |−⟩|1⟩: <b>q1 = |−⟩, q2 = |1⟩</b> (the global phase e^{iπ/4} does not matter).</p>
+```out
+@@OUT apr26-19a@@
+```
+
+=== Apr26 Q19b
+<p>|ψ⟩ = |01⟩: q0 = 0, q1 = 1. X acts on q0 and H on q1, then CNOT with q0 as control and q1 as target.</p>
+<p><b>(i) Intermediate states:</b></p>
+<ul><li>X on q0: |0⟩ → |1⟩, giving <b>|11⟩</b>.</li>
+<li>H on q1: |1⟩ → |−⟩ = (|0⟩ − |1⟩)/√2, giving <b>|1⟩|−⟩ = (|10⟩ − |11⟩)/√2</b>.</li></ul>
+<p><b>(ii) After the CNOT:</b> the control q0 = 1 in both terms, so the target flips: |10⟩ → |11⟩ and |11⟩ → |10⟩, giving (|11⟩ − |10⟩)/√2.</p>
+<p><b>(iii) Dirac notation:</b> <b>|ψ_f⟩ = −(1/√2)|10⟩ + (1/√2)|11⟩ = −|1⟩ ⊗ |−⟩</b> (X|−⟩ = −|−⟩).</p>
+<p><b>(iv)</b> It factors as |1⟩ ⊗ (−|−⟩), so it is <b>separable</b>. For the 2×2 amplitude matrix [[a₀₀, a₀₁], [a₁₀, a₁₁]] = [[0, 0], [−1/√2, 1/√2]], det = 0, confirming it is a product state.</p>
+```out
+@@OUT apr26-19b@@
+```
+
+=== Apr26 Q20a
+<p>Superdense coding sends <b>2 classical bits by transmitting 1 qubit</b>, using a shared Bell pair. Alice holds q0 and Bob holds q1.</p>
+<p><b>Step 1, shared state:</b> |Φ⁺⟩ = (|00⟩ + |11⟩)/√2.</p>
+<p><b>Step 2, Alice encodes</b> on her qubit only: 00 → I, 01 → X, 10 → Z, 11 → ZX. For message <b>01</b> she applies <b>X</b>:</p>
+```gbox
+(X ⊗ I)|Φ⁺⟩ = (|10⟩ + |01⟩)/√2 = |Ψ⁺⟩
+```
+<p><b>Step 3:</b> Alice sends her qubit to Bob, who now has both.</p>
+<p><b>Step 4, Bob decodes</b> with a Bell measurement, CNOT (q0 → q1) then H on q0:</p>
+```gbox
+CNOT:  (|11⟩ + |01⟩)/√2 = (|0⟩ + |1⟩)/√2 ⊗ |1⟩ = |+⟩|1⟩
+H q0:  |0⟩|1⟩ = |01⟩
+```
+<p><b>Step 5:</b> Bob measures <b>01</b> with probability 1, which is Alice's message.</p>
+<p>The four encodings produce the four orthogonal Bell states, which is why Bob can tell them apart perfectly:</p>
+<table class="tbl"><tr><th>Message</th><th>Alice</th><th>State sent</th><th>Bob reads</th></tr>
+<tr><td>00</td><td>I</td><td>Φ⁺</td><td>00</td></tr><tr><td>01</td><td>X</td><td>Ψ⁺</td><td>01</td></tr><tr><td>10</td><td>Z</td><td>Φ⁻</td><td>10</td></tr><tr><td>11</td><td>ZX</td><td>Ψ⁻ (up to sign)</td><td>11</td></tr></table>
+```out
+@@OUT apr26-20a@@
+```
+
+=== Apr26 Q20b
+<p>Keep only the positions where the bases match, and use Bob's bit there.</p>
+<table class="tbl"><tr><th>Position</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+<tr><td>Bob's basis</td><td>Z</td><td>X</td><td>Z</td><td>X</td><td>Z</td><td>X</td></tr>
+<tr><td>Alice's basis</td><td>Z</td><td>Z</td><td>Z</td><td>X</td><td>X</td><td>X</td></tr>
+<tr><td>Match?</td><td>✓</td><td>✗</td><td>✓</td><td>✓</td><td>✗</td><td>✓</td></tr>
+<tr><td>Bob's bit</td><td><b>0</b></td><td>1</td><td><b>1</b></td><td><b>0</b></td><td>1</td><td><b>1</b></td></tr></table>
+<p>Same basis at positions <b>1, 3, 4, 6</b>. Final shared key: <b>0 1 0 1</b>. Positions 2 and 5 are discarded, because a wrong-basis measurement gives a random bit.</p>
+
+=== Apr26 Q21
+<p>N = 4 (2 qubits), marked state |10⟩. One Grover iteration is the oracle followed by the diffusion.</p>
+<p><b>(i)</b> H⊗H|00⟩ = ½(|00⟩ + |01⟩ + |10⟩ + |11⟩), with all amplitudes 1/2.</p>
+<p><b>(ii) Oracle</b> O|x⟩ = (−1)^{f(x)}|x⟩ flips the sign of the target:</p>
+```gbox
+½(|00⟩ + |01⟩ − |10⟩ + |11⟩)
+```
+<p><b>(iii) Diffusion</b> (inversion about the mean, aᵢ′ = 2ā − aᵢ): mean ā = (½ + ½ − ½ + ½)/4 = <b>1/4</b>.</p>
+```gbox
+|00⟩: 2(¼) − ½ = 0       |01⟩: 0
+|10⟩: 2(¼) − (−½) = 1    |11⟩: 0
+```
+<p><b>(iv)</b> Amplitudes after one iteration are (0, 0, 1, 0), i.e. the state is <b>|10⟩</b>.</p>
+<p><b>(v)</b> P(|10⟩) = 1² = <b>1 (100 %)</b>. For N = 4 a single iteration is exact: θ = arcsin(1/2) = 30°, and sin²(3θ) = sin²(90°) = 1.</p>
+```out
+@@OUT apr26-21@@
+```
+
+=== Apr26 Q22
+<p>f(x) = s·x mod 2 with s = 101, so f(x) = x₁ ⊕ x₃. Three input qubits and one ancilla.</p>
+<p><b>(i) Initial state:</b> |000⟩|1⟩ (the ancilla starts at |1⟩, so H turns it into |−⟩).</p>
+<p><b>(ii) After H on all qubits:</b></p>
+```gbox
+(1/√8) Σ_{x∈{0,1}³} |x⟩ ⊗ |−⟩
+```
+<p><b>(iii) Oracle:</b> U_f|x⟩|−⟩ = (−1)^{f(x)}|x⟩|−⟩ (phase kickback). For s = 101 it is two CNOTs, from qubit 1 and from qubit 3 onto the ancilla. The input register becomes:</p>
+```gbox
+(1/√8)[ |000⟩ − |001⟩ + |010⟩ − |011⟩ − |100⟩ + |101⟩ − |110⟩ + |111⟩ ]
+```
+<p>The sign of each term is (−1)^{x₁⊕x₃}. This is how f is "encoded": as phases, not as values.</p>
+<p><b>(iv) Final Hadamards:</b> this state equals H^⊗3|101⟩, and H is its own inverse, so H^⊗3 gives <b>|101⟩</b> (the ancilla becomes |1⟩).</p>
+<p><b>(v)</b> Measuring the input register gives <b>101 = s</b> with probability 1, in a single oracle call. A classical algorithm needs 3 queries: f(100), f(010) and f(001).</p>
+```out
+@@OUT apr26-22@@
+```
+
+=== Apr26 Q23
+<p>U|ψ⟩ = e^{2πiθ}|ψ⟩. There are two counting qubits: q0 is the most significant bit and controls U², and q1 controls U¹. The target holds the eigenvector |ψ⟩.</p>
+<p><b>(i) Initial state:</b> |00⟩ ⊗ |ψ⟩.</p>
+<p><b>(ii) After H on the counting qubits:</b> ½(|00⟩ + |01⟩ + |10⟩ + |11⟩) ⊗ |ψ⟩ = ½ Σₖ |k⟩|ψ⟩.</p>
+<p><b>(iii) Controlled-U^{2ᵏ}:</b> |ψ⟩ is an eigenvector, so U^{2ᵏ}|ψ⟩ = e^{2πiθ·2ᵏ}|ψ⟩. The target is untouched, and the phase is kicked back onto the control:</p>
+```gbox
+½ (|0⟩ + e^{2πi·2θ}|1⟩)_q0 ⊗ (|0⟩ + e^{2πiθ}|1⟩)_q1 ⊗ |ψ⟩  =  ½ Σ_{k=0}^{3} e^{2πiθk} |k⟩ ⊗ |ψ⟩
+```
+<p>This is the quantum Fourier transform of |4θ⟩.</p>
+<p><b>(iv) Inverse QFT:</b> QFT⁻¹ turns it back into the basis state <b>|4θ⟩</b> (exact when θ = j/4, otherwise the nearest value with high probability). Measuring gives the binary fraction θ = 0.q₀q₁. For example, θ = 1/4 = 0.01₂ reads 01, and θ = 3/4 reads 11 (shown below).</p>
+<p><b>(v) Link to Shor:</b> in Shor's algorithm U is "multiply by a mod N", U|y⟩ = |ay mod N⟩. Its eigenvalues are e^{2πi s/r}, where <b>r is the period</b> of f(x) = aˣ mod N. QPE therefore returns θ = s/r, and continued fractions give r. Example: N = 15, a = 7: 7¹, 7², 7³, 7⁴ ≡ 7, 4, 13, 1, so r = 4 and the phases are 0, 1/4, 2/4, 3/4. These are exactly what a 2-qubit register reads: 00, 01, 10, 11.</p>
+<p><b>(vi) Factors:</b> r = 4 is even and 7² = 49 ≢ −1 (mod 15), so</p>
+```gbox
+gcd(7^{r/2} − 1, 15) = gcd(48, 15) = 3
+gcd(7^{r/2} + 1, 15) = gcd(50, 15) = 5        →  15 = 3 × 5
+```
+```out
+@@OUT apr26-23@@
+```
+
+=== Apr26 Q24
+<h3>Adiabatic optimisation</h3>
+<p>Write the optimisation problem as a <b>problem Hamiltonian H_P</b> whose ground state (lowest energy) is the best answer. Usually it is in Ising/QUBO form, H_P = Σ hᵢZᵢ + Σ Jᵢⱼ ZᵢZⱼ. Start in the easy ground state of a <b>driver Hamiltonian H_B = −Σ Xᵢ</b>, which is |+⟩^⊗n, all answers in equal superposition. Then evolve</p>
+```gbox
+H(t) = (1 − t/T) H_B + (t/T) H_P ,   t: 0 → T
+```
+<p>By the <b>adiabatic theorem</b>, if the change is slow enough (T ≫ 1/Δ²_min, where Δ_min is the smallest energy gap along the path), the system stays in the instantaneous ground state and finishes in the ground state of H_P. Measuring it gives the answer. Adiabatic QC is polynomially equivalent to the gate model.</p>
+<h3>Quantum annealing</h3>
+<p>Annealing is the practical, noisy, finite-temperature version of the same idea, built into hardware such as D-Wave (thousands of superconducting flux qubits). The schedule A(s)H_B + B(s)H_P is not guaranteed adiabatic, so you <b>run it many times and keep the lowest-energy result</b>. Compared with classical simulated annealing, which climbs over energy barriers thermally, quantum annealing can <b>tunnel through</b> tall, thin barriers. Typical uses are max-cut, scheduling, routing, portfolio optimisation and protein folding.</p>
+<p><b>Example</b> (QB Q50): H_P = Z₁Z₂ − 0.5Z₂ gives E(00) = 0.5, E(01) = −0.5, E(10) = −1.5 and E(11) = 1.5, so the anneal should end in |10⟩.</p>
+<h3>Role in quantum machine learning</h3>
+<ul>
+<li>Many ML tasks <b>are</b> optimisation: training = minimising a loss. Feature selection, clustering, and training SVMs or binary neural networks can be written as QUBO problems and handed to an annealer.</li>
+<li><b>Boltzmann machines:</b> an annealer naturally produces samples from a Boltzmann (thermal) distribution. That is exactly the hard step in training restricted Boltzmann machines and quantum Boltzmann machines, so annealers are used as <b>samplers</b>.</li>
+<li><b>Quantum Hopfield / associative memory:</b> stored patterns are energy minima; annealing recalls the nearest pattern.</li>
+<li><b>Variational algorithms</b> (QAOA, VQE) are the gate-model cousins: a discretised adiabatic path whose angles are tuned by a classical optimiser.</li>
+</ul>
+<p>Limits: a small minimum gap means very slow schedules, noise and limited qubit connectivity (embedding) get in the way, and a general speed-up over classical heuristics is not proven.</p>

@@ -1,0 +1,3 @@
+|ψ0⟩ = |01⟩
+after X on q1: |00⟩
+after CNOT (q0 control, q1 target): |00⟩

@@ -1,0 +1,5 @@
+initial: |01⟩
+after X on q0: |11⟩
+after H on q1: 1/√2|10⟩ - 1/√2|11⟩
+after CNOT q0→q1 (final): -1/√2|10⟩ + 1/√2|11⟩
+entangled? False

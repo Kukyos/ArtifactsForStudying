@@ -54,7 +54,7 @@ function progress(id){
   if(id==='toc'){var p=read('toc-progress-v1')||{},n=Object.keys(p).length;return {pct:Math.round(n/39*100),txt:n+' of 39 chunks done'}}
   if(id==='dbms'){var d=read('dbms-progress-v1')||{},k=Object.keys(d).length;return {pct:Math.round(k/40*100),txt:k+' of 40 chunks done'}}
   if(id==='webtech'){var w=read('webtech-progress-v1')||{},j=Object.keys(w).length;return {pct:Math.round(j/27*100),txt:j+' of 27 chunks done'}}
-  if(id==='quantum'){var q=read('quantum-progress-v1')||{},k=Object.keys(q).length;return {pct:Math.round(k/23*100),txt:k+' of 23 chunks done'}}
+  if(id==='quantum'){var q=read('quantum-progress-v1')||{},k=Object.keys(q).length;return {pct:Math.round(k/25*100),txt:k+' of 25 chunks done'}}
   var s=read(id==='pandas'?'pandrill':'sqldrill');
   if(!s||!s.answered)return {pct:0,txt:'not started'};
   return {pct:Math.round(s.correct/s.answered*100),txt:s.answered+' answered · '+Math.round(s.correct/s.answered*100)+'% correct'};

@@ -1,0 +1,5 @@
+(i) H⊗H|00⟩: 1/2|00⟩ + 1/2|01⟩ + 1/2|10⟩ + 1/2|11⟩
+(ii) after oracle: 1/2|00⟩ + 1/2|01⟩ - 1/2|10⟩ + 1/2|11⟩
+    mean amplitude: 1/4
+(iii/iv) after inversion about the mean: |10⟩
+(v) P(|10⟩) = 1

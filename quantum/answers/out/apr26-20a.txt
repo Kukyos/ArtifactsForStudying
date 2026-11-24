@@ -1,0 +1,8 @@
+shared Φ+: 1/√2|00⟩ + 1/√2|11⟩
+Alice applies X to her qubit (q0): 1/√2|01⟩ + 1/√2|10⟩
+Bob: CNOT q0→q1: 1/√2|01⟩ + 1/√2|11⟩
+Bob: H on q0: |01⟩
+  message 00: Alice applies I → Bob measures |00⟩
+  message 01: Alice applies X → Bob measures |01⟩
+  message 10: Alice applies Z → Bob measures |10⟩
+  message 11: Alice applies ZX (X then Z) → Bob measures |11⟩
