@@ -1,0 +1,4 @@
+shared: 1/√2|00⟩ + 1/√2|11⟩
+to send 01 Alice applies X: state sent 1/√2|01⟩ + 1/√2|10⟩
+Bob CNOT q0→q1: 1/√2|01⟩ + 1/√2|11⟩
+Bob H q0: |01⟩ → reads 01

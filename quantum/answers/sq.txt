@@ -1,0 +1,119 @@
+=== SQ Q1
+```gbox
+X|1⟩ = [0 1][0] = [0·0 + 1·1] = [1] = |0⟩
+       [1 0][1]   [1·0 + 0·1]   [0]
+```
+<p><b>X|1⟩ = |0⟩</b> (bit flip).</p>
+
+=== SQ Q2
+```gbox
+Z|0⟩ = [1  0][1] = [1] = |0⟩
+       [0 −1][0]   [0]
+```
+<p><b>Z|0⟩ = |0⟩</b>: Z does nothing to |0⟩.</p>
+
+=== SQ Q3
+```gbox
+Y|0⟩ = [0 −i][1] = [0·1 + (−i)·0] = [0] = i|1⟩
+       [i  0][0]   [i·1 + 0·0   ]   [i]
+```
+<p><b>Y|0⟩ = i|1⟩</b>.</p>
+
+=== SQ Q4
+```gbox
+H|1⟩ = (1/√2)[1  1][0] = (1/√2)[ 1] = (|0⟩ − |1⟩)/√2 = |−⟩
+             [1 −1][1]         [−1]
+```
+
+=== SQ Q5
+```gbox
+S|1⟩ = [1 0][0] = [0] = i|1⟩
+       [0 i][1]   [i]
+```
+
+=== SQ Q6
+```gbox
+T|1⟩ = [1     0    ][0] = [   0    ] = e^{iπ/4}|1⟩ = ((1+i)/√2)|1⟩
+       [0  e^{iπ/4}][1]   [e^{iπ/4}]
+```
+
+=== SQ Q7
+<p>Apply the gates right to left: X first, then H.</p>
+```gbox
+X|1⟩ = |0⟩        H|0⟩ = (|0⟩ + |1⟩)/√2 = |+⟩
+HX|1⟩ = |+⟩
+```
+
+=== SQ Q8
+```gbox
+H|0⟩ = (|0⟩ + |1⟩)/√2        X(|0⟩ + |1⟩)/√2 = (|1⟩ + |0⟩)/√2
+XH|0⟩ = |+⟩
+```
+<p>X leaves |+⟩ unchanged, since |+⟩ is an eigenstate of X with eigenvalue +1.</p>
+
+=== SQ Q9
+```gbox
+H|0⟩ = |+⟩        H|+⟩ = (1/√2)[(|0⟩+|1⟩)/√2 + (|0⟩−|1⟩)/√2] = |0⟩
+HH|0⟩ = |0⟩        (H² = I : H is its own inverse)
+```
+
+=== SQ Q10
+```gbox
+H|0⟩ = (|0⟩ + |1⟩)/√2        Z(|0⟩ + |1⟩)/√2 = (|0⟩ − |1⟩)/√2
+ZH|0⟩ = |−⟩
+```
+
+=== SQ Q11
+```gbox
+Z|1⟩ = −|1⟩        H(−|1⟩) = −(|0⟩ − |1⟩)/√2 = (−|0⟩ + |1⟩)/√2
+HZ|1⟩ = −|−⟩
+```
+
+=== SQ Q12
+```gbox
+Y|0⟩ = i|1⟩        H(i|1⟩) = i(|0⟩ − |1⟩)/√2
+HY|0⟩ = i|−⟩ = (i|0⟩ − i|1⟩)/√2
+```
+```out
+@@OUT sq@@
+```
+
+=== SQ Q13
+```gbox
+X† = (Xᵀ)* = [0 1] = X        X†X = [0 1][0 1] = [0·0+1·1  0·1+1·0] = [1 0] = I
+             [1 0]                  [1 0][1 0]   [1·0+0·1  1·1+0·0]   [0 1]
+```
+<p>X†X = I, so <b>X is unitary</b>.</p>
+
+=== SQ Q14
+```gbox
+H† = H (real and symmetric)
+H†H = ½[1  1][1  1] = ½[1+1  1−1] = ½[2 0] = [1 0] = I
+        [1 −1][1 −1]   [1−1  1+1]    [0 2]   [0 1]
+```
+<p><b>H is unitary</b> (and H² = I).</p>
+
+=== SQ Q15
+```gbox
+Z† = Z        Z†Z = [1  0][1  0] = [1 0] = I
+                    [0 −1][0 −1]   [0 1]
+```
+<p><b>Z is unitary</b>.</p>
+
+=== SQ Q16
+```gbox
+HZ  = (1/√2)[1  1][1  0] = (1/√2)[1 −1]
+            [1 −1][0 −1]         [1  1]
+HZH = (1/√2)[1 −1]·(1/√2)[1  1] = ½[1−1  1+1] = ½[0 2] = [0 1] = X  ∎
+            [1  1]       [1 −1]    [1+1  1−1]    [2 0]   [1 0]
+```
+<p>Meaning: a phase flip in the X basis is a bit flip. H swaps the roles of the Z and X axes.</p>
+
+=== SQ Q17
+```gbox
+HX  = (1/√2)[1  1][0 1] = (1/√2)[ 1 1]
+            [1 −1][1 0]         [−1 1]
+HXH = (1/√2)[ 1 1]·(1/√2)[1  1] = ½[ 1+1  1−1] = ½[2  0] = [1  0] = Z  ∎
+            [−1 1]       [1 −1]    [−1+1 −1−1]    [0 −2]   [0 −1]
+```
+<p>Together with Q16 this gives HZH = X and HXH = Z: <b>conjugating by H exchanges X and Z</b>. It is used in the CZ ↔ CNOT conversion and in the Deutsch–Jozsa and Bernstein–Vazirani circuits.</p>

@@ -1,0 +1,87 @@
+=== POS Q1
+<p>Flow: <b>Quantum System → Quantum State → Wave-function → Probability Density</b>.</p>
+```gbox
+ Quantum system            (an electron, a photon, a qubit: the physical thing)
+        │  is described completely by
+        ▼
+ Quantum state  |ψ⟩        (a unit vector in a Hilbert space)
+        │  written in the position basis as
+        ▼
+ Wave-function ψ(x,t) = ⟨x|ψ⟩   (complex amplitude at each point)
+        │  Born rule: square the magnitude
+        ▼
+ Probability density  P(x,t) = |ψ(x,t)|² ,   ∫ |ψ|² dx = 1
+```
+<ul>
+<li>The <b>quantum system</b> is the object we study.</li>
+<li>Its <b>state</b> |ψ⟩ holds everything that can be known about it (Postulate 1).</li>
+<li>The <b>wave-function</b> is that state expressed in a particular basis. It is complex-valued, so it has a magnitude and a phase.</li>
+<li>The <b>probability density</b> |ψ|² gives the probability of finding the particle near x when it is measured. The phase does not show up in |ψ|², but it causes interference.</li>
+</ul>
+<p><b>Mathematical representation:</b> a system has a complex Hilbert space H. Its state is a normalised vector |ψ⟩ ∈ H (⟨ψ|ψ⟩ = 1), defined up to a global phase. For a qubit, H = ℂ² and |ψ⟩ = α|0⟩ + β|1⟩ = [α, β]ᵀ with |α|² + |β|² = 1. Observables are Hermitian operators, and time evolution is a unitary operator. For a mixed state, a density matrix ρ is used.</p>
+
+=== POS Q2
+<p><b>Measurement</b> is described by an observable A = Σ aₖ|k⟩⟨k| (Hermitian, eigenvalues aₖ, eigenvectors |k⟩):</p>
+<ol class="steps">
+<li>The only possible results are the <b>eigenvalues</b> aₖ.</li>
+<li>Born rule: P(aₖ) = |⟨k|ψ⟩|². For a qubit in the Z basis, P(0) = |α|² and P(1) = |β|².</li>
+<li>After the result aₖ the state becomes the eigenvector |k⟩ (renormalised).</li>
+</ol>
+<p><b>Wave-function collapse</b> is that last step: before measurement the system is in a superposition Σ cₖ|k⟩. Measurement picks one outcome at random with probability |cₖ|², and the state jumps to |k⟩. All the other components are lost. For example, |+⟩ = (|0⟩ + |1⟩)/√2 measured in Z gives 0 or 1 (50/50), and afterwards it is |0⟩ or |1⟩. Measuring again immediately repeats the same result.</p>
+<p><b>Why the state changes:</b></p>
+<ul>
+<li>Measurement is a <b>physical interaction</b>: the detector becomes entangled with the system and records one definite result. The system cannot remain in a superposition that disagrees with the record.</li>
+<li>It is <b>not unitary</b> and not reversible: the amplitudes and phase are gone, which is why one measurement cannot reveal α and β.</li>
+<li>Consequences: you cannot "peek" at a qubit without disturbing it (this is the basis of BB84 security), and quantum algorithms must arrange interference so that the right answer has high probability <b>before</b> they measure.</li>
+</ul>
+
+=== POS Q3
+<p>A <b>Hilbert space</b> is a complex vector space with an <b>inner product</b> ⟨φ|ψ⟩ that is complete (limits of sequences stay inside). The inner product gives lengths, angles and orthogonality. Examples: ℂ² for one qubit, ℂ^{2ⁿ} for n qubits, and square-integrable functions L² for a particle's ψ(x).</p>
+<p><b>Why quantum states live in Hilbert space:</b></p>
+<ul>
+<li><b>Superposition</b> requires a <b>vector space</b>: if |ψ₁⟩ and |ψ₂⟩ are possible states, so is α|ψ₁⟩ + β|ψ₂⟩.</li>
+<li><b>Complex</b> numbers are needed for phases and interference (|+⟩ and |−⟩ differ only by a sign).</li>
+<li>The <b>inner product</b> gives probabilities: P = |⟨φ|ψ⟩|². Normalisation ⟨ψ|ψ⟩ = 1 means the total probability is 1. Orthogonal states are perfectly distinguishable.</li>
+<li><b>Observables</b> are Hermitian operators on the space, and their eigenvectors form orthonormal bases, which is what measurement uses.</li>
+<li><b>Composite systems</b> use the tensor product H_A ⊗ H_B. That is where entanglement comes from.</li>
+</ul>
+<p><b>Time evolution</b> (Postulate of evolution) follows the Schrödinger equation:</p>
+```gbox
+iħ d|ψ(t)⟩/dt = Ĥ |ψ(t)⟩      →      |ψ(t)⟩ = U(t)|ψ(0)⟩ ,   U(t) = e^{−iĤt/ħ}
+```
+<p>Ĥ is the Hamiltonian (energy operator). U is <b>unitary</b> (U†U = I), so evolution is <b>deterministic, reversible and preserves normalisation</b>. In quantum computing each gate (X, H, CNOT, …) is one such unitary step. Measurement is the only non-unitary step.</p>
+
+=== POS Q4
+<h3>Composite quantum systems</h3>
+<p>The state space of a system made of parts A and B is the <b>tensor product</b> H_A ⊗ H_B. Dimensions multiply: n qubits have a 2ⁿ-dimensional space.</p>
+<ul>
+<li>Independent parts give a <b>product state</b> |a⟩ ⊗ |b⟩. Example: |0⟩ ⊗ |+⟩ = (|00⟩ + |01⟩)/√2.</li>
+<li>Most states are <b>not</b> products. Example: |Φ⁺⟩ = (|00⟩ + |11⟩)/√2 cannot be factored, so it is <b>entangled</b>. Each qubit alone is random, but the results always agree.</li>
+<li>Operators combine the same way: X ⊗ I flips only the first qubit, and CNOT acts jointly on both.</li>
+</ul>
+<p><b>Importance:</b> the exponentially large joint space and entanglement are the source of quantum computing power. Teleportation, superdense coding and error-correcting codes are all built on composite states.</p>
+<h3>Expectation values</h3>
+<p>The <b>average</b> result of measuring observable A many times on identically prepared |ψ⟩:</p>
+```gbox
+⟨A⟩ = ⟨ψ|A|ψ⟩ = Σ_k a_k P(a_k)          (density matrix:  ⟨A⟩ = Tr(ρA))
+```
+<p>Example: |ψ⟩ = (3/5)|0⟩ + (4/5)|1⟩, so ⟨Z⟩ = (+1)(9/25) + (−1)(16/25) = −7/25. For spin, ⟨S_z⟩ = (ħ/2)⟨Z⟩ = −7ħ/50. Another example: ⟨X⟩ for |+⟩ is 1, and for |0⟩ it is 0.</p>
+<p><b>Importance:</b> a single measurement is random, but ⟨A⟩ is what experiments actually report. It connects quantum states to classical quantities (Ehrenfest's theorem). The Bloch vector is (⟨X⟩, ⟨Y⟩, ⟨Z⟩). Variational algorithms (VQE) minimise ⟨H⟩, and uncertainty relations are stated using variances ⟨A²⟩ − ⟨A⟩².</p>
+
+=== POS Q5
+<p><b>(a) The five postulates</b></p>
+<ol>
+<li><b>State:</b> a closed system is described by a unit vector |ψ⟩ in a complex Hilbert space.</li>
+<li><b>Observables:</b> every measurable quantity is a Hermitian operator A. Its eigenvalues are the possible results.</li>
+<li><b>Measurement:</b> the result aₖ occurs with probability |⟨k|ψ⟩|² (Born rule), and the state then collapses to |k⟩.</li>
+<li><b>Evolution:</b> the state evolves unitarily, |ψ(t)⟩ = U|ψ(0)⟩, following the Schrödinger equation iħ ∂|ψ⟩/∂t = Ĥ|ψ⟩.</li>
+<li><b>Composite systems:</b> the joint state space is the tensor product H_A ⊗ H_B.</li>
+</ol>
+<p><b>(b) How the concepts relate to them</b></p>
+<table class="tbl"><tr><th>Concept</th><th>Postulate</th><th>Relation</th></tr>
+<tr><td>Quantum state</td><td>1</td><td>It is the vector |ψ⟩ that postulate 1 says describes the system.</td></tr>
+<tr><td>Wave-function</td><td>1 (and 3)</td><td>ψ(x) = ⟨x|ψ⟩ is the state written in the position basis. |ψ|² is its Born-rule probability density.</td></tr>
+<tr><td>Measurement</td><td>2, 3</td><td>Results are eigenvalues of the observable (2). They occur with the Born probabilities and collapse the state (3).</td></tr>
+<tr><td>Evolution</td><td>4</td><td>Between measurements, unitary U = e^{−iĤt/ħ}. In circuits, each gate is a unitary.</td></tr>
+<tr><td>Composite systems</td><td>5</td><td>The tensor product gives n-qubit registers and entangled states such as Bell and GHZ.</td></tr>
+<tr><td>Expectation values</td><td>2 + 3</td><td>⟨A⟩ = ⟨ψ|A|ψ⟩ = Σ aₖ P(aₖ): the observable from postulate 2 weighted by the probabilities from postulate 3.</td></tr></table>

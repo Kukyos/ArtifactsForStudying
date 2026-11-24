@@ -1,0 +1,94 @@
+=== IA2 Q1
+```gbox
+Z = [1   0]        Z|0⟩ = |0⟩ ,  Z|1⟩ = −|1⟩
+    [0  −1]
+```
+<p>Z is the <b>phase-flip</b> gate: it leaves |0⟩ alone and multiplies |1⟩ by −1 (a 180° rotation about the z axis). For example, Z|+⟩ = |−⟩.</p>
+
+=== IA2 Q2
+<p>Apply the <b>Hadamard</b> gate to |1⟩:</p>
+```gbox
+H|1⟩ = (1/√2)[1  1][0] = (1/√2)[ 1] = (|0⟩ − |1⟩)/√2 = |−⟩
+              [1 −1][1]         [−1]
+```
+
+=== IA2 Q3
+<p>P(|01⟩) = |amplitude of |01⟩|².</p>
+<p class="log">Note: as printed, the state (1/√10)(|00⟩ + 3|01⟩ + 2|10⟩) is <b>not normalised</b>: (1 + 9 + 4)/10 = 14/10. The correct factor is 1/√14.</p>
+<ul>
+<li>With the correct normalisation, |ψ⟩ = (|00⟩ + 3|01⟩ + 2|10⟩)/√14, so <b>P(01) = 9/14 ≈ 0.643</b>.</li>
+<li>Reading the printed coefficients directly would give |3/√10|² = 9/10. But the three probabilities would then add to 1.4, which is impossible. In the exam, write 9/14 and mention the normalisation check.</li>
+</ul>
+```out
+@@OUT ia2-3@@
+```
+
+=== IA2 Q4
+```gbox
+|ψ⟩ = cos(θ/2)|0⟩ + e^{iφ} sin(θ/2)|1⟩ ,   0 ≤ θ ≤ π ,  0 ≤ φ < 2π
+Bloch vector (x, y, z) = (sinθ cosφ, sinθ sinφ, cosθ)
+```
+<ul>
+<li><b>θ (polar angle)</b> is measured from the +z axis (|0⟩ at the north pole, |1⟩ at the south). It fixes the <b>measurement probabilities</b>: P(0) = cos²(θ/2), P(1) = sin²(θ/2).</li>
+<li><b>φ (azimuthal angle)</b> is the angle around the z axis. It is the <b>relative phase</b> between |0⟩ and |1⟩. It does not affect Z-basis probabilities, but it changes interference and X/Y measurements (φ = 0 gives |+⟩, φ = π gives |−⟩, φ = π/2 gives |+i⟩).</li>
+</ul>
+<p>The global phase is dropped because it is unobservable, which is why two real angles are enough.</p>
+
+=== IA2 Q5
+<p><b>(a)</b> |ψ₀⟩ = <b>|01⟩</b> = |0⟩ ⊗ |1⟩.</p>
+<p><b>(b)</b> H on the first qubit: <b>(|01⟩ + |11⟩)/√2</b> = |+⟩|1⟩.</p>
+<p><b>(c)</b> Z on the second qubit, which is |1⟩ in both terms, so both pick up −1: <b>−(|01⟩ + |11⟩)/√2</b>.</p>
+<p><b>(d)</b> CNOT (first → second): |01⟩ → |01⟩ and |11⟩ → |10⟩, giving <b>−(|01⟩ + |10⟩)/√2 = −|Ψ⁺⟩</b>. The amplitude matrix [[0, 1], [1, 0]] has det ≠ 0, so the state is <b>entangled</b> (a Bell state; the − is a global phase).</p>
+```out
+@@OUT ia2-5@@
+```
+
+=== IA2 Q6
+<p><b>(a)</b> |ψ₀⟩ = <b>|00⟩</b>.</p>
+<p><b>(b)</b> H on the first qubit: <b>(|00⟩ + |10⟩)/√2</b>.</p>
+<p><b>(c)</b> S on the first qubit (|1⟩ → i|1⟩): <b>(|00⟩ + i|10⟩)/√2</b>.</p>
+<p><b>(d)</b> CNOT: |10⟩ → |11⟩, giving <b>(|00⟩ + i|11⟩)/√2</b>, which is entangled.</p>
+<p><b>Role of the phase:</b> the S gate's i is carried into the entangled state as a <b>relative phase</b> between |00⟩ and |11⟩. It does not change the Z-basis statistics (still 50 % 00 and 50 % 11, always correlated). But it makes this a different state from |Φ⁺⟩: measured in the X or Y basis, or decoded with a Bell measurement, it behaves differently. That is how phases carry information in superdense coding and teleportation.</p>
+```out
+@@OUT ia2-6@@
+```
+
+=== IA2 Q7
+<p>The circuit is H on q0, then CNOT q0→q1. Starting from |00⟩:</p>
+<ol class="steps">
+<li>H on q0: (|00⟩ + |10⟩)/√2.</li>
+<li>CNOT: |10⟩ → |11⟩, giving <b>(|00⟩ + |11⟩)/√2 = |Φ⁺⟩</b>, the Bell state.</li>
+</ol>
+<p>This is the standard <b>Bell-state generator</b>. The output is maximally entangled: 00 or 11, each with probability 1/2. With other inputs it gives the other Bell states: |01⟩ → Ψ⁺, |10⟩ → Φ⁻, |11⟩ → Ψ⁻.</p>
+```out
+@@OUT ia2-7@@
+```
+
+=== IA2 Q8
+<table class="tbl"><tr><th>Position</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+<tr><td>Bob's basis</td><td>X</td><td>Z</td><td>X</td><td>Z</td><td>X</td></tr>
+<tr><td>Alice's basis</td><td>Z</td><td>Z</td><td>X</td><td>Z</td><td>X</td></tr>
+<tr><td>Match</td><td>✗</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>Bob's bit</td><td>1</td><td><b>0</b></td><td><b>1</b></td><td><b>1</b></td><td><b>0</b></td></tr></table>
+<p>Keep positions 2, 3, 4, 5. Shared secret key: <b>0 1 1 0</b>. Position 1 is discarded.</p>
+
+=== IA2 Q9
+<p>a = √(5/8), b = √(3/8), so |ψ⟩ = a|0⟩ + b|1⟩.</p>
+<p><b>(a)</b> |ψ⟩ ⊗ |Φ⁺⟩ = (1/√2)(a|000⟩ + a|011⟩ + b|100⟩ + b|111⟩).</p>
+<p><b>(b)</b> Alice applies CNOT (q0 → q1), then H on q0:</p>
+```gbox
+½ [ |00⟩(a|0⟩ + b|1⟩) + |01⟩(b|0⟩ + a|1⟩) + |10⟩(a|0⟩ − b|1⟩) + |11⟩(−b|0⟩ + a|1⟩) ]
+```
+<p><b>(c)</b> Outcome 01: Bob's qubit is <b>√(3/8)|0⟩ + √(5/8)|1⟩</b> (the amplitudes are swapped, X|ψ⟩). Bob applies <b>X</b> to get √(5/8)|0⟩ + √(3/8)|1⟩ = |ψ⟩.</p>
+```out
+@@OUT ia2-9@@
+```
+
+=== IA2 Q10
+<p><b>(a)</b> |Φ⁺⟩ = (|00⟩ + |11⟩)/√2. Alice holds the first qubit and Bob the second.</p>
+<p><b>(b)</b> Message 10: Alice applies <b>Z</b>: (Z⊗I)|Φ⁺⟩ = <b>(|00⟩ − |11⟩)/√2 = |Φ⁻⟩</b>.</p>
+<p><b>(c)</b> Bob's CNOT: (|00⟩ − |10⟩)/√2 = |−⟩|0⟩. H on the first qubit: <b>|10⟩</b>. Bob measures <b>10</b>, the message.</p>
+<p>Table: 00 → I, 01 → X, 10 → Z, 11 → ZX.</p>
+```out
+@@OUT ia2-10@@
+```

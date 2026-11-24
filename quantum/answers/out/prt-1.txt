@@ -1,0 +1,6 @@
+shared Ψ⁻: 1/√2|01⟩ - 1/√2|10⟩
+  message 00: Alice applies ZX (X then Z) → sends -1/√2|00⟩ - 1/√2|11⟩ → Bob reads 00
+  message 01: Alice applies Z → sends 1/√2|01⟩ + 1/√2|10⟩ → Bob reads 01
+  message 10: Alice applies X → sends -1/√2|00⟩ + 1/√2|11⟩ → Bob reads 10
+  message 11: Alice applies I → sends 1/√2|01⟩ - 1/√2|10⟩ → Bob reads 11
+message 11: Bob CNOT: 1/√2|01⟩ - 1/√2|11⟩ ; H: |11⟩

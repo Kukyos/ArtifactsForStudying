@@ -1,0 +1,211 @@
+=== PR Q1
+<ol class="steps">
+<li>The amplitude of |10⟩ is 4/√21.</li>
+<li>Born rule: P(|10⟩) = |4/√21|² = <b>16/21 ≈ 76.19 %</b>.</li>
+</ol>
+<p>(Check: (4 + 1 + 16)/21 = 1, so the state is normalised.)</p>
+
+=== PR Q2
+<p><b>(a)</b> ⟨ψ|ψ⟩ = |1/√17|² + |4i/√17|² = 1/17 + 16/17 = 1, so the state is <b>normalised</b>.</p>
+<p><b>(b)</b> P(0) = <b>1/17</b>, P(1) = <b>16/17</b>.</p>
+<p><b>(c)</b> H|0⟩ = (|0⟩+|1⟩)/√2 and H|1⟩ = (|0⟩−|1⟩)/√2:</p>
+```gbox
+H|ψ⟩ = (1/√17)(1/√2)[(|0⟩+|1⟩) + 4i(|0⟩−|1⟩)] = (1/√34)[(1+4i)|0⟩ + (1−4i)|1⟩]
+```
+<p><b>(d)</b> P(0) = |1 + 4i|²/34 = (1 + 16)/34 = <b>1/2 (50 %)</b>.</p>
+
+=== PR Q3
+<p>"First qubit" = q0 (left bit).</p>
+<p><b>(a)</b> |ψ₀⟩ = <b>|000⟩</b>.</p>
+<p><b>(b)</b> H on q0: (|000⟩ + |100⟩)/√2. SWAP q0↔q1: |000⟩ → |000⟩ and |100⟩ → |010⟩, giving <b>(|000⟩ + |010⟩)/√2</b>.</p>
+<p><b>(c)</b> Z on q0: q0 = 0 in both terms and Z|0⟩ = |0⟩, so the state is <b>unchanged</b>: (|000⟩ + |010⟩)/√2.</p>
+<p><b>(d)</b> H on q2 (|0⟩ → (|0⟩+|1⟩)/√2): <b>½(|000⟩ + |001⟩ + |010⟩ + |011⟩)</b>.</p>
+<p><b>(e)</b> Every term has q0 = 0, so P(0) = 1 and nothing is removed. The remaining two qubits are <b>½(|00⟩ + |01⟩ + |10⟩ + |11⟩) = |+⟩|+⟩</b>.</p>
+```out
+@@OUT pr-3@@
+```
+
+=== PR Q4
+<p>Encoding rules: Z basis 0 → |0⟩, 1 → |1⟩; X basis 0 → |+⟩, 1 → |−⟩.</p>
+<table class="tbl"><tr><th>Position</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+<tr><td>Bit</td><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>Basis</td><td>Z</td><td>X</td><td>X</td><td>Z</td><td>Z</td><td>X</td></tr>
+<tr><td><b>Alice sends</b></td><td>|0⟩</td><td>|−⟩</td><td>|+⟩</td><td>|1⟩</td><td>|1⟩</td><td>|+⟩</td></tr></table>
+
+=== PR Q5
+<table class="tbl"><tr><th>Position</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr>
+<tr><td>Alice's basis</td><td>X</td><td>Z</td><td>X</td><td>Z</td><td>X</td><td>Z</td></tr>
+<tr><td>Bob's basis</td><td>Z</td><td>Z</td><td>X</td><td>X</td><td>X</td><td>Z</td></tr>
+<tr><td>Same?</td><td>✗</td><td>✓</td><td>✓</td><td>✗</td><td>✓</td><td>✓</td></tr></table>
+<p><b>(a)</b> Same basis at positions <b>2, 3, 5, 6</b>.</p>
+<p><b>(b)</b> Alice's bits there: 0 1 1 0. Bob's measurements: 0 1 1 0. Sifted key <b>0110</b>.</p>
+<p><b>(c)</b> QBER = mismatches / sifted bits = 0/4 = <b>0 %</b>.</p>
+<p><b>(d)</b> If errors are found, the key cannot be used as it is. A small QBER (below about 11 %) is fixed by <b>error correction (information reconciliation)</b> followed by <b>privacy amplification</b>. If the QBER is above the threshold, an eavesdropper may know too much, so the key is <b>discarded</b> and the protocol is repeated.</p>
+
+=== PR Q6
+<p>Let a = √(3/5) and b = √(2/5).</p>
+<p><b>(a)</b> |ψ⟩|Φ⁺⟩ = (a|0⟩ + b|1⟩) ⊗ (|00⟩ + |11⟩)/√2 = <b>(1/√2)(a|000⟩ + a|011⟩ + b|100⟩ + b|111⟩)</b>.</p>
+<p><b>(b)</b> CNOT q0→q1: (1/√2)(a|000⟩ + a|011⟩ + b|110⟩ + b|101⟩). Then H on q0, grouped by Alice's two bits:</p>
+```gbox
+|ψ⟩ = ½ [ |00⟩(a|0⟩ + b|1⟩) + |01⟩(a|1⟩ + b|0⟩) + |10⟩(a|0⟩ − b|1⟩) + |11⟩(a|1⟩ − b|0⟩) ]
+```
+<p><b>(c)</b> Outcome 01: Bob holds <b>b|0⟩ + a|1⟩ = √(2/5)|0⟩ + √(3/5)|1⟩</b> (= X|ψ⟩).</p>
+<p><b>(d)</b> Bob applies <b>X</b>.</p>
+<p><b>(e)</b> X(b|0⟩ + a|1⟩) = a|0⟩ + b|1⟩ = <b>√(3/5)|0⟩ + √(2/5)|1⟩ = |ψ⟩</b>.</p>
+```out
+@@OUT pr-6@@
+```
+
+=== PR Q7
+<p>a = 1/√5, b = 2/√5.</p>
+<p><b>(a)</b> |ψ⟩|Φ⁺⟩ = (1/√10)(|000⟩ + |011⟩ + 2|100⟩ + 2|111⟩).</p>
+<p><b>(b)</b> After CNOT q0→q1 and H on q0:</p>
+```gbox
+½ [ |00⟩(a|0⟩+b|1⟩) + |01⟩(b|0⟩+a|1⟩) + |10⟩(a|0⟩−b|1⟩) + |11⟩(−b|0⟩+a|1⟩) ]
+```
+<p><b>(c)</b> Outcome 11: Bob holds <b>−b|0⟩ + a|1⟩ = (−2|0⟩ + |1⟩)/√5</b>.</p>
+<p><b>(d)</b> Apply <b>X then Z</b>: X gives (|0⟩ − 2|1⟩)/√5, then Z gives (|0⟩ + 2|1⟩)/√5 = |ψ⟩ ✓.</p>
+```out
+@@OUT pr-7@@
+```
+
+=== PR Q8
+<p><b>(a)</b> |Φ⁺⟩ = (|00⟩ + |11⟩)/√2 (Alice holds q0, Bob holds q1).</p>
+<p><b>(b)</b> Message 01: Alice applies <b>X</b> to her qubit.</p>
+<p><b>(c)</b> (X⊗I)|Φ⁺⟩ = <b>(|10⟩ + |01⟩)/√2 = |Ψ⁺⟩</b>.</p>
+<p><b>(d)</b> CNOT q0→q1: (|11⟩ + |01⟩)/√2 = |+⟩|1⟩. H on q0: <b>|01⟩</b>.</p>
+<p><b>(e)</b> Bob measures <b>01</b> with certainty, which is the message. Two classical bits arrived in one qubit.</p>
+```out
+@@OUT pr-8@@
+```
+
+=== PR Q9
+<p><b>(a)</b> |Φ⁻⟩ = (|00⟩ − |11⟩)/√2.</p>
+<p><b>(b)</b> Bob's Bell measurement (CNOT, H) reads Φ⁺ → 00, Ψ⁺ → 01, Φ⁻ → 10, Ψ⁻ → 11. To make him read 11, Alice must turn Φ⁻ into Ψ⁻, so she applies <b>X</b>.</p>
+<p><b>(c)</b> (X⊗I)|Φ⁻⟩ = (|10⟩ − |01⟩)/√2 = <b>−|Ψ⁻⟩</b> (the global sign does not matter).</p>
+<p><b>(d)</b> CNOT q0→q1: (|11⟩ − |01⟩)/√2 = −|−⟩|1⟩. H on q0: <b>−|11⟩</b>.</p>
+<p><b>(e)</b> Bob measures <b>11</b> (the −1 is a global phase), which is the message.</p>
+<p class="log">The encoding depends on the shared state. With Φ⁻ the usual Φ⁺ table (11 → ZX) would make Bob read 01, so it would be wrong here.</p>
+```out
+@@OUT pr-9@@
+```
+
+=== PR Q10
+<p><b>(a)</b> H|0⟩ = <b>(|0⟩ + |1⟩)/√2 = |+⟩</b>.</p>
+<p><b>(b)</b> X|+⟩ = (|1⟩ + |0⟩)/√2 = <b>|+⟩</b> (unchanged: |+⟩ is an eigenstate of X).</p>
+<p><b>(c)</b> Z|+⟩ = <b>(|0⟩ − |1⟩)/√2 = |−⟩</b>.</p>
+<p><b>(d)</b> (final H) H|−⟩ = <b>|1⟩</b>, so a measurement gives 1 with certainty.</p>
+```out
+@@OUT pr-10@@
+```
+
+=== PR Q11
+<p><b>(a)</b> H on q0: <b>(|000⟩ + |100⟩)/√2</b>.</p>
+<p><b>(b)</b> CNOT q0→q1: |100⟩ → |110⟩, giving <b>(|000⟩ + |110⟩)/√2</b>.</p>
+<p><b>(c)</b> CNOT q1→q2: |110⟩ → |111⟩, giving <b>(|000⟩ + |111⟩)/√2</b> (the GHZ state).</p>
+<p><b>(d)</b> P(|000⟩) = |1/√2|² = <b>1/2</b>.</p>
+<p><b>(e)</b> P(|111⟩) = <b>1/2</b>.</p>
+```out
+@@OUT pr-11@@
+```
+
+=== PR Q12
+<p><b>(a)</b> ⟨ψ|ψ⟩ = (|3|² + |i|²)/10 = (9 + 1)/10 = 1, so it is normalised ✓.</p>
+<p><b>(b)</b> P(0) = 9/10 = <b>90 %</b>.</p>
+<p><b>(c)</b> P(1) = 1/10 = <b>10 %</b>.</p>
+<p><b>(d)</b> X swaps the amplitudes: X|ψ⟩ = <b>(1/√10)(i|0⟩ + 3|1⟩)</b>.</p>
+<p><b>(e)</b> P(0) after X = |i|²/10 = <b>1/10 (10 %)</b>.</p>
+
+=== PR Q13
+<p><b>(a)</b> Compare with cos(θ/2)|0⟩ + e^{iφ}sin(θ/2)|1⟩: θ/2 = π/6, so <b>θ = π/3</b>, and <b>φ = π/3</b>.</p>
+<p><b>(b)</b> x = sinθ cosφ = (√3/2)(1/2) = <b>√3/4</b>; y = sinθ sinφ = (√3/2)(√3/2) = <b>3/4</b>; z = cosθ = <b>1/2</b>.</p>
+<p><b>(c)</b> P(0) = cos²(π/6) = <b>3/4</b>; P(1) = sin²(π/6) = <b>1/4</b>.</p>
+<p><b>(d)</b> z = 1/2 &gt; 0, so the point is in the <b>upper hemisphere</b>, nearer |0⟩. Equivalently θ = 60° &lt; 90°, and P(0) &gt; P(1).</p>
+<p>(Check: x² + y² + z² = 3/16 + 9/16 + 4/16 = 1, so it is on the sphere, as a pure state must be.)</p>
+
+=== PR Q14
+<p><b>(a)</b></p>
+```gbox
+ρ = |ψ⟩⟨ψ| = ½ (|0⟩ + i|1⟩)(⟨0| − i⟨1|) = ½ ( |0⟩⟨0| − i|0⟩⟨1| + i|1⟩⟨0| + |1⟩⟨1| )
+  = ½ [1  −i]
+      [i   1]
+```
+<p><b>(b)</b> Tr ρ = ½(1 + 1) = <b>1</b>.</p>
+<p><b>(c)</b> ρ² = ½[[1, −i], [i, 1]]·½[[1, −i], [i, 1]] = ¼[[2, −2i], [2i, 2]] = ρ, so Tr ρ² = <b>1</b>, which confirms a <b>pure</b> state.</p>
+<p><b>(d)</b> ρZ = ½[[1, i], [i, −1]], so ⟨Z⟩ = Tr(ρZ) = ½(1 − 1) = <b>0</b>. The state lies on the equator (it is the +y point).</p>
+
+=== PR Q15
+<p><b>(a)</b></p>
+```gbox
+ρ = 0.6|0⟩⟨0| + 0.4|+⟩⟨+| = 0.6[1 0] + 0.4·½[1 1] = [0.8  0.2]
+                              [0 0]        [1 1]   [0.2  0.2]
+```
+<p><b>(b)</b> Tr ρ = 0.8 + 0.2 = <b>1</b>.</p>
+<p><b>(c)</b> ρ² = [[0.68, 0.20], [0.20, 0.08]], so Tr ρ² = <b>0.76 &lt; 1</b>: a <b>mixed</b> state.</p>
+<p><b>(d)</b> P(0) = ⟨0|ρ|0⟩ = ρ₀₀ = <b>0.8</b>. Check: 0.6·1 + 0.4·½ = 0.8 ✓.</p>
+```out
+@@OUT pr-15@@
+```
+
+=== PR Q16
+<p><b>(a) No-cloning theorem:</b> no unitary operation U can copy an <b>arbitrary unknown</b> quantum state. There is no U with U|ψ⟩|0⟩ = |ψ⟩|ψ⟩ for every |ψ⟩.</p>
+<p><b>(b) Proof.</b> Suppose such a U exists. Then:</p>
+```gbox
+U|0⟩|0⟩ = |0⟩|0⟩        U|1⟩|0⟩ = |1⟩|1⟩
+Linearity:  U|+⟩|0⟩ = (1/√2)(U|0⟩|0⟩ + U|1⟩|0⟩) = (|00⟩ + |11⟩)/√2
+Cloning:    U|+⟩|0⟩ = |+⟩|+⟩ = ½(|00⟩ + |01⟩ + |10⟩ + |11⟩)
+```
+<p>These are different states (one is entangled, the other is a product with |01⟩ and |10⟩ terms), which is a contradiction. So no such U exists. (Equivalently, unitaries preserve inner products: ⟨0|+⟩ = 1/√2, but ⟨0|+⟩² = 1/2.)</p>
+<p><b>(c) Why it matters for BB84:</b> Eve cannot copy Alice's qubits, keep the copies and measure them later in the correct basis once it is announced. She has to measure (or disturb) the qubits in transit. Because the bases are non-orthogonal, that introduces errors (about 25 % on the sifted key for intercept-resend), and Alice and Bob detect them by comparing a sample. The security of QKD rests on this theorem.</p>
+
+=== PR Q17
+<p><b>(a)</b> CNOT (control q1, target q2), basis order |00⟩, |01⟩, |10⟩, |11⟩:</p>
+```gbox
+CNOT = [1 0 0 0]
+       [0 1 0 0]
+       [0 0 0 1]
+       [0 0 1 0]
+```
+<p><b>(b)</b> |00⟩ → |00⟩ and |11⟩ → |10⟩: <b>|ψ′⟩ = (|00⟩ + 2|10⟩)/√5</b>.</p>
+<p><b>(c)</b> |ψ′⟩ = ((|0⟩ + 2|1⟩)/√5) ⊗ |0⟩, so it is <b>separable (not entangled)</b>. Test: amplitude matrix [[1, 0], [2, 0]]/√5, det = 0.</p>
+<p class="log">Correction to the posted answer key: it says "entangled". The <b>input</b> (|00⟩ + 2|11⟩)/√5 is entangled (det = 2/5 ≠ 0), but the CNOT <b>removes</b> the entanglement. The checker confirms the output is a product state.</p>
+<p><b>(d)</b> No term has the second qubit = 1, so P = <b>0</b>.</p>
+```out
+@@OUT pr-17@@
+```
+
+=== PR Q18
+<p><b>(a)</b> The Toffoli (CCNOT) flips the target (third qubit) only when <b>both controls are 1</b>: |a, b, c⟩ → |a, b, c ⊕ ab⟩. So |110⟩ ↔ |111⟩, and the other six basis states are unchanged.</p>
+<p><b>(b)</b> (|110⟩ + |111⟩)/√2 → (|111⟩ + |110⟩)/√2, the <b>same state</b>. (It is |11⟩|+⟩, and X|+⟩ = |+⟩.)</p>
+<p><b>(c)</b> P(third qubit = 1) = |1/√2|² = <b>1/2</b>.</p>
+
+=== PR Q19
+<p><b>(a)</b> S = [[1, 0], [0, i]] and T = [[1, 0], [0, e^{iπ/4}]], with e^{iπ/4} = (1 + i)/√2. (T² = S.)</p>
+<p><b>(b)</b> S|ψ⟩ = <b>(|0⟩ + i|1⟩)/√2</b>.</p>
+<p><b>(c)</b> T|ψ⟩ = <b>(|0⟩ + e^{iπ/4}|1⟩)/√2</b> = (1/√2)|0⟩ + ((1 + i)/2)|1⟩.</p>
+<p><b>(d)</b> P_S(1) = |i/√2|² = <b>1/2</b>, and P_T(1) = |e^{iπ/4}/√2|² = <b>1/2</b>. Phase gates never change Z-basis probabilities, only the phase (a rotation about the z axis).</p>
+
+=== PR Q20
+<p><b>(a)</b> (H⊗I)|00⟩ = <b>(|00⟩ + |10⟩)/√2</b>.</p>
+<p><b>(b)</b> CNOT: |10⟩ → |11⟩, giving <b>(|00⟩ + |11⟩)/√2 = |Φ⁺⟩</b>.</p>
+<p><b>(c)</b> Suppose (a|0⟩ + b|1⟩)(c|0⟩ + d|1⟩) = ac|00⟩ + ad|01⟩ + bc|10⟩ + bd|11⟩. Then ad = 0 and bc = 0, but ac = bd = 1/√2 ≠ 0. If a = 0 then ac = 0, contradiction; if d = 0 then bd = 0, contradiction. So no product form exists, and the state is <b>entangled</b>.</p>
+<p><b>(d)</b> P(00) = <b>1/2</b>, P(11) = <b>1/2</b>, P(01) = P(10) = <b>0</b>. The two qubits always agree.</p>
+
+=== PR Q21
+<p><b>(a)</b> H on q0: (|000⟩ + |100⟩)/√2. CNOT q0→q1: (|000⟩ + |110⟩)/√2. CNOT q0→q2: <b>(|000⟩ + |111⟩)/√2</b>.</p>
+<p><b>(b)</b> The <b>GHZ (Greenberger–Horne–Zeilinger) state</b>.</p>
+<p><b>(c)</b> P(000) = <b>1/2</b>, P(111) = <b>1/2</b>, and all other outcomes 0. All three qubits always agree.</p>
+<p><b>(d)</b> It cannot be split as (one qubit) ⊗ (two qubits) in any way, so all three are entangled together. Yet any <b>two</b> qubits alone (tracing out the third) are just a classical 50/50 mixture of |00⟩ and |11⟩, with no pairwise entanglement. The correlation exists only among all three, which is why it is called genuine three-qubit entanglement. Measuring one qubit leaves the other two in a product state.</p>
+
+=== PR Q22
+<p><b>(a)</b> Input |0⟩ and ancilla |−⟩: |ψ₀⟩ = <b>|0⟩|−⟩ = (|00⟩ − |01⟩)/√2</b>.</p>
+<p><b>(b)</b> H on the input gives |+⟩|−⟩ = ½(|00⟩ − |01⟩ + |10⟩ − |11⟩). Both inputs x = 0 and x = 1 are now queried <b>at once</b>, and with |−⟩ on the ancilla the oracle acts as a <b>phase</b>: U_f|x⟩|−⟩ = (−1)^{f(x)}|x⟩|−⟩.</p>
+<p><b>(c)</b> f(x) = 0 for all x: y ⊕ 0 = y, so the state is <b>unchanged</b>: ½(|00⟩ − |01⟩ + |10⟩ − |11⟩) = |+⟩|−⟩.</p>
+<p><b>(d)</b> Final H on the input: |+⟩ → <b>|0⟩</b>, so the measurement gives 0.</p>
+<table class="tbl"><tr><th>f</th><th>Input before last H</th><th>Measured</th></tr>
+<tr><td>constant (f = 0 or f = 1)</td><td>±|+⟩</td><td><b>0</b></td></tr>
+<tr><td>balanced (f(x) = x or 1 − x)</td><td>±|−⟩</td><td><b>1</b></td></tr></table>
+<p>One query decides constant vs balanced, where a classical method needs two.</p>
+```out
+@@OUT pr-22@@
+```
