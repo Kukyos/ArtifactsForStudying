@@ -1,0 +1,59 @@
+=== 5.1
+Q: QB Q40, QB Q41, QB Q42
+<h2>Quantum Fourier transform</h2>
+```gbox
+QFT |x⟩ = (1/√N) Σ_{k=0}^{N−1} e^{2πi xk/N} |k⟩        N = 2ⁿ ,  ω = e^{2πi/N}
+N = 2 :  QFT = H
+N = 4 :  QFT = ½[1  1  1  1]        QFT|1⟩ = ½(1, i, −1, −i)
+                [1  i −1 −i]        QFT|2⟩ = ½(1, −1, 1, −1)
+                [1 −1  1 −1]
+                [1 −i −1  i]
+```
+<p><b>Product form</b> (how the circuit builds it), with x = x₁x₂…xₙ in binary and 0.x₂x₃ = x₂/2 + x₃/4:</p>
+```gbox
+QFT|x⟩ = (1/√2ⁿ)(|0⟩ + e^{2πi·0.xₙ}|1⟩)(|0⟩ + e^{2πi·0.xₙ₋₁xₙ}|1⟩)…(|0⟩ + e^{2πi·0.x₁…xₙ}|1⟩)
+|2⟩ = |010⟩ :  (|0⟩+|1⟩)(|0⟩−|1⟩)(|0⟩+i|1⟩)/√8
+```
+<p><b>Circuit:</b> on each qubit, an H followed by controlled-R_k phase gates (R_k = diag(1, e^{2πi/2ᵏ}); R2 = S, R3 = T) from the qubits below it, then SWAPs to reverse the order. It uses O(n²) gates, against O(n·2ⁿ) for the classical FFT on 2ⁿ numbers. The catch is that the amplitudes cannot be read out directly. The QFT is useful only <b>inside</b> algorithms such as phase estimation.</p>
+<p><b>Inverse QFT</b> = conjugate transpose (ω → ω⁻¹). It turns a state with "linearly increasing phases" back into a basis state: QFT⁻¹ of ½(1, −1, 1, −1) is |2⟩.</p>
+
+=== 5.2
+Q: Apr26 Q9, Apr26 Q15, Apr26 Q23, QB Q43, QB Q44
+<h2>Quantum phase estimation (QPE)</h2>
+<p>Given U and an eigenvector U|ψ⟩ = e^{2πiθ}|ψ⟩, estimate θ ∈ [0, 1) to t bits.</p>
+```gbox
+c0 ─H─────────────────●──────┐
+c1 ─H──────────●──────┼──────┤ QFT⁻¹ ─ measure → t-bit number m ≈ 2ᵗθ
+c2 ─H───●──────┼──────┼──────┘
+|ψ⟩ ────U─────U²────U⁴────── |ψ⟩ (unchanged)
+```
+<ol class="steps">
+<li>Counting register |0⟩^⊗t, then H on each qubit: (1/√2ᵗ)Σₖ|k⟩.</li>
+<li>Controlled-U^{2ʲ}: <b>phase kickback</b>, because U^{2ʲ}|ψ⟩ = e^{2πiθ2ʲ}|ψ⟩. The control picks up the phase and the target is untouched.</li>
+<li>The register becomes (1/√2ᵗ) Σₖ e^{2πiθk}|k⟩ = QFT|2ᵗθ⟩.</li>
+<li>QFT⁻¹ gives |2ᵗθ⟩. Measure, then θ ≈ m/2ᵗ.</li>
+</ol>
+```gbox
+U = T, |ψ⟩ = |1⟩ : e^{iπ/4} = e^{2πi·1/8} → θ = 1/8 = 0.001₂ → reads 001 (exact)
+θ = 1/3, t = 3 : 8/3 ≈ 2.67 → most likely 011, P ≈ 0.688 (not exact → spread over nearby values)
+```
+<p>The lowest counting qubit controls U¹ and the top one the highest power, so the top qubit is the most significant bit of θ.</p>
+
+=== 5.3
+Q: Apr26 Q23, QB Q45, QB Q46, QB Q47
+<h2>Shor's factoring algorithm</h2>
+<p>Factoring reduces to <b>order finding</b>: for random a with gcd(a, N) = 1, find the smallest r with aʳ ≡ 1 (mod N). This is the period of f(x) = aˣ mod N.</p>
+<ol class="steps">
+<li>Pick a &lt; N. If gcd(a, N) &gt; 1 you have found a factor by luck.</li>
+<li><b>Quantum part:</b> QPE on U|y⟩ = |ay mod N⟩. Its eigenphases are s/r, so the measurement gives m/2ᵗ ≈ s/r. <b>Continued fractions</b> then recover r.</li>
+<li>If r is odd, or a^{r/2} ≡ −1 (mod N), pick another a.</li>
+<li>Otherwise the factors are <b>gcd(a^{r/2} − 1, N)</b> and <b>gcd(a^{r/2} + 1, N)</b>.</li>
+</ol>
+<p>Why it works: aʳ − 1 = (a^{r/2} − 1)(a^{r/2} + 1) ≡ 0 (mod N), but neither factor is a multiple of N, so each shares a factor with N.</p>
+```gbox
+N = 15, a = 7 :  7, 4, 13, 1 → r = 4 ;  7² = 49 ;  gcd(48,15) = 3, gcd(50,15) = 5
+N = 33, a = 5 :  r = 10 ;  5⁵ ≡ 23 ;  gcd(22,33) = 11, gcd(24,33) = 3
+N = 77, a = 2 :  r = 30 ;  2¹⁵ ≡ 43 ;  gcd(42,77) = 7,  gcd(44,77) = 11
+period only:  3ˣ mod 11 → 3, 9, 5, 4, 1 → r = 5
+```
+<p><b>Complexity:</b> polynomial, about O((log N)³), against the best known classical method (sub-exponential). That is why it threatens RSA and motivates post-quantum cryptography and QKD.</p>

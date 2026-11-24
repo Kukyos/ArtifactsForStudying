@@ -1,0 +1,92 @@
+=== 6.1
+Q: Apr26 Q10, Apr26 Q24, QB Q50
+<h2>Quantum annealing</h2>
+<p>A technique for finding the <b>lowest-energy configuration</b> (ground state) of a system that encodes an optimisation problem: lower energy means a better answer.</p>
+<ol class="steps">
+<li><b>Encode</b> the cost as an Ising Hamiltonian H_P = Σ hᵢZᵢ + Σ JᵢⱼZᵢZⱼ (or QUBO with 0/1 variables).</li>
+<li><b>Start simple:</b> a transverse-field driver H_D = −ΣXᵢ, whose ground state is the equal superposition |+⟩^⊗n.</li>
+<li><b>Anneal slowly:</b> H(s) = A(s)·H_D + B(s)·H_P. As s goes from 0 to 1, A falls and B rises.</li>
+<li><b>Read out:</b> at s = 1 the qubits are classical bits. Measure, repeat many times, and keep the best.</li>
+</ol>
+<p><b>Adiabatic theorem:</b> if the change is slow compared with 1/Δ²_min (the smallest gap between the ground and first excited energies), the system stays in the ground state. Adiabatic quantum computation is equivalent in power to the gate model. Annealing is the practical, noisy version of it (D-Wave).</p>
+<h2>Energy landscape</h2>
+<p><b>Thermal (simulated) annealing</b> uses heat to climb over barriers and can get stuck in local minima. <b>Quantum annealing</b> can <b>tunnel through</b> tall, thin barriers to reach deeper valleys.</p>
+<h2>Worked: H_P = Z₁Z₂ − 0.5Z₂</h2>
+```gbox
+replace bit 0 → +1, bit 1 → −1:   E(00) = 0.5   E(01) = −0.5   E(10) = −1.5   E(11) = 1.5   → ground state |10⟩
+```
+<h2>From problem to hardware</h2>
+<p><b>Formulate</b> as QUBO/Ising, <b>embed</b> onto the hardware graph (chains of physical qubits for one logical variable), anneal, then sample.</p>
+<h2>Uses and role in quantum ML</h2>
+<ul><li>Optimisation: max-cut, scheduling, routing, portfolio selection.</li>
+<li>QML: training is optimisation (QUBO feature selection, binary classifiers), annealers sample Boltzmann distributions (for training Boltzmann machines), and Hopfield-style associative memory. The gate-model cousins are QAOA and VQE.</li></ul>
+
+=== 6.2
+Q: QB Q48
+<h2>Why quantum error correction is hard, and possible</h2>
+<ul><li>Qubits decohere (environment) and gates are imprecise. Large algorithms are impossible without error correction.</li>
+<li>Obstacles: <b>no-cloning</b> (you cannot just copy), <b>measurement destroys</b> superpositions, and errors are <b>continuous</b>. The solution: entangle the qubit into a code and measure only <b>parities (syndromes)</b>, which reveal the error but not α and β. Any error is a combination of I, X, Z and XZ, so fixing those fixes everything.</li></ul>
+<h2>Classical repetition code</h2>
+<p>0 → 000 and 1 → 111, decoded by majority vote. It corrects 1 flip, and the failure rate is 3p² − 2p³ &lt; p when p &lt; ½.</p>
+<h2>3-qubit bit-flip code</h2>
+```gbox
+encode: α|0⟩+β|1⟩ → α|000⟩ + β|111⟩   (two CNOTs from the data qubit — NOT three copies of |ψ⟩)
+syndrome: measure Z₁Z₂ and Z₂Z₃ (via two ancillas)
+error        state              (Z₁Z₂, Z₂Z₃)   bits   fix
+none         α|000⟩+β|111⟩      (+1, +1)       00     I
+X₁           α|100⟩+β|011⟩      (−1, +1)       10     X₁
+X₂           α|010⟩+β|101⟩      (−1, −1)       11     X₂
+X₃           α|001⟩+β|110⟩      (+1, −1)       01     X₃
+```
+<h2>3-qubit phase-flip code</h2>
+<p>Encode in the X basis: α|+++⟩ + β|−−−⟩. A Z error flips |+⟩ ↔ |−⟩, which looks like a bit flip in the Hadamard basis. Measure X₁X₂ and X₂X₃.</p>
+<h2>Shor's 9-qubit code</h2>
+```gbox
+|0_L⟩ = (|000⟩+|111⟩)(|000⟩+|111⟩)(|000⟩+|111⟩)/2√2
+|1_L⟩ = (|000⟩−|111⟩)(|000⟩−|111⟩)(|000⟩−|111⟩)/2√2
+```
+<p>Phase-flip code on the outside, bit-flip code on each block. Z-parity checks inside each block find X errors, and comparing block signs finds Z errors. It corrects <b>any single-qubit error</b> (X, Z or Y), and it was the first full quantum code.</p>
+
+=== 6.3
+Q: QB Q49
+<h2>The Steane [[7,1,3]] code</h2>
+<p>7 physical qubits, 1 logical qubit, distance 3, so it corrects t = ⌊(3−1)/2⌋ = 1 arbitrary single-qubit error. It is a <b>CSS code</b> built from the classical Hamming [7,4,3] code.</p>
+```gbox
+|0_L⟩ = (1/√8)(|0000000⟩+|1010101⟩+|0110011⟩+|1100110⟩+|0001111⟩+|1011010⟩+|0111100⟩+|1101001⟩)
+|1_L⟩ = X^⊗7 |0_L⟩
+```
+<h2>Six stabilizers (your class notes, qubits q₀…q₆)</h2>
+<table class="tbl"><tr><th>Z-type (detect X errors)</th><th>X-type (detect Z errors)</th></tr>
+<tr><td>S₁ᶻ = Z₀Z₁Z₂Z₃</td><td>S₁ˣ = X₀X₁X₂X₃</td></tr>
+<tr><td>S₂ᶻ = Z₀Z₁Z₄Z₅</td><td>S₂ˣ = X₀X₁X₄X₅</td></tr>
+<tr><td>S₃ᶻ = Z₀Z₂Z₄Z₆</td><td>S₃ˣ = X₀X₂X₄X₆</td></tr></table>
+<p>Measure each stabilizer with an ancilla (CNOTs from the data qubits, then measure). Ancilla 0 means eigenvalue +1, ancilla 1 means −1. A check reads 1 if it contains the faulty qubit.</p>
+```gbox
+X on q₂ : in S₁ (0123)? yes  S₂ (0145)? no  S₃ (0246)? yes  → syndrome 101 → apply X₂
+X on q₆ : 001          X on q₅ : 010          X on q₀ : 111
+```
+<p>Z errors give the same pattern on the X-type checks. A Y error lights both sets on the same qubit and is fixed with Y.</p>
+<p class="callout">The question bank (Q49) uses the other common labelling: qubits 1–7 with parity-check columns equal to the binary numbers 1–7, so the syndrome is the qubit's number in binary (qubit 6 → 110). Say which convention you are using.</p>
+
+=== 6.4
+Q: Apr26 Q16, Nov24 Q9
+<h2>Fault-tolerant quantum computation</h2>
+<p>Error correction itself uses faulty gates. <b>Fault tolerance</b> designs the whole computation so that faults do not spread out of control.</p>
+<ul>
+<li><b>Fault locations:</b> state preparation, gates, measurements and idle storage. Classical processing is assumed perfect, and faults are modelled as independent and random.</li>
+<li><b>Ingredients:</b> logical qubits stored in a QEC code, operations done by careful <b>gadgets</b>, and error correction repeated throughout.</li>
+<li><b>Error propagation:</b> a CNOT copies an X error from control to target, and a Z error from target to control. One fault could become two, which a distance-3 code cannot fix.</li>
+<li><b>Transversal gates</b> act qubit by qubit across code blocks (e.g. logical CNOT = 7 CNOTs between two Steane blocks), so one fault stays one error per block. In the Steane code, H, S and CNOT are transversal. T is not, so it needs <b>magic-state injection/distillation</b>.</li>
+<li><b>Threshold theorem:</b> if the physical error rate p is below a threshold p_th (about 10⁻⁴ to 10⁻² depending on the scheme), concatenating codes or growing a surface code makes the logical error rate p_L ≈ (p/p_th)^{2ᵏ} as small as desired with only polylogarithmic overhead. Large quantum computers are therefore possible in principle.</li>
+</ul>
+<h2>Gottesman–Knill theorem</h2>
+<p>Circuits using only <b>Clifford</b> gates (H, S, CNOT, Paulis) on basis-state inputs with Pauli measurements can be <b>simulated efficiently classically</b> (stabilizer formalism). So entanglement alone gives no speed-up, and quantum advantage needs a non-Clifford gate such as T. It also explains why stabilizer codes are easy to analyse.</p>
+<h2>Where quantum computing helps (algorithm categories)</h2>
+<table class="tbl"><tr><th>Category</th><th>Examples</th><th>Speed-up</th></tr>
+<tr><td>Oracle / query</td><td>Deutsch–Jozsa, Bernstein–Vazirani, Simon</td><td>exponential in queries</td></tr>
+<tr><td>Fourier / period finding</td><td>QFT, phase estimation, Shor</td><td>exponential (factoring, discrete log)</td></tr>
+<tr><td>Amplitude amplification</td><td>Grover, quantum counting</td><td>quadratic</td></tr>
+<tr><td>Simulation</td><td>Hamiltonian simulation, VQE (chemistry)</td><td>exponential for quantum systems</td></tr>
+<tr><td>Optimisation</td><td>annealing, QAOA</td><td>heuristic</td></tr>
+<tr><td>Machine learning</td><td>quantum kernels, QSVM, HHL linear systems</td><td>problem dependent</td></tr>
+<tr><td>Communication / crypto</td><td>QKD (BB84), teleportation, superdense coding</td><td>security / capacity</td></tr></table>

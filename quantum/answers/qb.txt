@@ -464,6 +464,7 @@ H = [0 0 0 1 1 1 1]
 ```
 <p>A bit flip on qubit j gives syndrome = column j of H. Column 6 = (1, 1, 0), so the <b>syndrome is 110 = 6 in binary</b>. Apply <b>X₆</b>. (Phase flips are found the same way using the X-type checks.)</p>
 <p class="log">The bit order of the syndrome depends on how the rows of H are ordered. Here the top row is the most significant bit, as in the key.</p>
+<p class="log"><b>Your class notes (Steane_Code) use a different labelling:</b> qubits q₀…q₆ and Z-checks Z₀Z₁Z₂Z₃, Z₀Z₁Z₄Z₅, Z₀Z₂Z₄Z₆, where a check reads 1 if it contains the flipped qubit. In that convention X on q₂ gives 101 (the notes' example), X on q₅ ("qubit 6" counting from 1) gives 010, and X on q₆ gives 001. In the exam, write down the stabilizers you are using first, then read the syndrome off them.</p>
 ```out
 @@OUT qb-q49@@
 ```

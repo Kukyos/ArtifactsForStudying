@@ -1,0 +1,70 @@
+=== 4.1
+Q: QB Q30, QB Q31, PR Q22
+<h2>The query model</h2>
+<p>A function f is given as a black box (<b>oracle</b>). The cost of an algorithm is the number of <b>queries</b> it makes. Quantumly, the oracle is the reversible unitary</p>
+```gbox
+U_f |x⟩|y⟩ = |x⟩|y ⊕ f(x)⟩          with y = |−⟩:   U_f |x⟩|−⟩ = (−1)^{f(x)} |x⟩|−⟩   (phase kickback)
+```
+<p>Put the input in superposition with H gates and the ancilla in |−⟩ (via X, H). One query then stamps (−1)^{f(x)} on <b>every</b> x at once, and a final round of H gates makes those phases interfere into a readable answer.</p>
+<h2>Deutsch's algorithm (1 bit)</h2>
+<p>Question: is f : {0,1} → {0,1} constant or balanced? Classically that takes 2 queries; quantumly, 1.</p>
+```gbox
+|0⟩|1⟩ → H⊗H → ½(|0⟩+|1⟩)(|0⟩−|1⟩) → U_f → ½((−1)^{f(0)}|0⟩ + (−1)^{f(1)}|1⟩)|−⟩
+constant: ±|+⟩|−⟩ → H → |0⟩      balanced: ±|−⟩|−⟩ → H → |1⟩
+```
+<h2>Deutsch–Jozsa (n bits)</h2>
+<p>Promise: f is either constant or balanced (0 on exactly half of the inputs). After H^⊗n, U_f, H^⊗n:</p>
+```gbox
+amplitude of |0…0⟩ = (1/2ⁿ) Σₓ (−1)^{f(x)}  =  ±1 if constant,  0 if balanced
+```
+<p>So measuring <b>all zeros means constant, anything else means balanced</b>: 1 query, against 2^{n−1} + 1 classically in the worst case (deterministically). Examples: f = x1 ⊕ x2 gives |11⟩ (balanced), and f = x1 for n = 3 gives |100⟩ (balanced).</p>
+
+=== 4.2
+Q: Apr26 Q7, Apr26 Q14, Apr26 Q22, QB Q32, QB Q33
+<h2>Bernstein–Vazirani</h2>
+<p>Hidden string s, with f(x) = s·x mod 2 = s₁x₁ ⊕ … ⊕ sₙxₙ. The goal is to find s.</p>
+```gbox
+|0ⁿ⟩|1⟩ → H^⊗(n+1) → (1/√2ⁿ) Σₓ |x⟩|−⟩ → U_f → (1/√2ⁿ) Σₓ (−1)^{s·x}|x⟩|−⟩ → H^⊗n → |s⟩|−⟩
+```
+<p>The last step works because H^⊗n|s⟩ = (1/√2ⁿ)Σₓ(−1)^{s·x}|x⟩ and H is its own inverse. The circuit gives <b>1 query against n classically</b>.</p>
+<p><b>Building the oracle:</b> put a CNOT from every input qubit i with sᵢ = 1 onto the ancilla. For s = 101, that is CNOTs from q0 and q2.</p>
+<h2>Worked: s = 101</h2>
+```gbox
+after oracle (input amplitudes × √8):  000:+ 001:− 010:+ 011:− 100:− 101:+ 110:− 111:+   = (−1)^{x1⊕x3}
+after H⊗3: |101⟩  → s = 101
+```
+<p>f(x) = x₂ ⊕ x₃ on 4 qubits means s = 0110: just read off which variables appear.</p>
+
+=== 4.3
+Q: Apr26 Q8, QB Q34, QB Q35
+<h2>Simon's problem</h2>
+<p>f : {0,1}ⁿ → {0,1}ⁿ is 2-to-1, with f(x) = f(x ⊕ s) for a secret s ≠ 0. The goal is to find s. Classically this needs about 2^{n/2} queries (to find a collision); quantumly, O(n). It was the first <b>exponential</b> separation, and it inspired Shor.</p>
+<ol class="steps">
+<li>|0ⁿ⟩|0ⁿ⟩ → H^⊗n on the first register → U_f: (1/√2ⁿ) Σₓ |x⟩|f(x)⟩.</li>
+<li>Measure (or ignore) the second register. The first collapses to (|x₀⟩ + |x₀ ⊕ s⟩)/√2.</li>
+<li>H^⊗n and measure: the result is a random y with <b>y·s = 0 (mod 2)</b>.</li>
+<li>Repeat about n − 1 times to collect independent y's, then solve the linear system over GF(2).</li>
+</ol>
+```gbox
+s = 101:  y·s = y1 ⊕ y3 = 0  →  y ∈ {000, 010, 101, 111}
+runs give 010 → s2 = 0 ;  101 → s1 = s3  →  s = 101 (the non-zero solution)
+```
+<p>Spotting s from a table: find two inputs with equal outputs, and XOR them. f(00) = f(01) gives s = 01.</p>
+
+=== 4.4
+Q: Apr26 Q21, QB Q36, QB Q37, QB Q38, QB Q39
+<h2>Grover's search</h2>
+<p>Find the marked item among N = 2ⁿ unsorted items in about (π/4)√N queries (classically N/2 on average). That is a quadratic speed-up, and it is provably optimal.</p>
+<ol class="steps">
+<li>H^⊗n|0…0⟩: all amplitudes 1/√N.</li>
+<li><b>Oracle</b> O|x⟩ = (−1)^{f(x)}|x⟩ flips the sign of the target. On its own this does not change any probability.</li>
+<li><b>Diffusion</b> (inversion about the mean): aᵢ′ = 2ā − aᵢ. The target's negative amplitude jumps far above the mean.</li>
+<li>Repeat k ≈ (π/4)√N times, then measure.</li>
+</ol>
+```gbox
+θ = arcsin(1/√N)       target amplitude after k rounds = sin((2k+1)θ)       P_k = sin²((2k+1)θ)
+N = 4 :  θ = 30°, k = 1 → sin²90° = 1           (½,½,½,½) → oracle (½,½,−½,½) → mean ¼ → (0,0,1,0)
+N = 8 :  θ ≈ 20.7°, k = 1 → 0.884 amplitude; k = 2 → P ≈ 0.945
+N = 16:  k = 3 → P ≈ 0.961      N = 64: k = 6 → P ≈ 0.9966
+```
+<p class="callout">Too many iterations <b>overshoots</b>: for N = 16, P falls from 96 % at k = 3 to 58 % at k = 4. Geometrically, each iteration rotates the state by 2θ towards the target.</p>

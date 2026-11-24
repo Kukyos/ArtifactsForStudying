@@ -1,0 +1,79 @@
+=== 3.1
+Q: Apr26 Q1, QB Q21, QB Q29, PR Q20, PR Q21
+<h2>Entanglement</h2>
+<p>A joint state that is <b>not a product</b> of single-qubit states. The parts have no state of their own, but their measurement results are correlated whatever the distance between them. The correlation alone cannot send a message (no-signalling); it becomes useful together with classical communication.</p>
+<h2>The four Bell states</h2>
+```gbox
+|Φ⁺⟩ = (|00⟩ + |11⟩)/√2      from |00⟩      Bell measurement reads 00
+|Ψ⁺⟩ = (|01⟩ + |10⟩)/√2      from |01⟩                            01
+|Φ⁻⟩ = (|00⟩ − |11⟩)/√2      from |10⟩                            10
+|Ψ⁻⟩ = (|01⟩ − |10⟩)/√2      from |11⟩                            11
+create:  H on q0, then CNOT q0→q1        measure (Bell basis):  CNOT q0→q1, then H on q0, then measure
+```
+<p>They form an orthonormal basis of two-qubit space, and each is maximally entangled. One-qubit Paulis move between them: X⊗I Φ⁺ = Ψ⁺, Z⊗I Φ⁺ = Φ⁻, ZX⊗I Φ⁺ = Ψ⁻ (up to sign).</p>
+<h2>GHZ state</h2>
+<p>(|000⟩ + |111⟩)/√2, made by H on q0 and then CNOTs from q0 (or chained). Outcomes are 000 or 111, each with probability ½. Genuine three-party entanglement: tracing out any one qubit leaves the other two merely classically correlated.</p>
+<h2>CHSH / Bell inequality</h2>
+```gbox
+S = E(a,b) − E(a,b′) + E(a′,b) + E(a′,b′)
+local hidden variables: |S| ≤ 2          quantum (Φ⁺, E = cos(a−b)):  up to 2√2 ≈ 2.83
+best angles: a = 0, a′ = π/2, b = π/4, b′ = 3π/4  →  S = 2√2
+```
+<p>Measured violations (Aspect, and the 2015 loophole-free tests) show that nature is not locally realistic. Entanglement is a real resource, and it is used for device-independent QKD.</p>
+
+=== 3.2
+Q: Apr26 Q2, Apr26 Q6, Apr26 Q13, QB Q22, QB Q23, QB Q24, PR Q6, PR Q7, IA2 Q9, PRT Q3
+<h2>Teleportation: one Bell pair + 2 classical bits → 1 qubit</h2>
+```gbox
+q0  |ψ⟩ ────────────●──H──M── m1 ┐
+q1  |0⟩ ──H──●──────⊕─────M── m2 ┤ (classical)
+q2  |0⟩ ─────⊕──────────────────X^m2──Z^m1── |ψ⟩
+```
+<ol class="steps">
+<li>Shared pair |Φ⁺⟩ on q1 (Alice) and q2 (Bob). Total state (α|0⟩ + β|1⟩)⊗(|00⟩ + |11⟩)/√2.</li>
+<li>Alice: CNOT q0→q1, then H on q0.</li>
+<li>Regroup by Alice's two qubits:</li>
+</ol>
+```gbox
+½[ |00⟩(α|0⟩+β|1⟩) + |01⟩(α|1⟩+β|0⟩) + |10⟩(α|0⟩−β|1⟩) + |11⟩(α|1⟩−β|0⟩) ]
+```
+<table class="tbl"><tr><th>Alice measures m1 m2</th><th>Bob holds</th><th>Bob applies</th></tr>
+<tr><td>00</td><td>α|0⟩ + β|1⟩</td><td>I</td></tr><tr><td>01</td><td>β|0⟩ + α|1⟩ = X|ψ⟩</td><td>X</td></tr>
+<tr><td>10</td><td>α|0⟩ − β|1⟩ = Z|ψ⟩</td><td>Z</td></tr><tr><td>11</td><td>−β|0⟩ + α|1⟩ = ZX|ψ⟩</td><td>X then Z</td></tr></table>
+<p>Each outcome has probability ¼, independent of α and β, so Alice learns nothing. Bob has nothing useful until the 2 bits arrive, so it is not faster than light. Alice's copy is destroyed, so no cloning happens.</p>
+<p class="callout">If the shared pair is not Φ⁺ (QB Q24 uses Ψ⁺), work it out from scratch: Bob's qubit carries an extra X, and the correction table changes (00 → X, 01 → I, 10 → ZX, 11 → Z).</p>
+
+=== 3.3
+Q: Apr26 Q20a, QB Q25, QB Q26, PR Q8, PR Q9, IA2 Q10, PRT Q1
+<h2>Superdense coding: 1 qubit + 1 Bell pair → 2 classical bits</h2>
+<p>This is teleportation reversed. Alice holds q0 and Bob holds q1 of |Φ⁺⟩.</p>
+<table class="tbl"><tr><th>Message</th><th>Alice applies to q0</th><th>State</th><th>Bob: CNOT q0→q1, H q0 →</th></tr>
+<tr><td>00</td><td>I</td><td>Φ⁺</td><td>|00⟩</td></tr><tr><td>01</td><td>X</td><td>Ψ⁺</td><td>|01⟩</td></tr>
+<tr><td>10</td><td>Z</td><td>Φ⁻</td><td>|10⟩</td></tr><tr><td>11</td><td>ZX (X then Z)</td><td>Ψ⁻ (up to −1)</td><td>|11⟩</td></tr></table>
+```gbox
+message 01:  X on q0: (|10⟩+|01⟩)/√2 → CNOT: (|11⟩+|01⟩)/√2 = |+⟩|1⟩ → H: |01⟩
+```
+<p>It works because the four Bell states are <b>orthogonal</b>, so one measurement distinguishes them perfectly. A single qubit on its own can carry at most 1 bit (Holevo's bound); the pre-shared entanglement supplies the second.</p>
+<p class="callout">If the shared state is different (Φ⁻ in Practice Q9, Ψ⁻ in Protocols Q1), choose Alice's gate so that her result is the Bell state Bob's decoder maps to the message. With Ψ⁻ shared, "11" needs no gate at all.</p>
+
+=== 3.4
+Q: Apr26 Q20b, QB Q27, QB Q28, PR Q4, PR Q5, PR Q16, IA2 Q8, PRT Q2
+<h2>Why QKD</h2>
+<p>RSA and ECC rely on hard maths that Shor's algorithm breaks. QKD's security rests on <b>physics</b> instead: measurement disturbs the state, and unknown states cannot be copied (no-cloning). Setup: a quantum channel (photons) plus an authenticated public classical channel.</p>
+<h2>BB84 (Bennett–Brassard 1984)</h2>
+```gbox
+Z basis (rectilinear):  0 → |0⟩   1 → |1⟩
+X basis (diagonal):     0 → |+⟩   1 → |−⟩
+```
+<ol class="steps">
+<li>Alice picks random bits and random bases, and sends the corresponding states.</li>
+<li>Bob measures each qubit in a random basis.</li>
+<li><b>Sifting:</b> they announce their <b>bases</b> (not the bits) publicly and keep only the positions where the bases match. About half survive.</li>
+<li><b>Error estimation:</b> they reveal a random sample of the sifted bits. QBER = mismatches / compared bits.</li>
+<li>If the QBER is below the threshold (about 11 %), they run error correction, then privacy amplification, and keep the final key. Otherwise they abort.</li>
+</ol>
+<p><b>Solving the table questions:</b> mark ✓ where the bases match, copy Bob's (or Alice's) bit at those positions, and that is the key. The number discarded = total − matches.</p>
+<h2>Eavesdropper detection</h2>
+<p>Eve does not know the basis. If she measures in the wrong one (probability ½), she resends the wrong state, and Bob, measuring in the correct basis, then gets a random bit (wrong with probability ½). So an intercept-resend attack causes about <b>25 % errors</b> in the sifted key. Example: Eve always measures in Z, so the kept X-basis positions are wrong half the time.</p>
+<h2>No-cloning theorem</h2>
+<p>There is no unitary U with U|ψ⟩|0⟩ = |ψ⟩|ψ⟩ for all |ψ⟩. Proof: cloning |0⟩ and |1⟩ plus linearity gives U|+⟩|0⟩ = (|00⟩ + |11⟩)/√2, which is not |+⟩|+⟩. So Eve cannot keep a copy and measure it later in the right basis.</p>

@@ -1,0 +1,88 @@
+=== 2.1
+Q: SQ Q1, SQ Q2, SQ Q3, SQ Q4, SQ Q5, SQ Q6, SQ Q7, SQ Q8, SQ Q9, SQ Q10, SQ Q11, SQ Q12, SQ Q13, SQ Q14, SQ Q15, SQ Q16, SQ Q17, QB Q5, QB Q6, QB Q17, IA2 Q1, IA2 Q2, PR Q10, PR Q19
+<h2>The gates</h2>
+<table class="tbl"><tr><th>Gate</th><th>Matrix</th><th>|0⟩ →</th><th>|1⟩ →</th><th>Bloch rotation</th></tr>
+<tr><td>X (NOT)</td><td>[[0,1],[1,0]]</td><td>|1⟩</td><td>|0⟩</td><td>π about x</td></tr>
+<tr><td>Y</td><td>[[0,−i],[i,0]]</td><td>i|1⟩</td><td>−i|0⟩</td><td>π about y</td></tr>
+<tr><td>Z (phase flip)</td><td>[[1,0],[0,−1]]</td><td>|0⟩</td><td>−|1⟩</td><td>π about z</td></tr>
+<tr><td>H (Hadamard)</td><td>(1/√2)[[1,1],[1,−1]]</td><td>|+⟩</td><td>|−⟩</td><td>π about (x+z)/√2</td></tr>
+<tr><td>S (√Z)</td><td>[[1,0],[0,i]]</td><td>|0⟩</td><td>i|1⟩</td><td>π/2 about z</td></tr>
+<tr><td>T (√S)</td><td>[[1,0],[0,e^{iπ/4}]]</td><td>|0⟩</td><td>e^{iπ/4}|1⟩</td><td>π/4 about z</td></tr></table>
+<h2>How to compute (your teacher's 5 steps)</h2>
+<ol class="steps"><li>Write the gate matrix.</li><li>Write the input as a column vector.</li><li>Output = matrix × vector.</li><li>Multiply row by column.</li><li>Read off the ket.</li></ol>
+<p><b>A sequence of gates acts right to left:</b> HX|1⟩ means X first, then H. A circuit diagram is read left to right, so the matrix product is written in reverse order.</p>
+<h2>Identities worth memorising</h2>
+```gbox
+X² = Y² = Z² = H² = I         S² = Z      T² = S
+HZH = X     HXH = Z     HYH = −Y
+XZ = −ZX    Y = iXZ
+X|±⟩ = ±|±⟩    Z|±⟩ = |∓⟩    H|±⟩ = |0⟩,|1⟩
+```
+<h2>Unitarity</h2>
+<p>Every gate satisfies U†U = I (U† is the conjugate transpose), so it is reversible and preserves normalisation. Check it by multiplying the matrices (SQ Q13–Q15).</p>
+<p class="callout">Phase gates (Z, S, T) never change Z-basis probabilities, only phases. To see their effect, put an H after them: H S H|0⟩ gives ((1+i)/2)|0⟩ + ((1−i)/2)|1⟩.</p>
+
+=== 2.2
+Q: Apr26 Q4, Apr26 Q18b, QB Q8, QB Q9, QB Q19
+<h2>Classical compound systems</h2>
+<p>For systems X, Y, … the state set is the <b>Cartesian product</b> Σ_X × Σ_Y × …, listed in alphabetical (lexicographic) order. The size is the product of the sizes.</p>
+```gbox
+three bits: {0,1}³ = {000, 001, 010, 011, 100, 101, 110, 111}  (8 states)
+X∈{0,1}, Y∈{a,b,c}, Z∈{0,1}: 2·3·2 = 12 states
+independent:  p(x, y) = p(x)·p(y)        e.g. p(1, b) = 0.7 × 0.2 = 0.14
+```
+<h2>Quantum: the tensor product</h2>
+```gbox
+[a]⊗[c] = [ac]       |0⟩⊗|1⟩ = |01⟩ = (0,1,0,0)ᵀ
+[b] [d]   [ad]
+          [bc]       |+⟩⊗|−⟩ = ½(1, −1, 1, −1)ᵀ = ½(|00⟩ − |01⟩ + |10⟩ − |11⟩)
+          [bd]
+```
+<ul><li>Basis order: |00⟩, |01⟩, |10⟩, |11⟩. The <b>left</b> bit is the first qubit (q0 on this site).</li>
+<li>Gates on separate qubits: (A⊗B)(|a⟩⊗|b⟩) = (A|a⟩)⊗(B|b⟩). Example: (X⊗Z⊗H)|011⟩ = |1⟩ ⊗ (−|1⟩) ⊗ |−⟩.</li>
+<li>Marginal probability of one qubit: add the |amplitude|² of every string with that value.</li>
+<li>Partial measurement: keep the matching terms, then divide by √(their total probability).</li></ul>
+
+=== 2.3
+Q: Apr26 Q12, Apr26 Q18a, QB Q13, QB Q15, QB Q16, QB Q20, PR Q17, PR Q18
+<h2>Two- and three-qubit gates</h2>
+<table class="tbl"><tr><th>Gate</th><th>Rule</th><th>Notes</th></tr>
+<tr><td>CNOT (CX)</td><td>|c, t⟩ → |c, t ⊕ c⟩</td><td>flips the target when the control = 1; its own inverse</td></tr>
+<tr><td>CZ</td><td>|11⟩ → −|11⟩</td><td>symmetric (no fixed control/target); (I⊗H)CZ(I⊗H) = CNOT</td></tr>
+<tr><td>SWAP</td><td>|ab⟩ → |ba⟩</td><td>= three CNOTs, alternating direction</td></tr>
+<tr><td>Toffoli (CCX)</td><td>|a, b, c⟩ → |a, b, c ⊕ ab⟩</td><td>reversible AND; universal for classical logic</td></tr>
+<tr><td>Controlled-U</td><td>|0⟩|ψ⟩ → |0⟩|ψ⟩, |1⟩|ψ⟩ → |1⟩U|ψ⟩</td><td>used in phase estimation</td></tr></table>
+```gbox
+CNOT = [1 0 0 0]     CZ = diag(1, 1, 1, −1)     SWAP = [1 0 0 0]
+       [0 1 0 0]                                       [0 0 1 0]
+       [0 0 0 1]                                       [0 1 0 0]
+       [0 0 1 0]                                       [0 0 0 1]
+```
+<h2>How to apply them</h2>
+<p>Go <b>term by term</b>: for each basis ket in the superposition, check the control bit(s), flip the target if needed, and keep the amplitude. Read the diagram carefully: the dot (●) is the control and ⊕ is the target. The control can be the lower wire (QB Q11, Q18).</p>
+<p><b>Phase kickback:</b> if the target is |−⟩, a CNOT puts a −1 on the control's |1⟩ branch and leaves the target as it is: CNOT|x⟩|−⟩ = (−1)^x|x⟩|−⟩. This trick drives Deutsch–Jozsa, Bernstein–Vazirani and Grover's oracle.</p>
+<p><b>Eigenstate trick:</b> X|+⟩ = |+⟩, so a CNOT or Toffoli with its target in |+⟩ does nothing (QB Q11, Q16; Practice Q18).</p>
+
+=== 2.4
+Q: Apr26 Q5, Apr26 Q19a, Apr26 Q19b, QB Q10, QB Q11, QB Q12, QB Q14, QB Q18, PR Q3, PR Q11, IA2 Q5, IA2 Q6, IA2 Q7
+<h2>The method for "trace the circuit" questions</h2>
+<ol class="steps">
+<li>Write the initial state and <b>state the ket order</b> (q0 on the left).</li>
+<li>Take the gates in time order (left to right in the diagram). Gates in the same column act on different qubits, so they can be applied in either order.</li>
+<li>Write the full state after <b>every</b> gate: each roman-numeral sub-part asks for one of these.</li>
+<li>Simplify: collect like terms and factor out common pieces.</li>
+<li>Answer what was asked: probabilities, post-measurement state, entangled or not.</li>
+</ol>
+<h2>Is it entangled?</h2>
+<p>For two qubits a|00⟩ + b|01⟩ + c|10⟩ + d|11⟩:</p>
+```gbox
+separable  ⇔  ad − bc = 0          (det of [a b; c d])
+(|00⟩+|11⟩)/√2 : ad − bc = ½ ≠ 0   → entangled
+(|00⟩+2|10⟩)/√5: ad − bc = 0       → separable = ((|0⟩+2|1⟩)/√5)⊗|0⟩
+```
+<p>For more qubits, check whether any one qubit can be factored out. GHZ (|000⟩ + |111⟩)/√2 cannot be split in any way.</p>
+<h2>Standard building blocks</h2>
+<ul><li><b>H then CNOT</b> on |00⟩ gives the Bell state |Φ⁺⟩. Further CNOTs from the same line give GHZ.</li>
+<li><b>CNOT then H</b> (the reverse) is the Bell measurement used in teleportation and superdense coding.</li>
+<li><b>Measuring part of a state:</b> keep the terms that match the outcome, renormalise, and drop the measured qubit. (Apr26 Q19a(iv): q0 = 1 leaves q1q2 = |−⟩|1⟩.)</li></ul>
+<p class="callout">Typical slip: applying H to |1⟩ and forgetting the minus sign. H|1⟩ = (|0⟩ − |1⟩)/√2.</p>
