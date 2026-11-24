@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en" data-subject="quantum">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script src="../shared/study.js"></script>
+<meta charset="utf-8">
+<title>Quantum Tutor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Same layout as the Web Tech tutor. Question pages: the question as a screenshot, then its answer. */
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --ink:#111c26; --muted:#566775; --line:#d8e0e6;
+  --accent:#0a6f8f; --accent-soft:#dff0f5; --accent-ink:#ffffff;
+  --var:#6d2fb0; --var-bg:#efe6fa; --term:#a8480a; --term-bg:#fdeedd;
+  --ok:#1b7f45; --ok-soft:#e0f3e8; --warn:#a8480a; --warn-soft:#fdeedd; --code:#eaf0f4;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;padding:0}
+h1,h2,h3{line-height:1.25;text-wrap:balance;margin:0}
+h2{font-size:1.25rem;margin-top:2rem} h3{font-size:1.05rem;margin-top:1.4rem}
+p{margin:.6rem 0} a{color:var(--accent)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+code{background:var(--code);padding:.08em .35em;border-radius:4px}
+.v{color:var(--var);font-weight:600} .t{color:var(--term);font-weight:600}
+.shell{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100vh}
+#side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:20px 12px 30px max(12px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);background:var(--surface)}
+#side h4{margin:20px 0 6px;padding:0 10px;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side a{display:flex;gap:10px;align-items:baseline;padding:5px 10px;text-align:left;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.92rem}
+#side a:hover{background:var(--accent-soft)} #side a.on{background:var(--accent-soft);font-weight:600}
+#side a .no{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:2.2rem;flex:none}
+#side a.home{margin-top:12px}
+#side .srch{position:relative;margin:10px 0 2px;padding:0 6px}
+#side .srch input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem}
+#side .sres{margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);max-height:62vh;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+#side .sres h5{margin:0;padding:9px 10px 3px;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side .sres a{display:block;padding:6px 10px;font-size:.86rem;line-height:1.3;border-radius:0}
+#side .sres a.sel,#side .sres a:hover{background:var(--accent-soft)}
+#side .sres a .sn{font-family:var(--mono);font-size:.76rem;color:var(--muted);margin-right:6px}
+#side .sres a small{display:block;color:var(--muted);font-size:.76rem;margin-top:1px;overflow-wrap:anywhere}
+#side .sres .none{padding:10px;color:var(--muted);font-size:.85rem}
+#side .sres .more{padding:4px 10px 8px;color:var(--muted);font-size:.76rem}
+.hit{animation:hit 2.4s ease-out}@keyframes hit{0%{outline:3px solid var(--term);outline-offset:3px}100%{outline:3px solid transparent;outline-offset:3px}}
+
+.nav .btn{text-decoration:none}
+.prog{padding:6px 10px 0;font-size:.8rem;color:var(--muted)}
+.scrim{display:none}
+.dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--muted);flex:none;transform:translateY(1px)}
+.dot.done{background:var(--ok);border-color:var(--ok)} .dot.now{border-color:var(--accent);background:var(--accent-soft)}
+.brand{display:flex;align-items:baseline;gap:10px;font-weight:600;padding:0 10px;font-size:1.05rem}
+.brand small{color:var(--muted);font-weight:400}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 8px 0}
+.bar i{display:block;height:100%;background:var(--ok)}
+main{padding:24px clamp(20px,4vw,56px) 80px;min-width:0;max-width:1060px;width:100%}
+.menu{display:none}
+.kicker{font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.04em}
+.pill{display:inline-block;font-size:.74rem;padding:1px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-left:8px;vertical-align:middle}
+.pill.done{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.now{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.chip{font-size:.78rem;font-family:var(--mono);padding:2px 8px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+.card.model{border-left:4px solid var(--accent)}
+.card h3:first-child{margin-top:0}
+.callout{background:var(--warn-soft);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:.95rem}
+.callout.ok{background:var(--ok-soft)}
+.tbl{border-collapse:collapse;width:100%;font-size:.93rem}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.tbl th{background:var(--code);font-weight:600}
+.scroll{overflow-x:auto;max-width:100%}
+.g{font-family:var(--mono);font-size:.95rem;white-space:pre-wrap}
+.gbox{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;white-space:pre;overflow-x:auto;margin:10px 0}
+ol.practice{padding-left:0;list-style:none;counter-reset:q;display:grid;gap:12px}
+ol.practice>li{counter-increment:q;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+ol.practice>li::before{content:"Q" counter(q);font-family:var(--mono);font-weight:600;color:var(--accent);margin-right:8px}
+.src{font-family:var(--mono);font-size:.74rem;background:var(--code);padding:1px 7px;border-radius:4px;color:var(--muted);margin-right:6px}
+details.ans{margin-top:8px} details.ans summary{cursor:pointer;color:var(--accent);font-size:.9rem;font-weight:500}
+details.ans>div{margin-top:8px;padding:10px 14px;background:var(--ok-soft);border-radius:8px;font-size:.95rem}
+button,.btn{font:inherit;font-size:.9rem;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:7px}
+button:hover{border-color:var(--accent)} button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=number]{font:inherit;font-family:var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:5px 9px;max-width:100%}
+.w{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.w .cap{font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.form{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0;font-family:var(--mono);font-size:1.1rem}
+.tok{padding:2px 8px;border-radius:6px;border:1px solid var(--line);min-width:1.9rem;text-align:center}
+.tok.var{background:var(--var-bg);color:var(--var);border-color:transparent;font-weight:600}
+.tok.term{background:var(--term-bg);color:var(--term);font-weight:600;border-color:transparent}
+button.tok.var{cursor:pointer;font:inherit;font-family:var(--mono);font-size:1.1rem;font-weight:600}
+.tok.var.sel{outline:2px solid var(--var);outline-offset:1px}
+.tok.dis{opacity:.4;cursor:default}
+.log{font-family:var(--mono);font-size:.88rem;color:var(--muted);margin:8px 0}
+.log b{color:var(--ink);font-weight:500}
+.split{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.split>*{min-width:0}
+.msg{margin-top:8px;font-size:.93rem}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--warn)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:38px;flex-wrap:wrap}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.big{font-size:2.6rem;font-weight:600;line-height:1;font-family:var(--mono)}
+@media (max-width:820px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:0}
+  #side{position:fixed;inset:0 auto 0 0;width:min(86vw,300px);z-index:30;box-shadow:0 0 24px rgba(0,0,0,.25);transform:translateX(-105%);transition:transform .2s;padding:18px 14px 30px max(16px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);height:100%}
+  body.open #side{transform:none}
+  body.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+  main{padding:56px 16px 80px}
+  .menu{display:inline-block}
+}
+@media (prefers-reduced-motion:reduce){#side{transition:none}}
+.dot.ready{border-color:var(--accent)}
+.pill.ready{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.steps{counter-reset:s;padding-left:0;list-style:none;display:grid;gap:10px;margin:10px 0}
+.steps>li{counter-increment:s;padding-left:36px;position:relative}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:.8rem;font-weight:600}
+.qimg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px}
+.pyq{border-left:3px solid var(--term);background:var(--warn-soft);border-radius:6px;padding:8px 12px;margin:6px 0 10px;font-size:.95rem;white-space:pre-line}
+.steps>li,.practice>li{min-width:0;overflow-wrap:anywhere}
+.steps>li .scroll,.card .scroll{max-width:100%}
+.card,.w,.callout{min-width:0;max-width:100%}
+code{overflow-wrap:anywhere}
+pre.sql{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:.88rem;line-height:1.5;white-space:pre;max-width:100%}
+.tbl{margin:10px 0}
+.qa{margin:18px 0 26px;scroll-margin-top:12px}
+.qa .qh{margin:0 0 6px}
+.answer{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:8px;padding:10px 16px;margin-top:8px;min-width:0}
+.answer .kicker{color:var(--ok);font-weight:600}
+.answer.todo{border-left-color:var(--line);color:var(--muted);font-size:.92rem}
+.answer ul{padding-left:1.3rem}
+pre.code,pre.out{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:.86rem;line-height:1.5;white-space:pre;max-width:100%}
+pre.code{border-left:3px solid var(--accent)}
+pre.out{background:#0f1720;color:#d5e3ee;border-left:3px solid var(--ok)}
+.qjump{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0}
+.qjump a{font-family:var(--mono);font-size:.78rem;padding:2px 7px;border:1px solid var(--line);border-radius:5px;text-decoration:none;background:var(--surface)}
+.qlinks li{margin:4px 0}
+.qjump a.todo{color:var(--muted);border-style:dashed}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav id="side" aria-label="Contents"></nav>
+  <main id="main"></main>
+</div>
+<div class="scrim" onclick="document.body.classList.remove('open')"></div>
+<script src="answers.js"></script>
+<script src="chunks.js"></script>
+<script>
+/* PYQ: [tag, question text (search and alt text), marks, 1 = no screenshot]. Generated by AutoLAB/Subjects/Quantum-theory/pyq/pyq_js.py */
+var PYQ=[
+["Apr26 Q1", "Define quantum entanglement.", "1 mark"],
+["Apr26 Q2", "State the role of measurement in quantum teleportation.", "1 mark"],
+["Apr26 Q3", "Determine the probability of measuring the state ∣1⟩of the given qubit.", "1 mark"],
+["Apr26 Q4", "Define the classical state set of a compound system (X, Y).", "1 mark"],
+["Apr26 Q5", "Interpret the meaning of an entangled state in a two-qubit system.", "1 mark"],
+["Apr26 Q6", "Summarize the role of classical communication in the quantum teleportation protocol.", "1 mark"],
+["Apr26 Q7", "Sate the objective of the Bernstein–Vazirani algorithm.", "1 mark"],
+["Apr26 Q8", "Identify the hidden string (s) in Simon’s algorithm.", "1 mark"],
+["Apr26 Q9", "Interpret the role of Inverse QFT in phase estimation.", "1 mark"],
+["Apr26 Q10", "Interpret the need of adiabatic quantum computation.", "1 mark"],
+["Apr26 Q11", "A qubit is represented as . Determine the normalization condition and the physical meaning of α and β", "3 marks"],
+["Apr26 Q12", "Describe the action of a Controlled-NOT operation on two bits with state transitions.", "3 marks"],
+["Apr26 Q13", "Explain the concept of quantum teleportation and the roles of Alice and Bob in the protocol.", "3 marks"],
+["Apr26 Q14", "Describe the working principle of the Bernstein–Vazirani algorithm and the process to identify the hidden string efficiently.", "3 marks"],
+["Apr26 Q15", "Employ Quantum Phase Estimation circuit, to control unitary operations encode the phase into the control qubits.", "3 marks"],
+["Apr26 Q16", "Interpret the significance of the Gottesman–Knill theorem.", "3 marks"],
+["Apr26 Q17a", "Explain the concept of quantum spin measurement in terms of i. spin states in matrix form ii. measurement probabilities iii. collapse of quantum state after measurement", "6 marks"],
+["Apr26 Q17b", "A single qubit is represented on the Bloch sphere by the state:  Explain the significance of parameters θ and ϕ  Show how superposition states are represented geometrically  Discuss special cases (|0⟩, |1⟩, |+⟩) on the Bloch sphere", "6 marks"],
+["Apr26 Q18a", "Perform the follwing on a 2-qubit system is in the state ∣ψ⟩=∣01⟩for the given circuit i. Determine the intermediate state after X gate. ii. Compute the final output state. iii. Verify the correctness using truth table logic of CNOT.", "6 marks"],
+["Apr26 Q18b", "Explain the process of generating Cartesian products for classical states of multiple systems using an example of three bits", "6 marks"],
+["Apr26 Q19a", "A three-qubit quantum system is initially prepared in the state and the circuit is as given. i. Construct the initial state of the system. ii. Determine the quantum state after the Hadamard and first CNOT operations. iii. Compute the final quantum state after the complete sequence of gates. iv. Given that the first qubit is measured as ∣1⟩, determine the post- measurement state of qubits q1 and q2.", "6 marks"],
+["Apr26 Q19b", "A 2-qubit system is initialized as and the circuit is given below i. Determine the intermediate quantum states after each gate operation. ii. Compute the final output state of the system. iii. Express the resulting state in Dirac notation. iv. Determine whether the resulting state is entangled or separable.", "6 marks"],
+["Apr26 Q20a", "Derive the superdense coding protocol to transmit two classical bits using a single qubit and shared entanglement. Illustrate the entire process. Alice and Bob initially share the Bell state: Alice wants to send the classical message 01 to Bob.", "8 marks"],
+["Apr26 Q20b", "In a BB84 protocol execution, Bob measures qubits as follows: Position 1 2 3 4 5 6 Bob’s Bases Z X Z X Z X Bob’s Bits 0 1 1 0 1 1 After transmission, Alice announces her chosen bases: Position 1 2 3 4 5 6 Alice’s Bases Z Z Z X X X Identify the positions where Alice and Bob used the same basis and determine the final shared secret key.", "4 marks"],
+["Apr26 Q21", "Consider a search space of N=4 elements where the marked element is ∣10⟩ i. Construct the initial equal superposition state of the system. ii. Determine the resulting state after the oracle marks the target state. iii. Perform the diffusion (inversion-about-mean) operation and obtain the updated state. iv. Compute the amplitudes of all basis states after one iteration. i. Evaluate the probability of measuring the target state.", "12 marks"],
+["Apr26 Q22", "Given a function f(x)=s.x where the hidden string is s=101, i. Determine the initial state of the qubits. ii. Obtain the superposition state after performing the Hadamard transformation on all input qubits. iii. Deduce the action of the oracle and derive how the function f(x) is encoded into the quantum state. iv. Evaluate the resulting state after performing the final Hadamard transformations. CO4 A 12 v. Deduce the hidden string sss from the measurement outcome.", ""],
+["Apr26 Q23", "Consider a unitary operator U such that : QPE Circuit: i. Determine the initial quantum state of the control and target registers. ii. Obtain the superposition state after performing the Hadamard transformation on the control qubits. iii. Interpret the effect of controlled-U2koperations iv. Evaluate the outcome after performing the inverse Quantum Fourier Transform v. Relate the obtained phase to the period of the function in Shor’s algorithm. vi. Deduce the factors of a composite number using the identified period.", "12 marks"],
+["Apr26 Q24", "Explain the concepts of adiabatic optimization, quantum annealing, and their role in quantum machine learning.", "12 marks"],
+["Nov24 Q1", "Analyze how the Gram-Schmidt process ensures the orthonormality of vectors in a quantum state, and discuss its significance in qubit representation.", "20 marks"],
+["Nov24 Q2", "Evaluate the implications of the Cauchy-Schwarz inequality in defining quantum states' measurement accuracy, using bra-ket formalism.", "20 marks"],
+["Nov24 Q3a", "Apply the Pauli operators to represent a quantum observable in matrix form for a two-dimensional quantum system.", "10 marks"],
+["Nov24 Q3b", "Design a matrix representation for a Hermitian operator in two-dimensional space and justify its importance in quantum mechanics.", "10 marks"],
+["Nov24 Q4", "Apply the concept of outer products to express the projection operator in terms of eigenvectors for a given observable.", "20 marks"],
+["Nov24 Q5", "Evaluate how commutator algebra underlies the Heisenberg uncertainty principle and its implications for measuring quantum observables.", "20 marks"],
+["Nov24 Q6", "Analyze the significance of polar decomposition and singular values in interpreting quantum states within the framework of quantum mechanics postulates.", "20 marks"],
+["Nov24 Q7", "Evaluate the utility of the density operator for characterizing mixed states.", "20 marks"],
+["Nov24 Q8a", "Compare and contrast projective and generalized measurements in terms of their effects on quantum states and the information they provide.", "10 marks"],
+["Nov24 Q8b", "Design a quantum circuit that employs positive operator-valued measures (POVMs) to discriminate between two specific quantum states.", "10 marks"],
+["Nov24 Q9", "Propose a novel quantum algorithm inspired by genetic programming principles to solve a specific computational problem. CO6 C 20 CO3 compute the algebra and demonstrate the uncertainty principle, decomposition operations.", ""],
+["QB Q1", "A qubit is in the state |ψ⟩ = (1/2)|0⟩ + (√3/2)|1⟩. Determine P(0), P(1) and the state of the qubit after a measurement in the computational basis gives the outcome |1⟩.", ""],
+["QB Q2", "Normalize the state |ψ⟩ = 2|0⟩ + (1 −i)|1⟩ and find the probabilities of measuring |0⟩ and |1⟩.", ""],
+["QB Q3", "A qubit on the Bloch sphere has θ = π/3 and φ = π. Write the state as α|0⟩ + β|1⟩, find the measurement probabilities and determine the Bloch vector (x, y, z).", ""],
+["QB Q4", "A spin-½ particle is in the state |ψ⟩ = (3/5)|↑⟩ + (4i/5)|↓⟩. If S_z is measured, determine the probabilities of the outcomes ±ħ/2 and the expectation value ⟨S_z⟩.", ""],
+["QB Q5", "A qubit initially in |0⟩ is passed through the gate sequence H, then S, then H. Determine the final state and the probabilities of measuring |0⟩ and |1⟩.", ""],
+["QB Q6", "A qubit initially in |0⟩ is passed through the gate sequence X, H, Z, H. Using the relation HZH = X, determine the final state.", ""],
+["QB Q7", "A two-qubit system is in the state |ψ⟩ = (1/√6)(|00⟩ + 2|01⟩ −|10⟩). Determine the probability of measuring |01⟩ and the probability that the first qubit is found in |0⟩.", ""],
+["QB Q8", "A compound system has X ∈{0, 1}, Y ∈{a, b, c} and Z ∈{0, 1}. Write the number of classical states of (X, Y, Z). If X and Y are independent with p_X = (0.3, 0.7) and p_Y = (0.5, 0.2, 0.3), find the joint probability of (X, Y) = (1, b).", ""],
+["QB Q9", "Compute the two-qubit state |+⟩ ⊗|−⟩ and write it as a four-entry state vector in the basis {|00⟩, |01⟩, |10⟩, |11⟩}.", ""],
+["QB Q10", "A 2-qubit system in the state |ψ⟩ = (1/√3)|00⟩ + √(2/3)|10⟩ passes through the circuit shown. Compute the output state and determine whether it is separable or entangled.", ""],
+["QB Q11", "The state (|01⟩ + |11⟩)/√2 is applied to the circuit shown, in which q1 is the control and q0 is the target. Determine the output state and state whether the circuit changes it.", ""],
+["QB Q12", "The circuit shown is applied to |00⟩. Compute the state after each stage and determine whether the final state is separable or entangled.", ""],
+["QB Q13", "The circuit shown builds a SWAP gate from three CNOTs. Evaluate it for the input |01⟩, showing the state after each CNOT.", ""],
+["QB Q14", "A three-qubit system is initialised in |100⟩ and passed through the circuit shown. Determine the state after each gate and classify the final state.", ""],
+["QB Q15", "The input |+⟩|+⟩|0⟩ is applied to the circuit shown (Toffoli gate on q2). Compute the output state.", ""],
+["QB Q16", "The input |110⟩ is passed through the circuit shown. Determine the final state and explain the result.", ""],
+["QB Q17", "The Pauli-Y gate is applied to |+⟩ and then a Hadamard gate is applied. Determine the final state.", ""],
+["QB Q18", "The circuit shown is applied to |00⟩. Determine the intermediate states, the final state and whether it is entangled.", ""],
+["QB Q19", "Evaluate (X ⊗Z ⊗H)|011⟩ and write the result in Dirac notation.", ""],
+["QB Q20", "The circuit shown (H on the target, a controlled-Z, then H on the target) is applied to |11⟩. Determine the output and identify the equivalent gate.", ""],
+["QB Q21", "The state (|00⟩ −|11⟩)/√2 is applied to the circuit shown. Determine the measurement outcome.", ""],
+["QB Q22", "In the teleportation circuit shown, Alice’s state is |ψ⟩ = (1/2)|0⟩ + (√3/2)|1⟩ and the shared pair is |Φ⁺⟩. If Alice measures 01 (m1 = 0, m2 = 1), determine Bob’s state before correction and the correction required.", ""],
+["QB Q23", "Using the teleportation circuit of the previous question, teleport |ψ⟩ = |−⟩ with shared |Φ⁺⟩. For Alice’s outcome 11, find Bob’s state and the corrections.", ""],
+["QB Q24", "Alice teleports |ψ⟩ = (4/5)|0⟩ −(3/5)|1⟩ using the shared state |Ψ⁺⟩ = (|01⟩ + |10⟩)/√2 instead of |Φ⁺⟩, with the same Alice circuit. For outcome (m1, m2) = (1, 0), find Bob’s state and the correction.", ""],
+["QB Q25", "Alice and Bob share |Φ⁺⟩ and use superdense coding. Alice encodes the message 01 with the gate shown and Bob decodes with the circuit shown. Derive the state after each step and Bob’s result.", ""],
+["QB Q26", "Alice and Bob share |Ψ⁺⟩ = (|01⟩ + |10⟩)/√2. Alice sends the message 11 by applying the gate shown, and Bob decodes with the same circuit. Determine the state sent and Bob’s result.", ""],
+["QB Q27", "In a BB84 run, Bob’s bases are X Z X Z Z X X Z and his bits are 1 0 1 1 0 0 1 0. Alice’s bases are X Z Z Z X X Z Z. Find the matching positions and the shared key.", ""],
+["QB Q28", "In BB84 Alice sends the bits 1 0 1 1 0 1 in bases Z X X Z Z X; Bob measures in bases Z Z X X Z X. Find the sifted key Bob should obtain without noise. If Eve measures every qubit in the Z basis, at which kept positions can she introduce errors?", ""],
+["QB Q29", "For the Bell state |Φ⁺⟩ the correlation of measurements along angles a and b is E(a, b) = cos(a −b). Compute the CHSH value S = E(a, b) −E(a, b′) + E(a′, b) + E(a′, b′) for a = 0, a′ = π/2, b = π/4, b′ = 3π/4, and compare with the classical bound.", ""],
+["QB Q30", "Run the Deutsch–Jozsa circuit shown for the oracle f(x1x2) = x1 ⊕x2 (implemented by the two CNOTs). Determine the measurement outcome and the nature of f.", ""],
+["QB Q31", "For n = 3, f(x1x2x3) = x1. Apply the Deutsch–Jozsa algorithm and determine the nature of f from the final measurement.", ""],
+["QB Q32", "The Bernstein–Vazirani circuit shown uses the oracle for s = 101. Determine the state after the oracle, the state after the final Hadamards and the measured string.", ""],
+["QB Q33", "Apply the Bernstein–Vazirani algorithm to f(x) = x2 ⊕x3 on four input qubits and determine the hidden string.", ""],
+["QB Q34", "For Simon’s problem with n = 3, f(x) = f(x ⊕101). List all y with y·s = 0. Two runs give y = 010 and y = 101; solve for s.", ""],
+["QB Q35", "A function on 2 bits is f(00) = f(01) = 11 and f(10) = f(11) = 00. Find the Simon period s, list the y that satisfy s·y = 0 and show that a single non-zero y fixes s.", ""],
+["QB Q36", "Perform Grover’s search for N = 4 with marked element |00⟩. Give the initial amplitudes, the amplitudes after the oracle, the mean, the amplitudes after inversion about the mean and the success probability.", ""],
+["QB Q37", "For Grover’s search with N = 8 and marked element |011⟩, find the target amplitude after one iteration and the success probability after two iterations.", ""],
+["QB Q38", "For Grover’s search over N = 64 items, find the optimal number of iterations and the success probability.", ""],
+["QB Q39", "In Grover’s search with N = 8, the amplitude vector after the oracle is (1/√8)(1, 1, 1, 1, 1, 1, 1, −1). Apply the inversion about the mean and give the new amplitudes.", ""],
+["QB Q40", "Evaluate the QFT circuit shown on the 2-qubit input |01⟩ (q0 = |0⟩, q1 = |1⟩) and write the output state vector.", ""],
+["QB Q41", "Find the QFT of the 3-qubit basis state |x = 2⟩ in product form.", ""],
+["QB Q42", "Apply the inverse QFT (N = 4) to ½(|00⟩ −|01⟩ + |10⟩ −|11⟩).", ""],
+["QB Q43", "The phase estimation circuit shown uses U = T with eigenstate |1⟩ (eigenvalue e^(iπ/4)). Find θ and the measured outcome of the three counting qubits.", ""],
+["QB Q44", "A unitary has eigenphase θ = 1/3. Using a 3-qubit counting register, find the most probable outcome and its probability.", ""],
+["QB Q45", "Find the period of f(x) = 3ˣ mod 11.", ""],
+["QB Q46", "Apply Shor’s algorithm to N = 33 with a = 5. Find the order r and the factors.", ""],
+["QB Q47", "Apply Shor’s algorithm to N = 77 with a = 2. Find r and the factors.", ""],
+["QB Q48", "A logical qubit α|000⟩ + β|111⟩ (3-qubit bit-flip code) suffers an X error on qubit 3. Write the corrupted state, the syndrome (Z₁Z₂, Z₂Z₃) and the correction.", ""],
+["QB Q49", "In the Steane [[7,1,3]] code a bit-flip error occurs on qubit 6. Determine the syndrome and the correction.", ""],
+["QB Q50", "For the problem Hamiltonian H_P = Z₁Z₂ −0.5 Z₂, find the energies of the four basis states and the ground state that an adiabatic algorithm should reach.", ""],
+["IA2 Q1", "State the Z gate in terms of matrix notation.", ""],
+["IA2 Q2", "Derive |-> from |1> by applying appropriate operation.", ""],
+["IA2 Q3", "A two-qubit quantum system is prepared in the state Determine the probability of measuring the system in the state ∣01⟩.", ""],
+["IA2 Q4", "Write the general form of a qubit state on the Bloch sphere and the physical meaning of the angles θ and ϕ.", ""],
+["IA2 Q5", "A two-qubit quantum system is initially prepared in the state The following sequence of operations is performed: A Hadamard gate is applied to the first qubit. A Pauli-Z gate is applied to the second qubit. A CNOT gate is applied with the first qubit as control and the second qubit as target. (a) Identify the initial state of the two-qubit system in Dirac notation. (b) Determine the quantum state after the Hadamard operation on the first qubit. (c) Determine the state after the Pauli-Z operation on the second qubit. (d) Obtain the final two-qubit state after the CNOT operation and state whether the resulting state is separable or entangled.", ""],
+["IA2 Q6", "A two-qubit quantum system is initially prepared in the state |00⟩ (a) Write the initial state of the system in Dirac notation. (b) Determine the state after the Hadamard gate is applied to the first qubit. (c) Determine the state after the Phase (S) gate is applied. (d) Obtain the final two-qubit state after the CNOT operation and comment on the role of the phase factor in the final state.", ""],
+["IA2 Q7", "Evaluate the given quantum circuit.", ""],
+["IA2 Q8", "Bob, and Alice are establishing a secret key using the BB84 protocol. Bob measures the received qubits using the following bases and obtains the corresponding bits: Position 1 2 3 4 5 Bob’s Bases X Z X Z X Bob’s Bits 1 0 1 1 0 After the measurement, Alice announces that she used the following bases: | Z | Z | X | Z | X | Identify the bits that form the shared secret key between Alice and Bob.", ""],
+["IA2 Q9", "Determine the outcome of quantum teleportation for a given input state and a specified measurement result. Alice intends to transmit the quantum state to Bob. The entangled resource shared between them is (a) Formulate the initial three-qubit state using tensor-product notation. (b) Obtain the joint quantum state after the sequence of teleportation operations performed by Alice. (c) Identify the resulting state at Bob’s qubit, given that Alice’s measurement outcome is 01.", ""],
+["IA2 Q10", "Derive the superdense coding protocol to transmit two classical bits by sending a single qubit with the help of shared entanglement. Alice and Bob initially share the maximally entangled Bell state Alice wishes to communicate the classical message 10 to Bob. (a) Construct the initial two-qubit entangled state shared between Alice and Bob. (b) Determine the unitary operation Alice must perform on her qubit to encode the message 10, and obtain the resulting two-qubit state. (c) After Alice sends her qubit to Bob, Bob performs a CNOT operation followed by a Hadamard gate on the appropriate qubit. Determine the final measurement outcome and show how Bob retrieves the transmitted classical message.", ""],
+["PR Q1", "Practice Q1: Two-qubit state (2|00⟩+|01⟩+4|10⟩)/√21: probability of |10⟩", ""],
+["PR Q2", "Practice Q2: Single qubit (|0⟩+4i|1⟩)/√17: normalization, probabilities, Hadamard, P(0) after H", ""],
+["PR Q3", "Practice Q3: Three qubits |000⟩: H on q1, SWAP q1-q2, Z on q1, H on q3; post-measurement state", ""],
+["PR Q4", "Practice Q4: BB84: the state Alice sends for each bit and basis", ""],
+["PR Q5", "Practice Q5: BB84 sifting and key generation, QBER", ""],
+["PR Q6", "Practice Q6: Teleport √(3/5)|0⟩+√(2/5)|1⟩ with Φ+, outcome 01, correction", ""],
+["PR Q7", "Practice Q7: Teleport (|0⟩+2|1⟩)/√5, outcome 11, Pauli correction", ""],
+["PR Q8", "Practice Q8: Superdense coding with Φ+, message 01", ""],
+["PR Q9", "Practice Q9: Superdense coding with Φ−, message 11", ""],
+["PR Q10", "Practice Q10: Qubit |0⟩ through H → X → Z → H", ""],
+["PR Q11", "Practice Q11: Three-qubit entanglement: H, CNOT 1→2, CNOT 2→3, P(000), P(111)", ""],
+["PR Q12", "Practice Q12: Measurement of (3|0⟩+i|1⟩)/√10, then Pauli-X", ""],
+["PR Q13", "Practice Q13: Bloch sphere: cos(π/6)|0⟩+sin(π/6)e^(iπ/3)|1⟩, θ, φ, Bloch vector, hemisphere", ""],
+["PR Q14", "Practice Q14: Density matrix of the pure state (|0⟩+i|1⟩)/√2, Tr ρ, Tr ρ², ⟨Z⟩", ""],
+["PR Q15", "Practice Q15: Mixed-state density matrix: 0.6 |0⟩ and 0.4 |+⟩", ""],
+["PR Q16", "Practice Q16: The no-cloning theorem: statement, proof with |0⟩ and |+⟩, why it matters for BB84", ""],
+["PR Q17", "Practice Q17: CNOT on (|00⟩+2|11⟩)/√5: matrix, output, entanglement, P(second qubit = 1)", ""],
+["PR Q18", "Practice Q18: Toffoli on (|110⟩+|111⟩)/√2", ""],
+["PR Q19", "Practice Q19: Phase gates S and T on |+⟩", ""],
+["PR Q20", "Practice Q20: Bell state generation from |00⟩ and measurement", ""],
+["PR Q21", "Practice Q21: GHZ state and its correlations", ""],
+["PR Q22", "Practice Q22: Deutsch's algorithm for a constant f", ""],
+["SQ Q1", "Compute or prove X|1⟩", ""],
+["SQ Q2", "Compute or prove Z|0⟩", ""],
+["SQ Q3", "Compute or prove Y|0⟩", ""],
+["SQ Q4", "Compute or prove H|1⟩", ""],
+["SQ Q5", "Compute or prove S|1⟩", ""],
+["SQ Q6", "Compute or prove T|1⟩", ""],
+["SQ Q7", "Compute or prove HX|1⟩", ""],
+["SQ Q8", "Compute or prove XH|0⟩", ""],
+["SQ Q9", "Compute or prove HH|0⟩", ""],
+["SQ Q10", "Compute or prove ZH|0⟩", ""],
+["SQ Q11", "Compute or prove HZ|1⟩", ""],
+["SQ Q12", "Compute or prove HY|0⟩", ""],
+["SQ Q13", "Show X is unitary: X†X", ""],
+["SQ Q14", "Show H is unitary: H†H", ""],
+["SQ Q15", "Show Z is unitary: Z†Z", ""],
+["SQ Q16", "Prove HZH = X", ""],
+["SQ Q17", "Prove HXH = Z", ""],
+["PRT Q1", "Superdense coding with Ψ−, message 11: encoding gate, state, Bell-measurement decoding", ""],
+["PRT Q2", "BB84 with six qubits: matching bases, retained qubits, sifted key, discarded count", ""],
+["PRT Q3", "Teleport (|0⟩+2|1⟩)/√5 with Φ+: initial state, Alice's operations, all outcomes and corrections", ""],
+["POS Q1", "Explain the relationship between Quantum System, Quantum State, Wave-function and Probability Density with a neat flow diagram. Also explain how a quantum system is mathematically represented.", "", 1],
+["POS Q2", "Explain the process of measurement in quantum mechanics. What is meant by wave-function collapse, and why does the state of a quantum system change after measurement?", "", 1],
+["POS Q3", "What is Hilbert Space? Explain why quantum states are represented in Hilbert Space. Also describe how a quantum state evolves with time.", "", 1],
+["POS Q4", "Explain the following concepts with suitable examples: Composite Quantum Systems, Expectation Values. Discuss their importance in quantum mechanics.", "", 1],
+["POS Q5", "a) List the five fundamental postulates. b) Explain how the following concepts are related to these postulates: Quantum State, Wave-function, Measurement, Evolution, Composite Systems, Expectation Values.", "", 1]
+];/* ---------- helpers ---------- */
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+/* every question's screenshot is q/<paper>-q<no>.png, cut by AutoLAB/Subjects/Quantum-theory/pyq/crop_q.py and crop_bands.py */
+function qimg(k){var m=/^(\w+) Q(\w+)$/.exec(k);return 'q/'+m[1].toLowerCase()+'-q'+m[2]+'.png'}
+var WIDGETS={};  /* CONTENT (topic pages) comes from chunks.js, built from chunks/*.txt */
+
+
+/* ===== modules (chunks are filled in as they are built) ===== */
+var TITLES=[
+ {n:1,name:'Introduction to Quantum Mechanics',c:[['1.1','Why quantum computing: from the universe to the limits of classical chips'],['1.2','Postulates of quantum mechanics'],['1.3','Qubits, superposition and measurement'],['1.4','Bloch sphere and spin-½'],['1.5','Density matrices: pure and mixed states'],['1.6','Linear algebra and measurement theory (old 18CS3074 paper)']]},
+ {n:2,name:'Quantum Gates and Circuits',c:[['2.1','Single-qubit gates: X, Y, Z, H, S, T'],['2.2','Multiple systems: classical states, tensor products, probabilities'],['2.3','Multi-qubit gates: CNOT, CZ, SWAP, Toffoli'],['2.4','Tracing circuits and testing for entanglement']]},
+ {n:3,name:'Entanglement and Quantum Protocols',c:[['3.1','Bell states, GHZ and the CHSH inequality'],['3.2','Quantum teleportation'],['3.3','Superdense coding'],['3.4','Quantum key distribution (BB84) and no-cloning']]},
+ {n:4,name:'Quantum Algorithms I',c:[['4.1','Query model, Deutsch and Deutsch–Jozsa'],['4.2','Bernstein–Vazirani'],['4.3','Simon’s algorithm'],['4.4','Grover’s search']]},
+ {n:5,name:'Quantum Algorithms II',c:[['5.1','Quantum Fourier transform'],['5.2','Quantum phase estimation'],['5.3','Shor’s factoring algorithm']]},
+ {n:6,name:'Quantum Applications',c:[['6.1','Adiabatic computing, quantum annealing and QML'],['6.2','Quantum error correction: bit-flip, phase-flip, Shor’s 9-qubit code'],['6.3','The Steane 7-qubit code'],['6.4','Fault tolerance, Gottesman–Knill and where quantum helps']]}
+];
+var PKEY='quantum-progress-v1',PROG={};
+try{PROG=JSON.parse(localStorage.getItem(PKEY))||{}}catch(e){PROG={}}
+function saveProg(){try{localStorage.setItem(PKEY,JSON.stringify(PROG))}catch(e){}}
+var MODS=TITLES.map(function(m){return {n:m.n,name:m.name,chunks:m.c.map(function(x){return {no:x[0],t:x[1]}})}});
+var ALL=[];
+MODS.forEach(function(m){m.chunks.forEach(function(c){c.id='c'+c.no.replace('.','-');c.mod=m;var X=CONTENT[c.no];if(X){c.h=X.h;c.exam=X.qs}ALL.push(c)})});
+var TOTAL=ALL.length,DONE=0,PCT=0,BUILT=ALL.filter(function(c){return c.h}).length;
+function recalc(){
+  var seen=false;
+  ALL.forEach(function(c){if(PROG[c.id])c.s='done';else if(c.h){c.s=seen?'ready':'now';seen=true}else c.s='todo'});
+  DONE=ALL.filter(function(c){return c.s==='done'}).length;PCT=Math.round(DONE/TOTAL*100);
+}
+recalc();
+var PILL={done:'done',now:'up next',ready:'not started',todo:'being built'};
+
+/* ---------- past papers: every question as a screenshot, answered right under it ---------- */
+var SECS=[
+ {id:'s-apr26',t:'End-sem Apr/May 2026',code:'23CS2037',d:'Your exact course (23CS2037), the only past paper for it so far. 100 marks: Part A 10 × 1, Part B 6 × 3, Part C any five of Q17–Q23 plus the compulsory Q24, 12 marks each.',re:/^Apr26 /,part:function(n){return 'Part '+(n<=10?'A':n<=16?'B':'C')}},
+ {id:'s-nov24',t:'End-sem Nov/Dec 2024',code:'18CS3074',d:'The old-regulation Quantum Computing paper (18CS3074). Different syllabus: mostly the linear algebra behind quantum mechanics (topic 1.6). Four 20-mark either/or pairs (1 or 2, 3 or 4, 5 or 6, 7 or 8) plus a compulsory Q9.',re:/^Nov24 /,part:function(n){return n<=8?'Part A · answer one of each pair':'Compulsory question'}},
+ {id:'r-qb',rev:1,t:'Question Bank',code:'23CS2037',d:'The 50-question bank for 23CS2037, grouped by module. Every circuit and number below was checked with a small exact simulator (its output is shown where it helps). Final answers agree with the key that came with the bank unless a note says otherwise.',re:/^QB /,part:function(n){return n<=6?'Module 1 · Introduction to Quantum Mechanics':n<=20?'Module 2 · Quantum Gates and Circuits':n<=29?'Module 3 · Entanglement and Protocols':n<=39?'Module 4 · Quantum Algorithms I':n<=47?'Module 5 · Quantum Algorithms II':'Module 6 · Quantum Applications'}},
+ {id:'r-pr',rev:1,t:'Quantum Practice',code:'Classroom · Practice',d:'The handwritten Quantum Practice sheet from Classroom (22 questions). Your teacher posted answers separately; these are worked in full and checked against them.',re:/^PR /},
+ {id:'r-ia2',rev:1,t:'IA2 Assignment',code:'Classroom · Pen & Paper',d:'Assignment for IA2: gates, two-qubit circuits, BB84, teleportation and superdense coding.',re:/^IA2 /},
+ {id:'r-prt',rev:1,t:'Quantum Protocols assignment',code:'Classroom · Pen & Paper',d:'Three protocol problems: superdense coding with Ψ−, BB84 sifting, and teleportation with every outcome.',re:/^PRT /},
+ {id:'r-sq',rev:1,t:'Single-qubit problems',code:'Classroom · Pen & Paper',d:'The 17 single-qubit gate problems, worked the way your teacher’s answer sheet does them: gate matrix, input vector, multiply, read off the ket.',re:/^SQ /},
+ {id:'r-pos',rev:1,t:'Postulates assignment (written)',code:'Classroom · Pen & Paper',d:'The handwritten "Quantum Computing" assignment. It was posted as text only, so the questions are shown as text.',re:/^POS /}
+];
+function natKey(k){return k.toLowerCase().replace(/\d+/g,function(n){return ('0000'+n).slice(-4)})}
+SECS.forEach(function(S){S.q=PYQ.filter(function(q){return S.re.test(q[0])});S.q.sort(function(a,b){return natKey(a[0])<natKey(b[0])?-1:1})});
+function qid(k){return 'q-'+k.replace(/\W+/g,'-')}
+function srcPage(S){
+  var done=S.q.filter(function(q){return ANS[q[0]]}).length;
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">'+(S.rev?(S.id==='r-qb'?'QUESTION BANK':'CLASSROOM'):'PAST PAPERS')+' · '+esc(S.code)+'</div><h1 style="font-size:1.8rem;margin-top:6px">'+esc(S.t)+'</h1><p>'+esc(S.d)+'</p>';
+  h+='<p class="log">'+S.q.length+' questions, each shown as set with its answer right under it'+(done<S.q.length?' · '+done+' answered so far':'')+'. Circuit answers show the output of the checker that verified them.</p>';
+  h+='<div class="qjump">'+S.q.map(function(q){return '<a href="#'+S.id+'" data-q="'+qid(q[0])+'" class="'+(ANS[q[0]]?'':'todo')+'">'+esc(q[0].split(' ')[1])+'</a>'}).join('')+'</div>';
+  var part='';
+  S.q.forEach(function(q){
+    var n=parseInt(q[0].split(' Q')[1],10),p=S.part?S.part(n):'';
+    if(p&&p!==part){part=p;h+='<h2>'+esc(p)+'</h2>'}
+    h+='<section class="qa" id="'+qid(q[0])+'"><div class="log qh"><b>'+esc(q[0])+'</b>'+(q[2]?' · '+esc(q[2]):'')+'</div>'+(q[3]?'<div class="pyq">'+esc(q[1])+'</div>':'<img class="qimg" src="'+qimg(q[0])+'" alt="'+esc(q[1])+'" loading="lazy">')+
+       (ANS[q[0]]?'<div class="answer"><div class="kicker">ANSWER</div>'+ANS[q[0]]+'</div>':'<div class="answer todo">Answer being written.</div>')+'</section>';
+  });
+  return h;
+}
+
+/* ---------- search: chunks, papers, every question and its answer ---------- */
+var LASTQ='',PEND=null;
+function stoks(q){return q.toLowerCase().split(/[\s,;:.()\[\]{}"'“”‘’?!]+/).filter(function(x){return x})}
+function sall(text,toks){for(var i=0;i<toks.length;i++)if(text.indexOf(toks[i])<0)return false;return true}
+function plain(h){return (h||'').replace(/<[^>]+>/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/\s+/g,' ')}
+function renderRes(){
+  var box=$('#qres');if(!box)return;
+  var q=LASTQ.trim(),toks=stoks(q);
+  if(q.length<2||!toks.length){box.hidden=true;box.innerHTML='';return}
+  var topics=ALL.filter(function(c){return sall((c.no+' '+c.t+' '+plain(c.h)).toLowerCase(),toks)}),qs=[];
+  SECS.forEach(function(S){S.q.forEach(function(qq){if(sall((qq[0]+' '+qq[1]+' '+plain(ANS[qq[0]])).toLowerCase(),toks))qs.push({S:S,q:qq})})});
+  var h='';
+  if(!topics.length&&!qs.length){box.innerHTML='<div class="none">Nothing found for “'+esc(q)+'”.</div>';box.hidden=false;return}
+  if(topics.length){h+='<h5>Topics</h5>';topics.slice(0,8).forEach(function(c){h+='<a href="#'+c.id+'"><span class="sn">'+c.no+'</span>'+esc(c.t)+'</a>'})}
+  if(qs.length){
+    h+='<h5>Questions ('+qs.length+')</h5>';
+    qs.slice(0,14).forEach(function(r){h+='<a href="#'+r.S.id+'" data-q="'+qid(r.q[0])+'"><span class="sn">'+esc(r.q[0])+'</span>'+esc(r.q[1].replace(/\s+/g,' ').slice(0,90))+'<small>'+esc(r.S.t)+'</small></a>'});
+    if(qs.length>14)h+='<div class="more">and '+(qs.length-14)+' more. Add another word to narrow it down.</div>';
+  }
+  box.innerHTML=h;box.hidden=false;
+}
+function goQ(id){var el=document.getElementById(id);if(el){el.scrollIntoView({block:'start'});el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}}
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[data-q]');
+  if(a){PEND=a.getAttribute('data-q');if(location.hash===a.getAttribute('href')){e.preventDefault();var p=PEND;PEND=null;document.body.classList.remove('open');goQ(p)}}
+  if(!e.target.closest||!e.target.closest('.srch')){var b=$('#qres');if(b)b.hidden=true}
+});
+var sd=document.getElementById('side');
+sd.addEventListener('input',function(e){if(e.target.id==='qs'){LASTQ=e.target.value;renderRes()}});
+sd.addEventListener('focusin',function(e){if(e.target.id==='qs')renderRes()});
+sd.addEventListener('keydown',function(e){
+  if(e.target.id!=='qs')return;
+  var box=$('#qres'),links=box?$$('a',box):[],cur=links.findIndex(function(a){return a.classList.contains('sel')});
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    if(!links.length)return;e.preventDefault();
+    if(cur>=0)links[cur].classList.remove('sel');
+    cur=e.key==='ArrowDown'?Math.min(links.length-1,cur+1):Math.max(0,cur-1);
+    links[cur].classList.add('sel');links[cur].scrollIntoView({block:'nearest'});
+  }else if(e.key==='Enter'){var t=links[cur>=0?cur:0];if(t){e.preventDefault();t.click()}}
+  else if(e.key==='Escape'){LASTQ='';e.target.value='';renderRes()}
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))){var i=$('#qs');if(i){e.preventDefault();document.body.classList.add('open');i.focus()}}
+});
+
+/* ---------- views ---------- */
+function side(cur){
+  var h='<div class="brand"><span>Quantum Tutor</span><small>23CS2037</small></div><div class="bar" aria-label="progress"><i style="width:'+PCT+'%"></i></div><div class="prog">'+DONE+' of '+TOTAL+' chunks done ('+PCT+'%)'+(BUILT<TOTAL?'<br>'+BUILT+' of '+TOTAL+' chunks built':'')+'</div>';
+  h+='<a href="#home" class="home'+(cur==='home'?' on':'')+'">Overview</a>';
+  h+='<div class="srch"><input id="qs" type="search" placeholder="Search topics, questions…  ( / )" autocomplete="off" spellcheck="false" aria-label="Search the whole site" value="'+esc(LASTQ)+'"><div id="qres" class="sres" hidden></div></div>';
+  h+='<h4>Past papers (answered)</h4>';
+  SECS.filter(function(S){return !S.rev}).forEach(function(S){h+='<a href="#'+S.id+'" class="'+(cur===S.id?'on':'')+'"><span class="no">'+S.q.length+'</span><span>'+esc(S.t)+'</span></a>'});
+  h+='<h4>Question bank and Classroom (answered)</h4>';
+  SECS.filter(function(S){return S.rev}).forEach(function(S){h+='<a href="#'+S.id+'" class="'+(cur===S.id?'on':'')+'"><span class="no">'+S.q.length+'</span><span>'+esc(S.t)+'</span></a>'});
+  MODS.forEach(function(m){
+    h+='<h4>Module '+m.n+' · '+esc(m.name)+'</h4>';
+    m.chunks.forEach(function(c){h+='<a href="#'+c.id+'" class="'+(cur===c.id?'on':'')+'"><span class="dot '+(c.s==='done'?'done':c.s==='now'?'now':c.s==='ready'?'ready':'')+'"></span><span class="no">'+c.no+'</span><span>'+esc(c.t)+'</span></a>'});
+  });
+  $('#side').innerHTML=h;
+}
+function home(){
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">QUANTUM COMPUTING · 23CS2037 · ENDSEM PLAN</div><h1 style="font-size:1.9rem;margin-top:6px">Where you are</h1>';
+  h+='<h2>Past papers, answered</h2><p>Every question is shown exactly as it was set (cut from the paper), with the answer directly under it. Every circuit, probability and number was checked with a small exact simulator, and the circuit answers show its output.</p>';
+  h+='<div class="mods">'+SECS.filter(function(S){return !S.rev}).map(function(S){var d=S.q.filter(function(q){return ANS[q[0]]}).length;
+    return '<a class="card" style="margin:0;text-decoration:none;color:inherit" href="#'+S.id+'"><div class="kicker">'+esc(S.code)+(S.code==='23CS2037'?' · START HERE':'')+'</div><div style="font-weight:600;margin:2px 0 8px">'+esc(S.t)+'</div><div class="bar" style="margin:0"><i style="width:'+Math.round(d/S.q.length*100)+'%"></i></div><div class="log" style="margin:6px 0 0">'+d+' of '+S.q.length+' answered</div></a>'}).join('')+'</div>';
+  h+='<h2>Question bank and Classroom sets, answered</h2><p>The 50-question bank and every problem set from your Classroom (practice sheet, IA2 assignment, protocols, single-qubit problems, the written postulates assignment), in the same screenshot-and-answer format.</p><div class="mods">'+SECS.filter(function(S){return S.rev}).map(function(S){var d=S.q.filter(function(q){return ANS[q[0]]}).length;return '<a class="card" style="margin:0;text-decoration:none;color:inherit" href="#'+S.id+'"><div class="kicker">'+esc(S.id==='r-qb'?'QUESTION BANK':'CLASSROOM')+'</div><div style="font-weight:600;margin:2px 0 4px">'+esc(S.t)+'</div><div class="log" style="margin:0">'+d+' of '+S.q.length+' answered</div></a>'}).join('')+'</div>';
+  h+='<h2>What the exam looks like</h2><p>100 marks in 3 hours: <b>Part A</b> 10 × 1, <b>Part B</b> 6 × 3, <b>Part C</b> any five of Q17–Q23 plus the <b>compulsory Q24</b>, 12 marks each. Part C is almost all <b>calculation</b>: trace a circuit gate by gate, run teleportation or superdense coding for a given state, sift a BB84 key, do one Grover iteration, run Bernstein–Vazirani for a hidden string, or walk through phase estimation into Shor. Q24 (CO6) was the one theory question: adiabatic optimisation, annealing and QML.</p>';
+  h+='<div class="mods">'+MODS.map(function(m){var d=m.chunks.filter(function(c){return c.s==='done'}).length,b=m.chunks.filter(function(c){return c.h}).length,p=Math.round(d/m.chunks.length*100);
+    return '<div class="card" style="margin:0"><div class="kicker">MODULE '+m.n+'</div><div style="font-weight:600;margin:2px 0 8px">'+esc(m.name)+'</div><div class="bar" style="margin:0"><i style="width:'+p+'%"></i></div><div class="log" style="margin:6px 0 0">'+d+' / '+m.chunks.length+(b<m.chunks.length?' · '+b+' built':'')+'</div></div>'}).join('')+'</div>';
+  h+='<h2>Three habits that earn the marks</h2><ul><li><b>Write the state after every gate.</b> Each roman-numeral part asks for one intermediate state; a correct final answer with no steps loses most of the marks.</li><li><b>Say which qubit is which.</b> Write the ket order once (here q0 is the leftmost bit, the top wire) and keep it.</li><li><b>Check normalisation and finish with a sentence:</b> squared amplitudes add to 1, then "the state is entangled", "the key is 1010", "Bob applies X".</li></ul>';
+  h+='<p class="log" style="margin-top:24px">Progress is saved in this browser only. <button data-resetprog>Reset progress</button></p>';
+  return h;
+}
+function chunk(c,i){
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">MODULE '+c.mod.n+' · '+esc(c.mod.name.toUpperCase())+'</div><h1 style="font-size:1.8rem;margin-top:6px">'+c.no+' '+esc(c.t)+'<span class="pill '+c.s+'">'+PILL[c.s]+'</span></h1>';
+  if(c.exam&&c.exam.length)h+='<div class="chips"><span class="chip">'+c.exam.length+' exam and revision questions on this topic, listed at the end</span></div>';
+  h+=c.h||'<div class="card"><p>This chunk is still being built. The past papers are already answered: start there.</p></div>';
+  if(c.exam&&c.exam.length)h+='<h2>Questions on this topic</h2><p class="log">Each link opens the question with its full answer.</p><ul class="qlinks">'+c.exam.map(function(k){var S=SECS.filter(function(S){return S.re.test(k)})[0],q=PYQ.filter(function(q){return q[0]===k})[0];return S&&q?'<li><a href="#'+S.id+'" data-q="'+qid(k)+'"><b>'+esc(k)+'</b></a> '+esc(q[1].split(String.fromCharCode(10))[0].slice(0,110))+(q[2]?' <span class="log">('+esc(q[2])+')</span>':'')+'</li>':''}).join('')+'</ul>';
+  if(c.h)h+='<div class="card" style="margin-top:28px"><div class="row" style="justify-content:space-between"><span>'+(c.s==='done'?'You marked this chunk as done.':'Finished this chunk?')+'</span><button data-mark class="'+(c.s==='done'?'':'primary')+'">'+(c.s==='done'?'Mark as not done':'Mark as done')+'</button></div></div>';
+  var p=ALL[i-1],n=ALL[i+1];
+  h+='<div class="nav">'+(p?'<a class="btn" href="#'+p.id+'">← '+p.no+' '+esc(p.t)+'</a>':'<span></span>')+(n?'<a class="btn" href="#'+n.id+'">'+n.no+' '+esc(n.t)+' →</a>':'')+'</div>';
+  return h;
+}
+function hydrate(root){Object.keys(WIDGETS).forEach(function(sel){$$(sel,root).forEach(function(el){if(!el.dataset.hyd){el.dataset.hyd=1;WIDGETS[sel](el)}})})}
+function route(){
+  var id=(location.hash||'#home').slice(1),main=$('#main');
+  document.body.classList.remove('open');recalc();
+  var SS=SECS.filter(function(S){return S.id===id})[0];
+  if(SS){side(id);main.innerHTML=srcPage(SS)}
+  else if(id==='home'||!ALL.some(function(c){return c.id===id})){side('home');main.innerHTML=home()}
+  else{var i=ALL.map(function(c){return c.id}).indexOf(id);side(id);main.innerHTML=chunk(ALL[i],i)}
+  hydrate(main);
+  var mk=$('[data-mark]',main);if(mk)mk.onclick=function(){if(PROG[id])delete PROG[id];else PROG[id]=1;saveProg();var y=window.scrollY;route();window.scrollTo(0,y)};
+  var rp=$('[data-resetprog]',main);if(rp)rp.onclick=function(){if(confirm('Reset all Quantum progress in this browser?')){PROG={};saveProg();route()}};
+  var mb=$('.menu',main);if(mb)mb.onclick=function(){document.body.classList.toggle('open')};
+  var a=$('#side a.on');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest'});
+  window.scrollTo(0,0);
+  if(PEND){var P=PEND;PEND=null;setTimeout(function(){goQ(P)},60)}
+}
+window.addEventListener('hashchange',route);route();
+</script>
+</body></html>
