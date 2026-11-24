@@ -1,2 +1,2 @@
-A = [[2, 1 - I], [1 + I, 3]]  coefficients (I, X, Y, Z) = Tr(σA)/2 = [5/2, 1, 1, -1/2]
+A = [[2, 1 - i], [1 + i, 3]]  coefficients (I, X, Y, Z) = Tr(σA)/2 = [5/2, 1, 1, -1/2]
 eigenvalues of A: {4: 1, 1: 1}

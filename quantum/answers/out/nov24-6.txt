@@ -1,2 +1,2 @@
-A†A = [[1, 1], [1, 2]]  eigenvalues [3/2 - sqrt(5)/2, sqrt(5)/2 + 3/2]  singular values [sqrt(6 - 2*sqrt(5))/2, sqrt(2*sqrt(5) + 6)/2]  ≈ [0.618, 1.618]
+A†A = [[1, 1], [1, 2]]  eigenvalues [3/2 - √(5)/2, √(5)/2 + 3/2]  singular values [√(6 - 2·√(5))/2, √(2·√(5) + 6)/2]  ≈ [0.618, 1.618]
 |det A| = product of singular values = 1

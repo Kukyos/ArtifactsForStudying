@@ -51,7 +51,11 @@ Q: Apr26 Q12, Apr26 Q18a, QB Q13, QB Q15, QB Q16, QB Q20, PR Q17, PR Q18
 <tr><td>CZ</td><td>|11⟩ → −|11⟩</td><td>symmetric (no fixed control/target); (I⊗H)CZ(I⊗H) = CNOT</td></tr>
 <tr><td>SWAP</td><td>|ab⟩ → |ba⟩</td><td>= three CNOTs, alternating direction</td></tr>
 <tr><td>Toffoli (CCX)</td><td>|a, b, c⟩ → |a, b, c ⊕ ab⟩</td><td>reversible AND; universal for classical logic</td></tr>
-<tr><td>Controlled-U</td><td>|0⟩|ψ⟩ → |0⟩|ψ⟩, |1⟩|ψ⟩ → |1⟩U|ψ⟩</td><td>used in phase estimation</td></tr></table>
+<tr><td>Controlled-U</td><td>|0⟩|ψ⟩ → |0⟩|ψ⟩, |1⟩|ψ⟩ → |1⟩U|ψ⟩</td><td>used in phase estimation</td></tr>
+<tr><td>CY, CH</td><td>apply Y or H to the target when the control = 1</td><td>CY|11⟩ = −i|10⟩; CH|10⟩ = |1⟩|+⟩</td></tr>
+<tr><td>CS, CT, CP(φ)</td><td>|11⟩ → i|11⟩, e^{iπ/4}|11⟩, e^{iφ}|11⟩; others unchanged</td><td>phase only on |11⟩, so control and target can be swapped; CP(π) = CZ</td></tr>
+<tr><td>Fredkin (CSWAP)</td><td>|1, a, b⟩ → |1, b, a⟩; |0, a, b⟩ unchanged</td><td>controlled swap; reversible and conserves the number of 1s</td></tr></table>
+<p>Your Quantum Calculations decks work each of these (Problems 1–13, ending with Bell-state generation) by writing the 4×4 or 8×8 matrix and multiplying. Every controlled-U has the same block form: [[I, 0], [0, U]], with the control as the left (first) qubit.</p>
 ```gbox
 CNOT = [1 0 0 0]     CZ = diag(1, 1, 1, −1)     SWAP = [1 0 0 0]
        [0 1 0 0]                                       [0 0 1 0]

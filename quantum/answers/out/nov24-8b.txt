@@ -1,3 +1,3 @@
-input |0⟩: P(E1)= 0  P(E2)= 1 - sqrt(2)/2  P(E3, don't know)= sqrt(2)/2 ≈ 0.707
-input |+⟩: P(E1)= 1 - sqrt(2)/2  P(E2)= 0  P(E3, don't know)= sqrt(2)/2 ≈ 0.707
-E3 eigenvalues [-2 + 2*sqrt(2), 0] ≥ 0 ✓ so {E1,E2,E3} is a valid POVM
+input |0⟩: P(E1)= 0  P(E2)= 1 - √(2)/2  P(E3, don't know)= 1/√2 ≈ 0.707
+input |+⟩: P(E1)= 1 - √(2)/2  P(E2)= 0  P(E3, don't know)= 1/√2 ≈ 0.707
+E3 eigenvalues [-2 + 2·√(2), 0] ≥ 0 ✓ so {E1,E2,E3} is a valid POVM

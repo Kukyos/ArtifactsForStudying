@@ -92,3 +92,6 @@ Bloch vector (x, y, z) = (sinθ cosφ, sinθ sinφ, cosθ)
 ```out
 @@OUT ia2-10@@
 ```
+
+=== SD Q1
+@@SAME IA2 Q10

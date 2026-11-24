@@ -44,7 +44,7 @@ q2  |0⟩ ─────⊕─────────────────�
 <p class="callout">If the shared pair is not Φ⁺ (QB Q24 uses Ψ⁺), work it out from scratch: Bob's qubit carries an extra X, and the correction table changes (00 → X, 01 → I, 10 → ZX, 11 → Z).</p>
 
 === 3.3
-Q: Apr26 Q20a, QB Q25, QB Q26, PR Q8, PR Q9, IA2 Q10, PRT Q1
+Q: Apr26 Q20a, QB Q25, QB Q26, PR Q8, PR Q9, IA2 Q10, SD Q1, PRT Q1
 <h2>Superdense coding: 1 qubit + 1 Bell pair → 2 classical bits</h2>
 <p>This is teleportation reversed. Alice holds q0 and Bob holds q1 of |Φ⁺⟩.</p>
 <table class="tbl"><tr><th>Message</th><th>Alice applies to q0</th><th>State</th><th>Bob: CNOT q0→q1, H q0 →</th></tr>

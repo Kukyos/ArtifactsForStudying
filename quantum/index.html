@@ -304,6 +304,7 @@ var PYQ=[
 ["PRT Q1", "Superdense coding with Ψ−, message 11: encoding gate, state, Bell-measurement decoding", ""],
 ["PRT Q2", "BB84 with six qubits: matching bases, retained qubits, sifted key, discarded count", ""],
 ["PRT Q3", "Teleport (|0⟩+2|1⟩)/√5 with Φ+: initial state, Alice's operations, all outcomes and corrections", ""],
+["SD Q1", "Superdense coding: Alice and Bob share Φ+ (made with H and CNOT); Alice sends 10; find Bob's final measurement result", ""],
 ["POS Q1", "Explain the relationship between Quantum System, Quantum State, Wave-function and Probability Density with a neat flow diagram. Also explain how a quantum system is mathematically represented.", "", 1],
 ["POS Q2", "Explain the process of measurement in quantum mechanics. What is meant by wave-function collapse, and why does the state of a quantum system change after measurement?", "", 1],
 ["POS Q3", "What is Hilbert Space? Explain why quantum states are represented in Hilbert Space. Also describe how a quantum state evolves with time.", "", 1],
@@ -352,6 +353,7 @@ var SECS=[
  {id:'r-ia2',rev:1,t:'IA2 Assignment',code:'Classroom · Pen & Paper',d:'Assignment for IA2: gates, two-qubit circuits, BB84, teleportation and superdense coding.',re:/^IA2 /},
  {id:'r-prt',rev:1,t:'Quantum Protocols assignment',code:'Classroom · Pen & Paper',d:'Three protocol problems: superdense coding with Ψ−, BB84 sifting, and teleportation with every outcome.',re:/^PRT /},
  {id:'r-sq',rev:1,t:'Single-qubit problems',code:'Classroom · Pen & Paper',d:'The 17 single-qubit gate problems, worked the way your teacher’s answer sheet does them: gate matrix, input vector, multiply, read off the ket.',re:/^SQ /},
+ {id:'r-sd',rev:1,t:'Superdense Coding assignment',code:'Classroom · Study Material',d:'The Superdense Coding problem deck (slide 2 is the problem; the rest of the deck is the teacher’s 7-step solution). Same calculation as IA2 Q10.',re:/^SD /},
  {id:'r-pos',rev:1,t:'Postulates assignment (written)',code:'Classroom · Pen & Paper',d:'The handwritten "Quantum Computing" assignment. It was posted as text only, so the questions are shown as text.',re:/^POS /}
 ];
 function natKey(k){return k.toLowerCase().replace(/\d+/g,function(n){return ('0000'+n).slice(-4)})}
