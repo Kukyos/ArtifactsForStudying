@@ -1,0 +1,121 @@
+=== Descriptive statistics
+```gbox
+mean = Σx / n                    median = middle value (average of the two middle ones if n is even)        mode = most frequent
+variance σ² = Σ(x - x̄)² / N      std dev σ = √variance            range = max - min
+Q1 = median of the lower half    Q3 = median of the upper half    (median left out of both halves if n is odd)
+IQR = Q3 - Q1                    fences: Q1 - 1.5 x IQR   and   Q3 + 1.5 x IQR      (outside = outlier)
+five-number summary = min, Q1, median, Q3, max
+z = (x - mean) / sd
+```
+
+=== Estimation, confidence interval, hypothesis test
+```gbox
+standard error  SE = s / √n
+confidence interval = x̄ ± Z x s / √n          Z = 1.645 (90%)   1.96 (95%)   2.576 (99%)
+z-test:  z = (x̄ - μ) / (σ / √n)
+H0 always has the equality (=, ≤, ≥).   H1: μ > value (right-tailed)   μ < value (left-tailed)   μ ≠ value (two-tailed)
+critical z at 5%: 1.645 one-tailed, 1.96 two-tailed.   |z| beyond critical  =>  reject H0
+```
+
+=== Correlation
+```gbox
+Pearson   r = Σ(x - x̄)(y - ȳ) / √( Σ(x - x̄)² x Σ(y - ȳ)² )          -1 ≤ r ≤ +1
+Spearman  ρ = 1 - 6 Σd² / ( n (n² - 1) )          d = rank of x - rank of y
+ties: share the average of the ranks they occupy (ranks 6 and 7  =>  both 6.5)
+```
+```table
+|r| | Reading
+0.8 - 1 | very strong
+0.6 - 0.8 | strong
+0.4 - 0.6 | moderate
+0.2 - 0.4 | weak
+0 - 0.2 | very weak / none
+```
+<p>Pearson = linear, uses values, sensitive to outliers. Spearman = monotonic, uses ranks, robust. Correlation is not causation.</p>
+
+=== Regression
+```gbox
+simple linear   y = b0 + b1 x
+b1 = Σ(x - x̄)(y - ȳ) / Σ(x - x̄)²           b0 = ȳ - b1 x̄
+multiple   y = b0 + b1 x1 + b2 x2 + ...          polynomial   y = b0 + b1 x + b2 x² + ...
+residual e = y - ŷ           MSE = Σ(y - ŷ)² / N      RMSE = √MSE      MAE = Σ|y - ŷ| / N
+R² = 1 - Σ(y - ŷ)² / Σ(y - ȳ)²            closer to 1 = better fit
+logistic    p = 1 / (1 + e^-z),   z = b0 + b1 x          class 1 if p ≥ 0.5
+```
+<p>Table to draw: x, y, x - x̄, y - ȳ, product, (x - x̄)², each with a total.</p>
+
+=== KNN
+```gbox
+d = √( (x1 - a1)² + (x2 - a2)² + ... )          Euclidean
+steps: distance to every point -> sort ascending -> take K nearest -> majority vote
+```
+<p>Table: point, features, class, squared differences, distance, rank. Large-scale features dominate; scale them (min-max) when units differ.</p>
+
+=== K-means and hierarchical clustering
+```gbox
+K-means: assign every point to its nearest centroid, then new centroid = mean of its points (x̄, ȳ); repeat until nothing moves
+distortion (elbow method): plot against K, pick the bend
+single linkage   = MIN distance between members   (update the matrix with the minimum)
+complete linkage = MAX distance          average linkage = average of all pairwise distances
+cut the dendrogram: number of vertical lines the cut crosses = number of clusters
+```
+
+=== Decision tree (ID3)
+```gbox
+Entropy(S) = - Σ p log2 p                  0 = pure, 1 = two classes equally mixed
+Gain(S, A) = Entropy(S) - Σ (|Sv| / |S|) x Entropy(Sv)        highest gain = root
+```
+```table
+Fractions | Entropy
+1/2, 1/2 | 1
+1/3, 2/3 | 0.918
+1/4, 3/4 | 0.811
+2/5, 3/5 | 0.971
+9/14, 5/14 | 0.940
+```
+
+=== Confusion matrix (rows = actual, columns = predicted)
+```gbox
+Accuracy    = (TP + TN) / total
+Recall      = TP / (TP + FN)          (sensitivity, TPR)
+Precision   = TP / (TP + FP)
+Specificity = TN / (TN + FP)
+F1-score    = 2 x P x R / (P + R)
+Error rate  = (FP + FN) / total = 1 - accuracy
+FP = Type I error     FN = Type II error
+```
+
+=== Recommender systems
+```gbox
+cosine similarity   sim(a, b) = Σ ai bi / ( √Σ ai² x √Σ bi² )          1 = same direction, 0 = nothing in common
+TF = word count / total words      IDF = log(total docs / docs containing the word)      TF-IDF = TF x IDF
+predicted rating   R = Σ (sim x rating) / Σ sim          (weighted)      or the plain average of K neighbours
+Pearson (centred cosine): subtract each user's mean rating first
+MAE = Σ|actual - predicted| / n        RMSE = √( Σ(actual - predicted)² / n )
+hit rate = hits / users          ARHR = average of 1 / rank of the hits
+diversity = 1 - average similarity of the recommended items
+hybrid: weighted a x CF + (1 - a) x CBF, switching, mixed, cascade, feature combination, feature augmentation, meta-level
+```
+
+=== Ethics keywords
+```gbox
+5 C's: Consent, Confidentiality, Control, Compliance, Communication
+GDPR: purpose limitation, data minimisation, lawful basis, transparency and fairness, accuracy, storage limitation, integrity and confidentiality
+anonymisation techniques: suppression, generalisation, noise addition, differential privacy, k-anonymity
+bias types: historical, representation, measurement, algorithmic
+fairness: group (demographic parity), individual, equal opportunity
+fix bias: pre-processing (diverse data, reweighing), in-processing (constraints, adversarial), post-processing (audit, human in the loop, XAI)
+accountability: who (responsibility), how (auditability), the fix (redress)       LIME, SHAP = explainability
+```
+
+=== Pandas one-liners
+```table
+Task | Command
+read, look | pd.read_csv('f.csv'), head(), tail(), shape, columns, dtypes, info(), describe(include='all')
+select | df['a'], df[['a','b']], df.iloc[2:6, 0], df.loc[mask, ['a','b']]
+filter | df[(df['age'] > 25) & (df['g'] == 'F')], df.query('age > 25 and cgpa > 8'), between(50, 60)
+missing | isnull().sum(), dropna(), fillna(0), fillna(df['c'].mean()), ffill(), bfill(), interpolate()
+new / change | df['t'] = df['a'] + df['b'], apply(lambda m: ...), rename(columns={}), drop(columns='a', inplace=True)
+order, group | sort_values(by='a', ascending=False), rank(), groupby('d')['m'].mean(), reset_index(drop=True)
+plots | plt.bar, plt.hist, plt.scatter, plt.boxplot, then plt.show()
+```
