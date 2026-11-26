@@ -1,0 +1,207 @@
+=== Apr24 Q1
+<p><b>Data science</b> is the study of data that helps us derive useful insight for business decisions. It is a multidisciplinary approach that combines mathematics, statistics, artificial intelligence and computer engineering to analyse large amounts of data, understand what happened, why, and what is likely to happen.</p>
+
+=== Apr24 Q2
+<p>Two applications of data science in healthcare: <b>(1) disease prediction and diagnosis</b> from patient records and medical images (for example detecting cancer in scans); <b>(2) personalised medicine and epidemic forecasting</b>, choosing treatment from a patient's data and predicting the spread of an outbreak.</p>
+
+=== Apr24 Q3
+<p><b>EDA (exploratory data analysis)</b> is examining a dataset with statistics and plots, before modelling, to understand its structure, find patterns, relationships, missing values and outliers, and decide how to clean it and which model to use.</p>
+
+=== Apr24 Q4
+<p>The <b>median</b> is the middle value of the data when it is sorted in order. For an odd number of values it is the middle one; for an even number it is the average of the two middle values. Example: 3, 5, 9, 12, 20 has median 9. It is not affected by outliers.</p>
+
+=== Apr24 Q5
+@@SAME Apr26 Q8
+
+=== Apr24 Q6
+<p>Advantages of a decision tree:</p>
+<ul><li>Simple to understand and interpret; it follows the way a human decides, and can be drawn as a flow chart.</li><li>Used for both classification and regression, and handles numerical and categorical data.</li><li>No feature scaling needed.</li><li>Handles non-linear relationships, short training time.</li></ul>
+
+=== Apr24 Q7
+<table class="work"><tr><th></th><th>Supervised</th><th>Unsupervised</th></tr><tr><td>Data</td><td>labelled</td><td>unlabelled</td></tr><tr><td>Goal</td><td>predict a label or value for new data</td><td>discover groups or patterns</td></tr><tr><td>Examples</td><td>regression, KNN, decision tree</td><td>K-means, hierarchical clustering</td></tr></table>
+
+=== Apr24 Q8
+@@SAME Apr26 Q2
+
+=== Apr24 Q9
+@@SAME Apr26 Q9
+
+=== Apr24 Q10
+<p>Applications of unsupervised learning: <b>customer segmentation</b> (grouping buyers by behaviour), <b>market-basket analysis</b> (bread, butter and jam bought together), <b>anomaly and fraud detection</b>, grouping similar documents or news, <b>image segmentation</b> and recommender systems.</p>
+
+=== Apr24 Q11
+<p>A <b>data repository</b> is an archive or library of datasets that users can search and download. Datasets come from internal databases, external public datasets, data warehouses and lakes, APIs and web scraping. Exploring them means checking the size, columns, data types, quality and licence before using one.</p>
+<table class="work"><tr><th>Repository</th><th>What it offers</th></tr><tr><td>Kaggle Datasets</td><td>datasets in every domain with notebooks and competitions</td></tr><tr><td>UCI Machine Learning Repository</td><td>curated benchmark datasets (Iris, Wine, Adult Income)</td></tr><tr><td>Google Dataset Search</td><td>search engine for datasets across the web</td></tr><tr><td>Data.gov / World Bank Open Data</td><td>government, economic, health and climate data</td></tr><tr><td>AWS Open Data, BigQuery public datasets</td><td>very large datasets (genomics, satellite images)</td></tr><tr><td>OpenML</td><td>datasets, tasks and models for ML benchmarking</td></tr></table>
+<p>For each dataset check: number of rows and columns, type of each column, missing values, target variable, and what it is popular for.</p>
+
+=== Apr24 Q12
+<p>Two strategies for missing data:</p>
+<ol><li><b>Delete</b> the rows or columns that contain nulls: <code>df.dropna()</code> (only when few values are missing).</li><li><b>Impute</b> (fill) them: with the mean (symmetric data), the median (skewed data) or the mode (categorical data), <code>df['c'].fillna(df['c'].mean())</code>; or with the previous or next value (<code>ffill()</code>, <code>bfill()</code>), or by interpolation.</li></ol>
+
+=== Apr24 Q13
+<p><b>Correlation analysis</b> measures how strongly two variables are related and in which direction. The coefficient lies between -1 and +1: +1 perfect positive, -1 perfect negative, 0 no linear relationship. It shows association, not cause and effect.</p>
+<ul><li><b>Pearson</b>: linear relationship between continuous variables, r = sum (x - xbar)(y - ybar) / sqrt(sum (x - xbar)^2 x sum (y - ybar)^2); sensitive to outliers.</li><li><b>Spearman</b>: monotonic relationship using ranks, rho = 1 - 6 sum d^2 / (n (n^2 - 1)); used for non-linear, ordinal or ranked data.</li></ul>
+<p>Covariance shows the direction only (its size depends on units); correlation is covariance scaled by both standard deviations. Visualise with a scatter plot or a correlation heat map.</p>
+
+=== Apr24 Q14
+@@SAME Nov25 Q13
+
+=== Apr24 Q15
+@@SAME Apr26 Q4
+
+=== Apr24 Q16
+@@SAME Apr26 Q16
+
+=== Apr24 Q17a
+<p>Python libraries used in data science, classified by job:</p>
+<table class="work"><tr><th>Category</th><th>Libraries</th><th>Use</th></tr>
+<tr><td>Data handling</td><td>NumPy, Pandas</td><td>arrays and maths; DataFrames to read, clean, group and summarise</td></tr>
+<tr><td>Visualisation</td><td>Matplotlib, Seaborn, Plotly</td><td>line, bar, histogram, scatter, box plots, heat maps, interactive charts</td></tr>
+<tr><td>Statistics and science</td><td>SciPy, Statsmodels</td><td>statistical tests, distributions, optimisation, hierarchical clustering</td></tr>
+<tr><td>Machine learning</td><td>Scikit-learn</td><td>regression, KNN, decision trees, K-means, metrics, imputers</td></tr>
+<tr><td>Deep learning</td><td>TensorFlow, Keras, PyTorch</td><td>neural networks</td></tr>
+<tr><td>Text processing</td><td>NLTK, spaCy</td><td>natural language processing</td></tr></table>
+
+=== Apr24 Q17b
+@@SAME Apr26 Q17b
+
+=== Apr24 Q18
+<p><b>Exploratory data analysis (EDA)</b> is the first look at a dataset, before modelling, using statistics and plots to understand it. Goals: understand the structure and quality of the data, find patterns and relationships, spot missing values and outliers, test assumptions, and decide how to clean the data and which model to use.</p>
+<h4>Steps of EDA</h4>
+<ol class="steps">
+<li><b>Understand the data:</b> size (<code>shape</code>), column names, data types, a few rows (<code>head()</code>), and the meaning of each variable (numerical or categorical, target or feature).</li>
+<li><b>Clean the data:</b> count and treat missing values (<code>isnull().sum()</code>, fill with mean, median, mode or drop), remove duplicates, fix data types and inconsistent entries.</li>
+<li><b>Descriptive statistics:</b> mean, median, mode, standard deviation, quartiles for numerical columns (<code>describe()</code>); counts for categorical columns (<code>value_counts()</code>).</li>
+<li><b>Univariate analysis:</b> study each variable alone: histogram for the distribution and skew, box plot for the spread and outliers, bar chart for categories.</li>
+<li><b>Bivariate and multivariate analysis:</b> scatter plots, correlation (Pearson, Spearman) and a heat map, group-wise comparisons (<code>groupby</code>).</li>
+<li><b>Detect outliers:</b> box-plot rule (below Q1 - 1.5 IQR or above Q3 + 1.5 IQR) or z-scores; decide to keep, cap or remove them.</li>
+<li><b>Conclusions:</b> which features matter, whether to transform or scale, and which technique suits the problem.</li>
+</ol>
+<h4>Worked example (run for real)</h4>
+<p>Ten students: age, hours studied, marks (one missing) and department.</p>
+```python
+@@OUT a24_q18.code@@
+```
+```out
+@@OUT a24_q18@@
+```
+<img class="fig" src="img/a24_q18.png" alt="histogram of marks and box plot of age showing one outlier">
+<p><b>What EDA shows here:</b> one marks value was missing (filled with the median 60); the age of 45 stands out as an outlier on the box plot while the others are 19 to 23; hours studied and marks have a strong positive correlation (r = 0.91), whereas age has almost none with marks (0.05); the AI department has the highest average marks.</p>
+
+=== Apr24 Q19
+<h4>Linear regression</h4>
+<p>Supervised technique that predicts a <b>continuous</b> value y from x with the straight line <b>y = b0 + b1 x</b>, found by least squares: b1 = sum (x - xbar)(y - ybar) / sum (x - xbar)^2 and b0 = ybar - b1 xbar. Example: temperature (x) and ice-cream sales in litres (y).</p>
+```table
+@@OUT pp_q6@@
+```
+```gbox
+@@OUT pp_q6_calc@@
+```
+<img class="fig" src="img/pp_q6.png" alt="ice cream sales against temperature with the fitted line">
+<p>The line y = -12 + 1.28x predicts about 29 litres at 32 degrees.</p>
+<h4>Logistic regression</h4>
+<p>Used for <b>classification</b>. The linear score z = b0 + b1 x is passed through the sigmoid p = 1 / (1 + e^-z), which gives a probability between 0 and 1; the class is 1 when p &gt;= 0.5. Example: will a student pass, from hours studied, with b0 = -4 and b1 = 1 (illustrative):</p>
+```table
+@@OUT logit_example@@
+```
+<img class="fig" src="img/sigmoid.png" alt="sigmoid curve of the probability of passing">
+<table class="work"><tr><th></th><th>Linear regression</th><th>Logistic regression</th></tr><tr><td>Output</td><td>continuous number</td><td>probability, then a class</td></tr><tr><td>Curve</td><td>straight line</td><td>S-shaped sigmoid</td></tr><tr><td>Estimation</td><td>least squares</td><td>maximum likelihood</td></tr><tr><td>Problem</td><td>regression</td><td>classification</td></tr></table>
+
+=== Apr24 Q20a
+<p>A decision tree is a flow-chart model: each internal node tests an attribute, each branch is an outcome, each leaf is a class. It is built with ID3 by choosing the attribute with the highest information gain at every node.</p>
+<p><b>Example 1: speed of a vehicle (4 records).</b> Entropy of the parent (2 Slow, 2 Fast) = 1. Information gain of each attribute:</p>
+```table
+@@OUT dt_speed@@
+```
+<p>Speed limit has the highest gain (1) and both its branches are pure, so it is the root and the tree is finished.</p>
+<img class="fig" src="img/dt_speed.png" alt="decision tree with Speed limit at the root">
+<p><b>Example 2: will John play golf?</b> The gains are Outlook 0.247, Humidity 0.152, Windy 0.048, Temperature 0.029, so Outlook is the root; Overcast is a leaf (Yes), Sunny splits on Humidity and Rainy on Windy:</p>
+<img class="fig" src="img/dt_golf.png" alt="decision tree for play golf">
+
+=== Apr24 Q20b
+<p>Supervised learning learns from labelled data. Techniques:</p>
+<table class="work"><tr><th>Task</th><th>Technique</th><th>Idea</th></tr>
+<tr><td rowspan="3"><b>Classification</b> (category)</td><td>Logistic regression</td><td>sigmoid of a linear score gives the probability of a class</td></tr>
+<tr><td>K-nearest neighbours</td><td>classify by the majority class of the K closest training points (Euclidean distance)</td></tr>
+<tr><td>Decision tree</td><td>split on the attribute with the highest information gain until the groups are pure</td></tr>
+<tr><td rowspan="3"><b>Regression</b> (number)</td><td>Simple linear</td><td>y = b0 + b1 x by least squares</td></tr>
+<tr><td>Multiple linear</td><td>y = b0 + b1 x1 + b2 x2 + ... + bn xn</td></tr>
+<tr><td>Polynomial</td><td>y = b0 + b1 x + b2 x^2 + ... + bk x^k for a curved trend</td></tr></table>
+<p>Others: support vector machine and random forest. Models are trained on a training set and judged on a test set: accuracy, precision, recall and F1 for classification; MSE, RMSE and R^2 for regression.</p>
+
+=== Apr24 Q21
+<p><b>Regression analysis</b> is a supervised technique that studies the relationship between a dependent variable y (the response) and one or more independent variables x (predictors), and uses it to <b>explain</b> how much x influences y and to <b>predict</b> y for new x. A model y = f(x) maps the inputs to the output; the error of each point is e = y - y_hat.</p>
+<h4>Types of regression</h4>
+<table class="work"><tr><th>Type</th><th>Equation</th><th>Use</th></tr>
+<tr><td>Simple linear</td><td>y = b0 + b1 x</td><td>one predictor, e.g. experience gives salary</td></tr>
+<tr><td>Multiple linear</td><td>y = b0 + b1 x1 + ... + bn xn</td><td>several predictors, e.g. experience + education</td></tr>
+<tr><td>Polynomial</td><td>y = b0 + b1 x + ... + bk x^k</td><td>a curved relationship</td></tr>
+<tr><td>Logistic</td><td>p = 1 / (1 + e^-(b0 + b1 x))</td><td>a yes/no outcome (classification)</td></tr></table>
+<h4>Ordinary least squares and an example</h4>
+<p>Choose b0 and b1 to minimise the sum of the squared errors: b1 = sum (x - xbar)(y - ybar) / sum (x - xbar)^2, b0 = ybar - b1 xbar. Example: x = 1 to 5, y = 2, 4, 5, 4, 5.</p>
+```table
+@@OUT a26_q19a@@
+```
+```gbox
+@@OUT a26_q19a_calc@@
+```
+<img class="fig" src="img/a26_q19a.png" alt="scatter plot and regression line">
+<h4>Judging the model</h4>
+```gbox
+@@OUT a26_q19a_err@@
+```
+<p>Metrics: MAE, MSE, RMSE and R^2 (R^2 close to 1 means a good fit). Here R^2 = 0.6, so the line explains 60% of the variation of y.</p>
+
+=== Apr24 Q22a
+<p>Clustering groups unlabelled objects so that those in a cluster are similar and those in different clusters differ. Types:</p>
+<table class="work"><tr><th>Basis</th><th>Types</th><th>Example</th></tr>
+<tr><td><b>Partitioning (flat)</b></td><td>start from a random partition into K groups and refine it</td><td>K-means, fuzzy c-means, spectral clustering</td></tr>
+<tr><td><b>Hierarchical</b></td><td>build a tree (dendrogram): agglomerative (bottom-up, merge) or divisive (top-down, split); linkage single, complete or average</td><td>agglomerative, divisive</td></tr>
+<tr><td><b>Hard</b></td><td>every object belongs to exactly one cluster</td><td>K-means</td></tr>
+<tr><td><b>Soft (fuzzy)</b></td><td>an object may belong to more than one cluster, with a degree</td><td>fuzzy c-means</td></tr></table>
+<p>Distance measures: Euclidean and Manhattan. Applications: customer segmentation, recommendation, social-network communities, medical imaging, anomaly detection.</p>
+
+=== Apr24 Q22b
+<p>K-means groups unlabelled data into K clusters by minimising the distance of each point to its cluster centroid.</p>
+<ol class="steps"><li>Choose K and K initial centroids.</li><li>Compute the Euclidean distance of every point to every centroid.</li><li>Assign each point to its nearest centroid.</li><li>Recompute each centroid as the mean of its points.</li><li>Repeat 2 to 4 until the centroids stop changing.</li></ol>
+<h4>Example: K = 2 on (1,1), (2,2), (8,8), (9,9) with initial centroids (1,1) and (8,8)</h4>
+```table
+@@OUT a26_q20a_it1@@
+```
+```gbox
+@@OUT a26_q20a_c1@@
+```
+<p>The new centroids are (1.5, 1.5) and (8.5, 8.5); another pass gives the same clusters {(1,1), (2,2)} and {(8,8), (9,9)}, so the algorithm stops. Strengths: simple and fast. Weaknesses: K must be fixed, sensitive to the start and to outliers.</p>
+
+=== Apr24 Q23a
+<p><b>Content-based filtering</b> recommends items similar to those the user liked before ("show me more of what I have liked"). It uses the features of the items and a profile of the user, and does not need other users.</p>
+<ol class="steps"><li><b>Item profile:</b> describe each item (genre, artist, keywords); text is converted to TF-IDF vectors.</li><li><b>User profile:</b> built from the items the user rated high or bought.</li><li><b>Similarity:</b> cosine similarity, sim(a, b) = sum(ai bi) / (|a| |b|), between the profile and each item.</li><li><b>Recommend</b> the most similar items the user has not seen.</li></ol>
+<p>Example: a music app recommends more songs by the artist the user played most. Advantages: no other users needed, works for new items, easy to explain. Limitations: only similar items (over-specialisation), needs good item features, the new user needs a profile.</p>
+
+=== Apr24 Q23b
+<p><b>Case study: sentiment analysis of tweets</b> (classifying tweets as positive, negative or neutral), for example to learn how people feel about a new phone launch. It follows the data science life cycle:</p>
+<ol class="steps">
+<li><b>Problem:</b> measure public opinion about the launch so the company can react quickly.</li>
+<li><b>Data collection:</b> download tweets that contain the product name or hashtag through the Twitter (X) API; this is unstructured text. Label a sample of tweets by hand as positive, negative or neutral for training.</li>
+<li><b>Data preparation:</b> lowercase, remove URLs, mentions, hashtags symbols and stop words, correct emoticons, tokenise and stem; remove duplicates and retweets.</li>
+<li><b>Features:</b> convert the text to numbers: bag of words or TF-IDF vectors.</li>
+<li><b>Model building:</b> split into training and testing sets; train a classifier (logistic regression, naive Bayes or a decision tree) on the labelled tweets; or use a lexicon that scores positive and negative words.</li>
+<li><b>Evaluation:</b> confusion matrix with accuracy, precision, recall and F1 on the test tweets.</li>
+<li><b>Deployment and communication:</b> classify new tweets as they arrive, and show a dashboard of the share of positive and negative tweets over time, with the top complaints.</li>
+</ol>
+<p>Limitations: sarcasm, slang and mixed languages are hard to classify; tweets are not a random sample of all customers.</p>
+
+=== Apr24 Q24
+<p>A <b>recommender system</b> is a tool, an application of machine learning, that predicts what a user will like and suggests it automatically, from the user's preferences, past behaviour or the behaviour of similar users. Examples: Netflix and YouTube (movies), Amazon and Flipkart (products), Facebook and LinkedIn.</p>
+<table class="work"><tr><th></th><th>Search engine</th><th>Recommender system</th></tr><tr><td>Type</td><td>pull: the user asks</td><td>push: the system suggests</td></tr><tr><td>Based on</td><td>keywords of the query</td><td>past preferences</td></tr><tr><td>Purpose</td><td>information retrieval</td><td>information discovery</td></tr></table>
+<h4>Why recommender systems are needed</h4>
+<ul><li>Too much information: users cannot browse millions of items.</li><li>Less effort for the user, and new items are revealed.</li><li>More sales, engagement and customer retention for the business.</li></ul>
+<h4>Data used</h4>
+<p><b>Explicit</b> (ratings, comments, likes) and <b>implicit</b> (searches, purchase history, clicks), plus information about the items (keywords, categories) and the users (profile), and the user-item interactions.</p>
+<h4>Classification</h4>
+<table class="work"><tr><th>Type</th><th>Idea</th><th>Method</th><th>Weakness</th></tr>
+<tr><td><b>Content-based filtering</b></td><td>"show me more of what I liked": items similar to those liked before</td><td>item features, user profile, TF-IDF, cosine similarity</td><td>suggests only similar items</td></tr>
+<tr><td><b>Collaborative filtering</b></td><td>"people like me liked this": the ratings of similar users (user-based) or similar items (item-based)</td><td>utility matrix, cosine or Pearson similarity, weighted average of the neighbours' ratings</td><td>cold start, sparse matrix</td></tr>
+<tr><td><b>Hybrid</b></td><td>combines both</td><td>weighted, switching, mixed, cascade, feature combination, feature augmentation, meta-level</td><td>more complex</td></tr></table>
+<p><b>Example of collaborative filtering:</b> user X rated Item 1 = 5 and Item 2 = 3; users Y and Z also rated Item 3. The cosine similarities of X with Y (0.767) and Z (0.471) weight their ratings of Item 3 into a prediction of 2.76 for X (see Nov24 Q24b).</p>
+<p><b>Evaluation:</b> MAE and RMSE for ratings; hit rate and ARHR for top-N lists; coverage, diversity and novelty.</p>

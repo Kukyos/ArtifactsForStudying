@@ -1,0 +1,83 @@
+  dept   age  marks   city
+0  CSE  20.0   80.0   pune
+1  CSE   NaN   75.0   None
+2  ECE  22.0    NaN    goa
+3  ECE  21.0   66.0    goa
+4   AI   NaN   90.0  delhi
+5   AI  23.0    NaN   pune
+dept     0
+age      2
+marks    2
+city     1
+dtype: int64
+  dept   age  marks  city
+0  CSE  20.0   80.0  pune
+3  ECE  21.0   66.0   goa
+  dept
+0  CSE
+1  CSE
+2  ECE
+3  ECE
+4   AI
+5   AI
+  dept   age  marks   city
+0  CSE  20.0   80.0   pune
+1  CSE   NaN   75.0   None
+3  ECE  21.0   66.0    goa
+4   AI   NaN   90.0  delhi
+0    80.0
+1    75.0
+2     0.0
+3    66.0
+4    90.0
+5     0.0
+Name: marks, dtype: float64
+0    20.0
+1    21.5
+2    22.0
+3    21.0
+4    21.5
+5    23.0
+Name: age, dtype: float64
+0    80.0
+1    75.0
+2    77.5
+3    66.0
+4    90.0
+5    77.5
+Name: marks, dtype: float64
+0     pune
+1      goa
+2      goa
+3      goa
+4    delhi
+5     pune
+Name: city, dtype: object
+0    80.0
+1    75.0
+2    66.0
+3    66.0
+4    90.0
+5    90.0
+Name: marks, dtype: float64
+0    80.0
+1    75.0
+2    75.0
+3    66.0
+4    90.0
+5    90.0
+Name: marks, dtype: float64
+0    80.0
+1    75.0
+2    66.0
+3    66.0
+4    90.0
+5     NaN
+Name: marks, dtype: float64
+0    80.0
+1    75.0
+2    70.5
+3    66.0
+4    90.0
+5    90.0
+Name: marks, dtype: float64

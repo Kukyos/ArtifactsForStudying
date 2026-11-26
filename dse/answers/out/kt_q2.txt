@@ -1,0 +1,8 @@
+Point | Income | Credit | Class | squared differences, sum | distance d | rank
+C1 | 3 | 600 | Rejected | 6.25 + 3600 = 3606.25 | 60.05 | 6
+C2 | 4 | 620 | Rejected | 2.25 + 1600 = 1602.25 | 40.03 | 4
+C3 | 5 | 650 | Approved | 0.25 + 100 = 100.25 | 10.01 | 1
+C4 | 6 | 680 | Approved | 0.25 + 400 = 400.25 | 20.01 | 2
+C5 | 7 | 700 | Approved | 2.25 + 1600 = 1602.25 | 40.03 | 5
+C6 | 8 | 720 | Approved | 6.25 + 3600 = 3606.25 | 60.05 | 7
+C7 | 5 | 630 | Rejected | 0.25 + 900 = 900.25 | 30 | 3

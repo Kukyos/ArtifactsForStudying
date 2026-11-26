@@ -1,0 +1,25 @@
+import pandas as pd
+import numpy as np
+
+# 1. import the libraries and the dataset
+df = pd.DataFrame({'Name': ['Kamran', 'Imran', 'Micheal', 'Irfan', 'Zeeshan', 'Adnan', 'Farman', np.nan, 'Shaighan'],
+                   'State': ['Arizona', np.nan, 'Georgia', 'Newyork', 'Indiana', 'Florida', 'California', np.nan, 'Lahore'],
+                   'Gender': ['M', 'M', np.nan, 'M', 'M', 'M', 'M', np.nan, 'M'],
+                   'Score': [63, 48, 56, 75, 63, np.nan, 63, np.nan, 23]})
+print(df)
+
+# 2. statistical information of the qualitative and quantitative attributes
+print(df.describe(include='all'))
+
+# 3. fill the null values of Gender with F
+df['Gender'] = df['Gender'].fillna('F')
+print(df)
+
+# 4. arrange the Name column in ascending order
+print(df.sort_values(by='Name'))
+
+# 5. total number of elements in the dataframe
+print(df.size)
+
+# 6. rows that have a Score between 50 and 60
+print(df[df['Score'].between(50, 60)])

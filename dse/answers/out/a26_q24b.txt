@@ -1,0 +1,5 @@
+Movie | vector Action/Comedy/Romance/SciFi | dot product with A | |A| x |movie| | cosine similarity
+Movie B | 1 1 0 0 | 1 | sqrt(2) x sqrt(2) | 0.5
+Movie C | 0 1 1 0 | 0 | sqrt(2) x sqrt(2) | 0
+Movie D | 1 0 0 0 | 1 | sqrt(2) x sqrt(1) | 0.707
+Movie E | 0 0 1 1 | 1 | sqrt(2) x sqrt(2) | 0.5

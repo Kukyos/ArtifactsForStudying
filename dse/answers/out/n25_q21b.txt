@@ -1,0 +1,6 @@
+TP = 70, FN = 10, FP = 20, TN = 100, total = 200
+Accuracy  = (TP + TN) / total = (70 + 100) / 200 = 0.85  (85 %)
+Recall    = TP / (TP + FN) = 70 / 80 = 0.875
+Precision = TP / (TP + FP) = 70 / 90 = 0.7778
+F1-score  = 2 x P x R / (P + R) = 2 x 0.7778 x 0.875 / (0.7778 + 0.875) = 0.8235
+Specificity = TN / (TN + FP) = 100 / 120 = 0.8333

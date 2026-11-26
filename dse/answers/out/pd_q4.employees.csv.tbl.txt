@@ -1,0 +1,8 @@
+Employee_ID | Name | Age | Genre | Gender | Appraisal Marks | Overall Score
+E01 | Anita | 28 | Female | F | 78 | 80
+E02 | Bala | 24 | Male | M |  | 70
+E03 | Chitra | 31 | Female | F | 85 | 
+E04 | David | 27 | Male | M | 72 | 75
+E05 | Esha | 26 | Female | F |  | 88
+E06 | Farid | 35 | Male | M | 90 | 92
+E07 | Gita | 29 | Female | F | 66 | 

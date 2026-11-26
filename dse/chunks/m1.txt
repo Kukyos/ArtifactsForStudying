@@ -1,0 +1,52 @@
+=== 1.1
+Q: Nov25 Q1, Nov25 Q11, Nov25 Q17a, Nov24 Q17a, QA Q4, Apr26 Q1, Apr26 Q17a, Apr26 Q17b, Apr24 Q1, Apr24 Q2, Apr24 Q17b
+<p><b>Data science</b> is the study of data that helps us derive useful insight for decisions. It is a multidisciplinary approach that combines mathematics, statistics, artificial intelligence and computer engineering to analyse large amounts of data and answer: what happened, why it happened, what will happen, and what can be done about it.</p>
+<h4>Components</h4>
+<p>Statistics, visualisation, data engineering, domain experts, machine learning and deep learning (a subset of machine learning based on neural networks).</p>
+<h4>Applications</h4>
+<ul><li><b>Healthcare:</b> disease prediction, personalised medicine.</li><li><b>Finance:</b> fraud and risk detection, investment patterns.</li><li><b>E-commerce and media:</b> recommendations (Amazon, YouTube), targeted advertising, price comparison.</li><li><b>Search, speech and images:</b> Google, Alexa and Siri, Facebook image recognition.</li><li><b>Transport and logistics:</b> airline route planning, delivery (DHL, FedEx), automotive predictive maintenance and self-driving.</li><li><b>Education:</b> predicting performance and drop-out, personalised learning. Also gaming, AR, robots and chatbots.</li></ul>
+<h4>The life cycle (process)</h4>
+<img class="fig" src="img/lifecycle.png" alt="data science life cycle">
+<table class="work"><tr><th>Stage</th><th>What happens</th></tr>
+<tr><td>Discovery / data collection</td><td>understand the problem; gather data (web logs, social media, census, APIs, IoT sensors)</td></tr>
+<tr><td>Data preparation</td><td>clean (missing values, blank columns, wrong formats), transform (normalise), feature engineering</td></tr>
+<tr><td>Model planning</td><td>descriptive statistics, visualisation, correlation analysis; choose techniques</td></tr>
+<tr><td>Model building</td><td>split into training and testing sets; regression, classification, clustering; test the model</td></tr>
+<tr><td>Operationalise</td><td>deploy with reports, code and APIs; monitor performance</td></tr>
+<tr><td>Communicate results</td><td>present findings to stakeholders; decide success or failure</td></tr></table>
+<p><b>How to answer an "explain the life cycle for this case" question (8 marks):</b> list the stages in order, and for each one say what it means <i>for the given case</i> (what data, what cleaning, which model, what metric). Draw the diagram. Examples: the PowerGrid energy-demand case and the recommender cases.</p>
+
+=== 1.2
+Q: Nov24 Q1, Nov24 Q3, Nov24 Q11, QA Q1, QA Q3, Apr24 Q11
+<p><b>Data</b> is raw facts; <b>information</b> is data that has been processed so it is useful. More than 120 zettabytes of data were generated in 2023. Sources: social media, machine/IoT data, transactions, healthcare, government and public data, media and entertainment, industrial and scientific research data.</p>
+<h4>Structured, semi-structured, unstructured</h4>
+<table class="work"><tr><th></th><th>Structured</th><th>Semi-structured</th><th>Unstructured</th></tr>
+<tr><td>Form</td><td>fixed model, tables</td><td>tags/markers, self-describing</td><td>no model</td></tr>
+<tr><td>Stored in</td><td>relational DB, Excel (SQL)</td><td>JSON, XML files</td><td>NoSQL, files</td></tr>
+<tr><td>Examples</td><td>names, dates, transactions</td><td>JSON, XML</td><td>emails, images, video, tweets</td></tr></table>
+<p>Over 80% of data is unstructured.</p>
+<h4>Qualitative (categorical) vs quantitative (numerical)</h4>
+<table class="work"><tr><th></th><th>Categorical</th><th>Numerical</th></tr>
+<tr><td>Describes</td><td>quality, category</td><td>quantity, measurable</td></tr>
+<tr><td>Subtypes</td><td>nominal (no order: blood group), ordinal (ordered: Small, Medium, Large)</td><td>discrete (counted: number of pencils), continuous (measured: weight)</td></tr>
+<tr><td>Graphs</td><td>bar chart, pie chart</td><td>histogram, scatter plot, line graph, box plot</td></tr></table>
+<p>Quick test: temperature every hour is continuous; number of unread messages is discrete; T-shirt size is ordinal; nationality is nominal; a YouTube comment is unstructured; an ATM transaction is structured.</p>
+<h4>Repositories</h4>
+<p>A data repository is a library of datasets: Kaggle, UCI Machine Learning Repository, Google Dataset Search, Data.gov, World Bank Open Data, OpenML, AWS Open Data. Sources are internal databases, external public datasets, data warehouses and lakes, APIs and web scraping.</p>
+
+=== 1.3
+Q: Nov25 Q2, Nov25 Q17b, Nov24 Q2, Nov24 Q17b, Apr24 Q17a
+<h4>Big data: the 5 Vs</h4>
+<table class="work"><tr><th>V</th><th>Meaning</th></tr>
+<tr><td>Volume</td><td>amount of data to process</td></tr>
+<tr><td>Variety</td><td>number of data types (structured, semi-structured, unstructured)</td></tr>
+<tr><td>Velocity</td><td>speed at which data is generated, collected and analysed</td></tr>
+<tr><td>Veracity</td><td>quality and trustworthiness; inconsistency and uncertainty</td></tr>
+<tr><td>Value</td><td>data is useful only when turned into insight</td></tr></table>
+<p><b>Big data vs small data:</b> big data is the large picture, mostly unstructured; small data is focused, structured and easily interpreted.</p>
+<h4>Python toolbox</h4>
+<table class="work"><tr><th>Library</th><th>Use</th></tr>
+<tr><td>NumPy</td><td>arrays and maths</td></tr><tr><td>Pandas</td><td>DataFrames: read, clean, group, summarise</td></tr><tr><td>Matplotlib, Seaborn</td><td>plots</td></tr><tr><td>SciPy, Statsmodels</td><td>statistics, tests, clustering</td></tr><tr><td>Scikit-learn</td><td>machine learning and metrics</td></tr><tr><td>TensorFlow, PyTorch</td><td>deep learning</td></tr></table>
+<p>Other tools: SQL, R, SAS, Power BI, Tableau, Jupyter/Colab.</p>
+<h4>Challenges of data science</h4>
+<ul><li>Difficult access to data, and poor data quality (the biggest problem).</li><li>Integrating data of different formats and standards.</li><li>Massive datasets need heavy computing.</li><li>Lack of domain experts; explaining results to non-technical people.</li><li>Data security and privacy.</li></ul>

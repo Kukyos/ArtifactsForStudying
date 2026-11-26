@@ -1,0 +1,9 @@
+       genre  city
+count      4     4
+unique     2     2
+top     Male  pune
+freq       2     3
+city
+pune    3
+goa     1
+Name: count, dtype: int64

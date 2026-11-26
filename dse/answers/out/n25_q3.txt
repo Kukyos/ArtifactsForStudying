@@ -1,0 +1,6 @@
+    dept  students
+0    CSE       120
+1    ECE        90
+2    EEE        70
+3   MECH        60
+4  CIVIL        45

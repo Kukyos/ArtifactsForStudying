@@ -1,0 +1,37 @@
+import pandas as pd
+
+# 1. read only the needed columns, treat NA as missing
+cols = ['Student ID', 'Name', 'Department', 'Attendance', 'Internal Marks', 'External Marks', 'CGPA']
+df = pd.read_csv('college.csv', usecols=cols, na_values=['NA'])
+
+# 2. first 5 and last 5 records
+print(df.head())
+print(df.tail())
+
+# 3. dimensions and summary statistics
+print(df.shape)
+print(df.describe())
+
+# 4. names and CGPA of CSE students
+print(df.loc[df['Department'] == 'CSE', ['Name', 'CGPA']])
+
+# 5. attendance > 85 and CGPA > 8, boolean conditions then query()
+print(df[(df['Attendance'] > 85) & (df['CGPA'] > 8)])
+print(df.query('Attendance > 85 and CGPA > 8'))
+
+# 6. fill missing attendance with the department average
+df['Attendance'] = df['Attendance'].fillna(df.groupby('Department')['Attendance'].transform('mean'))
+print(df[['Name', 'Department', 'Attendance']])
+
+# 7. total marks
+df['Total Marks'] = df['Internal Marks'] + df['External Marks']
+
+# 8. grades with apply() and a lambda
+df['Grade'] = df['Total Marks'].apply(lambda m: 'A' if m >= 85 else 'B' if m >= 75 else 'C' if m >= 65 else 'D')
+
+# 9. rename CGPA
+df = df.rename(columns={'CGPA': 'Current_CGPA'})
+
+# 10. remove students with attendance below 60
+df = df[df['Attendance'] >= 60]
+print(df)

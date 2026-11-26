@@ -1,0 +1,4 @@
+n = 10, mean of Crabs = 2.9, mean of Clams = 124.9
+b1 = -1486.1 / 24.9 = -59.6827
+b0 = mean y - b1 x mean x = 124.9 - (-59.6827) x 2.9 = 297.9799
+regression line:  y = 297.98 - 59.683 x

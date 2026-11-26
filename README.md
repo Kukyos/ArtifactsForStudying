@@ -9,6 +9,7 @@ Static study site. No build step: Vercel serves the files as they are.
 | `/dbms/` | DBMS Tutor (Database Management Systems, 23CS2013) |
 | `/webtech/` | Web Tech Tutor (Web Technology, 23CS2048). Past papers answered under each question screenshot; answers are written in `webtech/answers/*.txt`, topic pages in `webtech/chunks/*.txt`; `python webtech/answers/build.py` builds `answers.js` and `chunks.js` |
 | `/quantum/` | Quantum Tutor (Quantum Computing, 23CS2037). Same layout as Web Tech: past papers, the question bank and Classroom sets answered under each question screenshot (`quantum/answers/*.txt`, topic pages `quantum/chunks/*.txt`, `python quantum/answers/build.py`). Numbers are checked by `AutoLAB/Subjects/Quantum-theory/check/` (exact sympy simulator), whose output lands in `quantum/answers/out/` |
+| `/dse/` | Data Science Ecosystem Tutor (23CS2024). Same layout as Quantum: past papers, and every Classroom problem set, answered under each question screenshot in exam style (tables drawn, steps shown) with `dse/answers/*.txt`, topic pages `dse/chunks/*.txt`, `python dse/answers/build.py`. Numbers, tables and diagrams come from `AutoLAB/Subjects/DSE-theory/check/` (output in `dse/answers/out/`, figures in `dse/img/`); pandas answers are run for real |
 | `/pandas/` | Pandas drill (DSE lab) |
 | `/sql/` | SQL*Plus drill (DBMS lab) |
 | `shared/study.js` | Theme toggle + subject selector used by every page |

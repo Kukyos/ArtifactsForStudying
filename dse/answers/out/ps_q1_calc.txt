@@ -1,0 +1,7 @@
+n = 10
+mean of Hours = 65 / 10 = 6.5
+mean of Marks = 660 / 10 = 66
+sum of products = 390, sum of (Hours-mean)^2 = 82.5, sum of (Marks-mean)^2 = 1854
+std dev of Hours = sqrt(82.5 / 10) = 2.872
+std dev of Marks = sqrt(1854 / 10) = 13.616
+r = 390 / sqrt(82.5 x 1854) = 390 / 391.095 = 0.9972

@@ -46,6 +46,7 @@ var DESC={
   dbms:'Interactive DBMS course (23CS2013): relational algebra, SQL, ER design, normalization, B+ trees, transactions and NoSQL, with every revision and question-bank question linked to its answer.',
   webtech:'Web Technology (23CS2048): five past end-sem papers from the last two years with every question shown as set and answered right under it, with live previews and real MongoDB and Node output.',
   quantum:'Quantum Computing (23CS2037): the Apr/May 2026 and old-regulation Nov/Dec 2024 papers, the 50-question bank and every Classroom problem set, each question shown as set and answered under it, every circuit checked by an exact simulator.',
+  dse:'Data Science Ecosystem (23CS2024): the Nov/Dec 2025 paper, the Nov/Dec 2024, Apr/May 2026 and Apr/May 2024 papers of the old Introduction to Data Science course, and every Classroom problem set, each question shown as set with a full worked answer under it; every number is recomputed by a checker and every pandas answer is run for real.',
   pandas:'Type-the-code drill for the DSE lab exam: NumPy, pandas, statistics and plots.',
   sql:'Type-the-query drill for the Oracle SQL*Plus lab: DDL, DML, joins, views, PL/SQL and triggers.'
 };
@@ -55,6 +56,7 @@ function progress(id){
   if(id==='dbms'){var d=read('dbms-progress-v1')||{},k=Object.keys(d).length;return {pct:Math.round(k/40*100),txt:k+' of 40 chunks done'}}
   if(id==='webtech'){var w=read('webtech-progress-v1')||{},j=Object.keys(w).length;return {pct:Math.round(j/27*100),txt:j+' of 27 chunks done'}}
   if(id==='quantum'){var q=read('quantum-progress-v1')||{},k=Object.keys(q).length;return {pct:Math.round(k/25*100),txt:k+' of 25 chunks done'}}
+  if(id==='dse'){var e=read('dse-progress-v1')||{},m=Object.keys(e).length;return {pct:Math.round(m/24*100),txt:m+' of 24 chunks done'}}
   var s=read(id==='pandas'?'pandrill':'sqldrill');
   if(!s||!s.answered)return {pct:0,txt:'not started'};
   return {pct:Math.round(s.correct/s.answered*100),txt:s.answered+' answered · '+Math.round(s.correct/s.answered*100)+'% correct'};

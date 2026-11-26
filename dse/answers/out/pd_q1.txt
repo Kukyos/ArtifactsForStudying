@@ -1,0 +1,9 @@
+  player    role  matches   runs  wickets
+0  kohli  batter      295  13906        5
+1  rohit  batter      262  10709        8
+2   gill  batter       90   4800        0
+  player    role  matches  runs  wickets
+6  shami  bowler      101   250      195
+7  siraj  bowler       44    60       71
+(8, 5)
+Index(['player', 'role', 'matches', 'runs', 'wickets'], dtype='object')

@@ -1,0 +1,11 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.DataFrame({'dept': ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL'], 'students': [120, 90, 70, 60, 45]})
+print(df)
+
+plt.bar(df['dept'], df['students'], color='steelblue')
+plt.xlabel('department')
+plt.ylabel('number of students')
+plt.title('students per department')
+plt.show()

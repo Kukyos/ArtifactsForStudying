@@ -1,0 +1,28 @@
+    age     city
+0  25.0  chennai
+1   NaN    delhi
+2  31.0     None
+3   NaN     pune
+4  40.0      goa
+     age   city
+0  False  False
+1   True  False
+2  False   True
+3   True  False
+4  False  False
+age     2
+city    1
+dtype: int64
+3
+    age     city
+0  25.0  chennai
+1  25.0    delhi
+2  31.0    delhi
+3  31.0     pune
+4  40.0      goa
+    age     city
+0  25.0  chennai
+1  31.0    delhi
+2  31.0     pune
+3  40.0     pune
+4  40.0      goa

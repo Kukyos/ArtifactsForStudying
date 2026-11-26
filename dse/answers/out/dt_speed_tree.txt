@@ -1,0 +1,2 @@
+Speed limit = No -> Fast
+Speed limit = Yes -> Slow

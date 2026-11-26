@@ -1,0 +1,71 @@
+  Employee_ID    Name  Age   Genre Gender  Appraisal Marks  Overall Score
+0         E01   Anita   28  Female      F             78.0           80.0
+1         E02    Bala   24    Male      M              NaN           70.0
+2         E03  Chitra   31  Female      F             85.0            NaN
+3         E04   David   27    Male      M             72.0           75.0
+4         E05    Esha   26  Female      F              NaN           88.0
+5         E06   Farid   35    Male      M             90.0           92.0
+6         E07    Gita   29  Female      F             66.0            NaN
+count     5.000000
+mean     78.200000
+std       9.654015
+min      66.000000
+25%      72.000000
+50%      78.000000
+75%      85.000000
+max      90.000000
+Name: Appraisal Marks, dtype: float64
+int64
+  Employee_ID    Name  Age
+0         E01   Anita   28
+1         E02    Bala   24
+2         E03  Chitra   31
+3         E04   David   27
+Employee_ID        0
+Name               0
+Age                0
+Genre              0
+Gender             0
+Appraisal Marks    2
+Overall Score      2
+dtype: int64
+  Employee_ID  Name  Age   Genre Gender  Appraisal Marks  Overall Score
+1         E02  Bala   24    Male      M              NaN           70.0
+4         E05  Esha   26  Female      F              NaN           88.0
+  Employee_ID    Name  Age   Genre Gender  Appraisal Marks  Overall Score
+0         E01   Anita   28  Female      F             78.0           80.0
+1         E02    Bala   24    Male      M             78.0           70.0
+2         E03  Chitra   31  Female      F             85.0           70.0
+3         E04   David   27    Male      M             72.0           75.0
+4         E05    Esha   26  Female      F             72.0           88.0
+5         E06   Farid   35    Male      M             90.0           92.0
+6         E07    Gita   29  Female      F             66.0           92.0
+Genre
+Female    4
+Male      3
+dtype: int64
+Genre
+Female    75.25
+Male      80.00
+Name: Appraisal Marks, dtype: float64
+  Employee_ID    Name  Age   Genre Gender  Appraisal Marks  Overall Score
+0         E01   Anita   28  Female      F             78.0           80.0
+2         E03  Chitra   31  Female      F             85.0           70.0
+4         E05    Esha   26  Female      F             72.0           88.0
+6         E07    Gita   29  Female      F             66.0           92.0
+  Employee_ID    Name  Age   Genre  Appraisal Marks  Overall Score
+6         E07    Gita   29  Female             66.0           92.0
+3         E04   David   27    Male             72.0           75.0
+4         E05    Esha   26  Female             72.0           88.0
+0         E01   Anita   28  Female             78.0           80.0
+1         E02    Bala   24    Male             78.0           70.0
+2         E03  Chitra   31  Female             85.0           70.0
+5         E06   Farid   35    Male             90.0           92.0
+  Employee_ID    Name  Age   Genre  Appraisal Marks
+0         E01   Anita   28  Female             78.0
+1         E02    Bala   24    Male             78.0
+2         E03  Chitra   31  Female             85.0
+3         E04   David   27    Male             72.0
+4         E05    Esha   26  Female             72.0
+5         E06   Farid   35    Male             90.0
+6         E07    Gita   29  Female             66.0

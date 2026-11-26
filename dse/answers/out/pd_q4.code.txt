@@ -1,0 +1,44 @@
+import pandas as pd
+
+# 1. read the csv
+df = pd.read_csv('employees.csv')
+print(df)
+
+# 2. statistical information of Appraisal Marks
+print(df['Appraisal Marks'].describe())
+
+# 3. data type of Age
+print(df['Age'].dtype)
+
+# 4. first 4 rows with Employee_ID, Name and Age
+print(df[['Employee_ID', 'Name', 'Age']].head(4))
+
+# 5. null values in each column
+print(df.isnull().sum())
+
+# 6. rows where Appraisal Marks is null
+print(df[df['Appraisal Marks'].isnull()])
+
+# 7. fill the nulls of every column with the previous value of the same column
+df = df.ffill()
+print(df)
+
+# 8. fill the remaining nulls with 0
+df = df.fillna(0)
+
+# 9. group by Genre
+print(df.groupby('Genre').size())
+print(df.groupby('Genre')['Appraisal Marks'].mean())
+
+# 10. Age > 25 and Genre = Female
+print(df[(df['Age'] > 25) & (df['Genre'] == 'Female')])
+
+# 11. drop Gender permanently
+df.drop(columns='Gender', inplace=True)
+
+# 12. sort by Appraisal Marks ascending
+print(df.sort_values(by='Appraisal Marks'))
+
+# 13. drop Overall Score permanently
+df.drop(columns='Overall Score', inplace=True)
+print(df)

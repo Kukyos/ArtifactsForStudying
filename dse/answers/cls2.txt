@@ -1,0 +1,158 @@
+=== ETH Q1
+<h4>(a) Ethical concerns: smart-city healthcare analytics</h4>
+<table class="work"><tr><th>Concern</th><th>Why it matters here</th></tr>
+<tr><td><b>Privacy of sensitive data</b></td><td>Medical histories and treatment records are among the most sensitive personal data. Combining records from many hospitals builds a detailed profile of each patient, and exposure can cause discrimination, stigma, or loss of insurance or jobs.</td></tr>
+<tr><td><b>Informed consent and purpose</b></td><td>Patients gave their data for treatment, not for a government analytics system. Using it for trend prediction without clear consent breaks purpose limitation.</td></tr>
+<tr><td><b>Confidentiality and security</b></td><td>A central database of many hospitals' records is a high-value target for breaches and for misuse by insiders.</td></tr>
+<tr><td><b>Re-identification</b></td><td>Removing names is not enough: age, postcode, rare disease and dates can be linked with other data to identify a person.</td></tr>
+<tr><td><b>Bias and fairness</b></td><td>Records from some hospitals or groups may be missing or unrepresentative, so predictions can be worse for under-represented communities and misdirect public health resources.</td></tr>
+<tr><td><b>Transparency and accountability</b></td><td>Citizens should know what is collected and who answers if the system errs or is misused; the department that built it must be accountable.</td></tr></table>
+<h4>(b) Guidelines and technical measures</h4>
+<ul>
+<li><b>Ethical and legal guidelines:</b> follow HIPAA/GDPR-style rules; collect only the data needed (data minimisation); use it only for the stated public-health purpose; obtain clear consent or a lawful basis and give an opt-out; set a retention limit; form an ethics board to approve uses; publish a plain-language policy.</li>
+<li><b>De-identification and anonymisation:</b> remove direct identifiers (suppression); generalise ages to ranges and postcodes to districts; test with k-anonymity; replace IDs with pseudonyms kept apart from the data.</li>
+<li><b>Differential privacy:</b> add calibrated noise to published statistics so no individual affects the result noticeably.</li>
+<li><b>Security:</b> encryption at rest and in transit, role-based access control with least privilege, audit logs, secure data-sharing agreements.</li>
+<li><b>Privacy-preserving analytics:</b> keep data at each hospital and share only model updates (federated learning) or aggregates.</li>
+<li><b>Fairness and accountability:</b> check data coverage and model error across groups, audit regularly, keep a human in the loop for decisions, name a responsible owner, and give people a way to complain and to have their data corrected.</li>
+</ul>
+
+=== ETH Q2
+<h4>(a) Ethical concerns: online shopping analytics</h4>
+<table class="work"><tr><th>Concern</th><th>In this scenario</th></tr>
+<tr><td><b>Privacy</b></td><td>Purchase history, browsing and preferences reveal habits, health, finances and beliefs. Customers did not expect them to leave the company.</td></tr>
+<tr><td><b>Confidentiality</b></td><td>Data given to the shop was passed to advertising partners without authorisation; the company lost control of where it went.</td></tr>
+<tr><td><b>Informed consent</b></td><td>Customers were not told about the sharing. Consent hidden in long terms is not informed consent; the data was used for a new purpose (advertising) they never agreed to.</td></tr>
+<tr><td><b>Re-identification</b></td><td>The "anonymised" data was joined with public data and customers were identified (a linkage attack), so the anonymisation was inadequate and the promise of anonymity was false.</td></tr>
+<tr><td><b>Trust and harm</b></td><td>Profiling can lead to manipulation, price discrimination and unwanted targeting; a breach of trust damages the company.</td></tr></table>
+<h4>(b) Ethical practices and technical safeguards</h4>
+<ul>
+<li><b>Practices:</b> tell customers clearly what is collected, why and with whom it is shared; opt-in consent for sharing with partners and an easy opt-out; purpose limitation and data minimisation; contracts that forbid partners from re-identifying or passing on the data; privacy audits and a data-protection officer; breach notification; compliance with GDPR-type law.</li>
+<li><b>Anonymisation done properly:</b> remove or generalise quasi-identifiers (exact age to range, postcode to region, exact time to date) and check k-anonymity before release.</li>
+<li><b>Differential privacy or noise addition</b> on anything shared; share aggregates or synthetic data rather than raw individual records.</li>
+<li><b>Security:</b> encryption, access control, logging, and separating identifiers from behaviour data.</li>
+<li><b>Re-identification testing:</b> try to link the release with public data before sharing it (a red-team test).</li>
+</ul>
+
+=== ETH Q3
+<h4>(a) Ethical concerns: employee monitoring</h4>
+<table class="work"><tr><th>Concern</th><th>In this scenario</th></tr>
+<tr><td><b>Privacy</b></td><td>Monitoring emails, computer use and location, possibly outside work hours or in private spaces, intrudes on employees' private life.</td></tr>
+<tr><td><b>Confidentiality</b></td><td>Emails and activity logs contain personal and sensitive information; access by managers or leaks could expose it, and it could be used beyond appraisal.</td></tr>
+<tr><td><b>Transparency</b></td><td>Employees are not told what is collected or how it is used, so they cannot question or correct it.</td></tr>
+<tr><td><b>Informed consent</b></td><td>Consent given by signing an employment contract is not free and informed, because refusing may mean losing the job (power imbalance).</td></tr>
+<tr><td><b>Fairness</b></td><td>Counting keystrokes, hours online or emails ignores quality of work and can wrongly penalise some people (carers, part-timers, creative roles); it can create stress and distrust.</td></tr></table>
+<h4>(b) Guidelines and technical measures</h4>
+<ul>
+<li><b>Guidelines:</b> a written monitoring policy shared with all staff before it starts: what is collected, why, who sees it, how long it is kept; get acknowledgement or consent; collect only data relevant to performance (data minimisation); never monitor private communication or off-duty location; give employees access to their data and a way to challenge results; human review of decisions; ethics or HR committee oversight; follow labour and data-protection law.</li>
+<li><b>Technical measures:</b> encryption and secure storage; role-based access (only HR and the direct manager, with logging); aggregate or pseudonymise the data for team-level analysis; automatic deletion after the retention period; use outcome-based measures (tasks completed, quality) rather than constant surveillance; test the scoring model for bias across groups and document how it works (explainability).</li>
+</ul>
+
+=== ETH Q4
+<h4>(a) Ethical issues: social media analysis</h4>
+<table class="work"><tr><th>Issue</th><th>In this scenario</th></tr>
+<tr><td><b>Privacy</b></td><td>Posts, comments, likes and shares expose interests, opinions, relationships, politics and health. Even public posts were not shared for research profiling.</td></tr>
+<tr><td><b>Informed consent</b></td><td>Users did not agree to be studied, and "it was public" is not consent to profiling and prediction of their behaviour.</td></tr>
+<tr><td><b>Confidentiality</b></td><td>The organisation holds large amounts of personal content and must protect it from leaks and misuse.</td></tr>
+<tr><td><b>Re-identification</b></td><td>Removing usernames does not anonymise: writing style, locations, timestamps and connections, joined with public profiles, identify the individuals. This is a linkage attack.</td></tr>
+<tr><td><b>Misuse</b></td><td>Predictions about interests and behaviour can be used for manipulation, targeted political messaging or discrimination.</td></tr></table>
+<h4>(b) Privacy-preserving techniques and ethical practices</h4>
+<ul>
+<li><b>Techniques:</b> k-anonymity by generalising or suppressing quasi-identifiers (exact location, timestamps, rare attributes); noise addition; <b>differential privacy</b> for released statistics and models; pseudonymisation with the key stored separately; analysing aggregates rather than individual users; federated learning or secure storage with encryption and access control; testing a release against public data for re-identification before sharing.</li>
+<li><b>Practices:</b> obtain ethics-board (IRB) approval; seek informed consent or, where impossible, use only data the platform terms allow and tell users how it is used; data minimisation and purpose limitation; a retention limit; do not publish or share raw data; accountability for who may access it; transparent reporting of methods and limitations.</li>
+</ul>
+
+=== QA Q1
+<p><b>Qualitative data</b> describes a quality or category and is not measured with numbers; it is sorted into groups. Example: blood group (A+, O-), eye colour, nationality, or a student's feedback (Excellent, Good, Poor).</p>
+
+=== QA Q2
+<p>Use <code>describe()</code> with <code>include='object'</code> (or <code>include=['object', 'category']</code>); it gives the count, number of unique values, the most frequent value (top) and its frequency (freq):</p>
+```python
+@@OUT qa_q2.code@@
+```
+```out
+@@OUT qa_q2@@
+```
+<p>(<code>df.describe(include='all')</code> gives the numerical and the categorical columns together; <code>df['col'].value_counts()</code> counts each category.)</p>
+
+=== QA Q3
+<table class="work"><tr><th></th><th>Structured data</th><th>Unstructured data</th></tr>
+<tr><td>Model</td><td>follows a predefined data model; rows and columns</td><td>no predefined model</td></tr>
+<tr><td>Analysis</td><td>easy with SQL and spreadsheets</td><td>needs advanced tools: text mining, image and speech processing, NoSQL</td></tr>
+<tr><td>Storage</td><td>relational databases, Excel/CSV</td><td>non-relational (NoSQL), data lakes, file stores</td></tr>
+<tr><td>Examples</td><td>names, dates, ATM transactions, stock data</td><td>emails, reports, images, audio, video, tweets, social media comments</td></tr>
+<tr><td>Share of data</td><td>smaller part (less than 20%)</td><td>vast majority (over 80%) and growing</td></tr></table>
+<p>Semi-structured data (JSON, XML) lies in between: it has tags but no fixed table.</p>
+
+=== QA Q4
+<p><b>Goal:</b> improve product recommendations for customers of an e-commerce company using structured data (customer demographics, purchase logs) and unstructured data (customer reviews, social media activity). Steps through the data science life cycle:</p>
+<img class="fig" src="img/lifecycle.png" alt="data science life cycle">
+<ol class="steps">
+<li><b>Discovery:</b> state the problem (show each customer products they are likely to buy), the success measures (click-through, conversion, RMSE and hit rate) and the available data.</li>
+<li><b>Data collection:</b> structured: customer table (age, city, gender) and purchase log (customer, product, price, date). Unstructured: review text, social media posts, product descriptions and images. Collect from the databases, web logs and social media APIs.</li>
+<li><b>Data preparation:</b> remove duplicates and bots, handle missing values, standardise formats, join the tables; convert text reviews into numbers (TF-IDF or sentiment scores); build the customer-product utility matrix from purchases and ratings; create features such as category, price band and recency.</li>
+<li><b>Model planning:</b> explore buying patterns with statistics and plots; choose content-based filtering (product features and customer profile, cosine similarity), collaborative filtering (similar customers or items) and a hybrid for new customers.</li>
+<li><b>Model building:</b> split the data into training and testing sets, compute similarities, predict ratings for products the customer has not bought, rank the top N; evaluate on the test set with MAE, RMSE, hit rate.</li>
+<li><b>Operationalise:</b> deploy the model to the website and app, update it with new purchases, monitor its accuracy, run A/B tests, protect customer privacy.</li>
+<li><b>Communicate results:</b> report the lift in conversion and revenue to the business, with the limitations (cold start, sparse data) and the next steps.</li>
+</ol>
+
+=== QA Q5
+<p>The post links <code>Customers.csv</code> as a Google Sheet that is not in the Classroom mirror, so a 10-row file with the usual columns (CustomerID, Genre, Age, Annual Income (k$), Spending Score) was built, with a few blanks so that the null-handling steps have something to do. The code is run exactly as written; the output is what it printed.</p>
+```table
+@@OUT qa_q5.Customers.csv.tbl@@
+```
+```python
+@@OUT qa_q5.code@@
+```
+```out
+@@OUT qa_q5@@
+```
+
+=== PD Q1
+<p>The cricket DataFrame has 8 players and 5 features (player, role, matches, runs, wickets). The figures are illustrative.</p>
+```python
+@@OUT pd_q1.code@@
+```
+```out
+@@OUT pd_q1@@
+```
+
+=== PD Q2
+<p>The post does not give a dataset, so a small <code>students.csv</code> (roll, name, dept, marks, project, city) was built with one missing mark and one missing city. Run for real:</p>
+```table
+@@OUT pd_q2.students.csv.tbl@@
+```
+```python
+@@OUT pd_q2.code@@
+```
+```out
+@@OUT pd_q2@@
+```
+<p><b>Why handling missing values matters:</b> missing values bias the mean and correlations, most machine learning algorithms cannot accept NaN, and dropping them blindly loses data; so they are found, understood and then imputed or removed deliberately.</p>
+
+=== PD Q3
+<p>The college dataset was built from the columns named in the post (a 10-student file with some Attendance and CGPA values missing, written as NA). Run for real:</p>
+```table
+@@OUT pd_q3.college.csv.tbl@@
+```
+```python
+@@OUT pd_q3.code@@
+```
+```out
+@@OUT pd_q3@@
+```
+<p>Note: the missing CGPA of Priya stays NaN (the question only asks to fill attendance); the student with attendance 57 and the one with 59 are removed in the last step.</p>
+
+=== PD Q4
+<p>The sheet linked in the post is not in the mirror, so an <code>employees.csv</code> with the named columns (Employee_ID, Name, Age, Genre, Gender, Appraisal Marks, Overall Score) was built, with blanks in Appraisal Marks and Overall Score. Run for real:</p>
+```table
+@@OUT pd_q4.employees.csv.tbl@@
+```
+```python
+@@OUT pd_q4.code@@
+```
+```out
+@@OUT pd_q4@@
+```
+<p>Step 7 fills each column from the row above it (<code>ffill</code>), so the first row, which has no previous value, stays null until step 8 fills it with 0.</p>

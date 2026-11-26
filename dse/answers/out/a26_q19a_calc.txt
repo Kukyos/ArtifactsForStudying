@@ -1,0 +1,4 @@
+n = 5, mean of x = 3, mean of y = 4
+b1 = 6 / 10 = 0.6
+b0 = mean y - b1 x mean x = 4 - 0.6 x 3 = 2.2
+regression line:  y = 2.2 + 0.6 x

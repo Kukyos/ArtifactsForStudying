@@ -1,0 +1,264 @@
+=== REV Q1
+<p>Note: the sentence at the top of the post mentions hours studied and test scores, but the table and the question ask for <b>age against monthly grocery spending</b> for 7 people, so that is what is solved.</p>
+<p><b>Formula:</b> r = sum (x - xbar)(y - ybar) / sqrt( sum (x - xbar)^2 x sum (y - ybar)^2 ), with x = Age and y = Spending.</p>
+<h4>Working table</h4>
+```table
+@@OUT rev_q1@@
+```
+<h4>Means, standard deviations and r</h4>
+```gbox
+@@OUT rev_q1_calc@@
+```
+<h4>Significance of the coefficient</h4>
+<ul><li><b>r = 0.996</b>, very close to +1: a <b>very strong positive linear correlation</b>. As age increases, monthly grocery spending increases almost in a straight line.</li>
+<li>r^2 = 0.992, so about <b>99.2%</b> of the variation in spending is explained by age in this sample.</li>
+<li>With only 7 people this describes the sample; a correlation shows association, <b>not that age causes the spending</b> (household size or income may be behind both).</li></ul>
+
+=== REV Q2
+<p>Points A1 to A8; initial centroids C1 = A1 = (2, 10), C2 = A4 = (5, 8), C3 = A7 = (1, 2). Distance d(a, b) = sqrt((xb - xa)^2 + (yb - ya)^2); each point goes to its nearest centroid.</p>
+<h4>Iteration 1</h4>
+```table
+@@OUT km8_it1@@
+```
+<p>New centres (mean of each cluster):</p>
+```gbox
+@@OUT km8_c1@@
+```
+<p><b>After one iteration: C1 = (2, 10), C2 = (6, 6), C3 = (1.5, 3.5)</b> with clusters {A1}, {A3, A4, A5, A6, A8} and {A2, A7}.</p>
+<h4>Next iteration (for completeness)</h4>
+```table
+@@OUT km8_it2@@
+```
+```gbox
+@@OUT km8_c2@@
+```
+<p>A8 moves to C1 and the centres become (3, 9.5), (6.5, 5.25) and (1.5, 3.5).</p>
+<img class="fig" src="img/km8.png" alt="K-means clusters of the 8 points after iteration 2">
+
+=== KM Q1
+@@SAME Nov25 Q20a
+
+=== KM Q2
+@@SAME REV Q2
+
+=== KM Q3
+<h4>Main steps</h4>
+<ol class="steps">
+<li>Choose K, the number of clusters (elbow method).</li>
+<li>Pick K initial centroids.</li>
+<li>Compute the Euclidean distance of every point to every centroid.</li>
+<li>Assign each point to its nearest centroid.</li>
+<li>Recompute each centroid as the mean of its cluster.</li>
+<li>Repeat steps 3 to 5 until the centroids stop moving; stop.</li>
+</ol>
+<img class="fig" src="img/kmeans_flow.png" alt="K-means flow diagram">
+<h4>Strengths</h4>
+<ul><li>Simple to understand and implement; fast and scales to large data (time O(n k t) for n points, k clusters, t iterations).</li><li>Every point goes to exactly one cluster, and the clusters are non-overlapping.</li><li>Always produces exactly K clusters.</li></ul>
+<h4>Weaknesses</h4>
+<ul><li>K must be fixed beforehand.</li><li>The result depends on the initial centroids and may stop at a local optimum.</li><li>Sensitive to outliers (they drag the mean) and to the scale of the features.</li><li>Finds only compact, roughly spherical (convex) clusters, and forces every point into a cluster.</li></ul>
+<h4>Applications</h4>
+<p>Customer or market segmentation and targeted marketing, grouping similar documents or news, image compression and segmentation, siting delivery or pizza centres, recommender systems, anomaly detection.</p>
+
+=== AGG Q1
+<p>Single linkage: the distance between two clusters is the <b>minimum</b> distance between any member of one and any member of the other. At each step merge the closest pair of clusters, then replace the two rows and columns by one row and column holding the minimum of the two old distances.</p>
+<h4>Step 0: distance matrix</h4>
+```table
+@@OUT agg1_m0@@
+```
+<p>Smallest = d(C, F) = 0.11, so merge C and F at 0.11. New row: d(CF, A) = min(0.25, 0.22) = 0.22; d(CF, B) = min(0.12, 0.26) = 0.12; d(CF, D) = min(0.16, 0.19) = 0.16; d(CF, E) = min(0.27, 0.35) = 0.27.</p>
+```table
+@@OUT agg1_m1@@
+```
+<p>Smallest = d(B, CF) = 0.12, merge B with CF at 0.12. d(BCF, A) = min(0.18, 0.22) = 0.18; d(BCF, D) = min(0.21, 0.16) = 0.16; d(BCF, E) = min(0.15, 0.27) = 0.15.</p>
+```table
+@@OUT agg1_m2@@
+```
+<p>Smallest = d(E, BCF) = 0.15, merge E with BCF at 0.15. d(EBCF, A) = min(0.29, 0.18) = 0.18; d(EBCF, D) = min(0.24, 0.16) = 0.16.</p>
+```table
+@@OUT agg1_m3@@
+```
+<p>Smallest = d(D, EBCF) = 0.16, merge at 0.16. d(DEBCF, A) = min(0.32, 0.18) = 0.18.</p>
+```table
+@@OUT agg1_m4@@
+```
+<p>Last merge: A joins everything at 0.18.</p>
+```gbox
+@@OUT agg1_merges@@
+```
+<img class="fig" src="img/agg1_dend.png" alt="single linkage dendrogram: C-F at 0.11, B at 0.12, E at 0.15, D at 0.16, A at 0.18">
+<p>Reading the dendrogram: C and F are the most similar pair; B, E and D join one by one (a "chain", typical of single linkage); A is last. Cutting at 0.13 gives 4 clusters {C,F,B}, {A}, {D}, {E}; cutting at 0.17 gives 2: {A} and {B,C,D,E,F}.</p>
+
+=== AGG Q2
+<p><b>Step 1: Euclidean distance between every pair</b>, d = sqrt((x1 - x2)^2 + (y1 - y2)^2):</p>
+```table
+@@OUT agg2_pts@@
+```
+```gbox
+@@OUT agg2_pairs@@
+```
+<p><b>Step 2: distance matrix</b></p>
+```table
+@@OUT agg2_m0@@
+```
+<p><b>Step 3: single-linkage merging.</b> Four pairs are tied at the smallest distance sqrt(2) = 1.414: (A,B), (B,C), (D,E) and (E,F). Ties may be merged in any order and give the same tree. Merge A and B at 1.414; then C joins {A,B} because min(d(C,A), d(C,B)) = min(2, 1.414) = 1.414; merge D and E at 1.414; F joins {D,E} because min(d(F,D), d(F,E)) = min(2, 1.414) = 1.414.</p>
+```table
+@@OUT agg2_m1@@
+```
+```table
+@@OUT agg2_m2@@
+```
+```table
+@@OUT agg2_m3@@
+```
+<p>Now two clusters are left, {A,B,C} and {D,E,F}. Their single-linkage distance is the smallest cross distance, d(B, D) = d(C, D) = 5, so they merge at height 5.</p>
+```table
+@@OUT agg2_m4@@
+```
+```gbox
+@@OUT agg2_merges@@
+```
+<img class="fig" src="img/agg2_dend.png" alt="single linkage dendrogram of the six points: two groups ABC and DEF joined at 5">
+<p><b>Conclusion:</b> the six points form two clear groups, {A, B, C} and {D, E, F}, which merge only at distance 5. Cutting the dendrogram anywhere between 1.5 and 5 gives these two clusters.</p>
+
+=== PP Q1
+<p>Model: y = b0 + b1 x with x = number of crabs and y = clams remaining.</p>
+```table
+@@OUT pp_q1@@
+```
+```gbox
+@@OUT pp_q1_calc@@
+```
+<p><b>Regression line: y = 297.98 - 59.68 x.</b> Each extra crab removes about 60 clams from the cage; with no crabs about 298 of the 300 clams remain.</p>
+<img class="fig" src="img/pp_q1.png" alt="clams remaining against number of crabs with regression line">
+<p>R^2 = 0.96: the line explains about 96% of the variation in clams remaining. (The line gives a negative number of clams for 5 crabs or more, which is the limit of a straight-line model, since the observed count never goes below 0.)</p>
+
+=== PP Q2
+```table
+@@OUT pp_q2@@
+```
+```gbox
+@@OUT pp_q2_calc@@
+```
+<p><b>r = 0.98</b>: a very strong positive correlation; students who studied more hours scored higher.</p>
+
+=== PP Q3
+<p>The ranks are given, so rho = 1 - 6 sum d^2 / (n (n^2 - 1)) is used directly, with d = Rx - Ry.</p>
+```table
+@@OUT pp_q3@@
+```
+```gbox
+@@OUT pp_q3_calc@@
+```
+<p><b>rho = 0.139</b>: a very weak positive rank correlation, so the two judges' rankings are almost unrelated: they largely disagree.</p>
+
+=== PP Q4
+<p>Features: Weight (g) and Size (cm). New fruit X = (175, 8.5). The sheet does not give K, so <b>K = 3</b> is assumed, as in the other KNN problems of this set (KT Q1, KT Q2). Euclidean distance.</p>
+```table
+@@OUT pp_q4@@
+```
+```gbox
+@@OUT pp_q4_vote@@
+```
+<p>C and D are equally close (5.02). The three nearest are C (Apple), D (Orange) and B (Apple), so Apple has 2 votes against 1. <b>The new fruit is classified as an Apple.</b></p>
+<p>Effect of K: with K = 1 the two nearest points C (Apple) and D (Orange) are tied, so the vote cannot decide; K = 3 and K = 5 (all five fruits: 3 Apples, 2 Oranges) both give Apple. The point sits exactly between the two groups, so it is a borderline case and K = 3 is the sensible choice.</p>
+
+=== PP Q5
+```table
+@@OUT pp_q5@@
+```
+```gbox
+@@OUT pp_q5_calc@@
+```
+<p><b>Regression equation: Marks = 28.67 + 6.70 x Hours.</b> For 6.5 hours: Marks = 28.667 + 6.697 x 6.5 = <b>72.2</b>.</p>
+<img class="fig" src="img/pp_q5.png" alt="marks against hours studied with regression line">
+<p>R^2 = 0.994, a very good fit.</p>
+
+=== PP Q6
+```table
+@@OUT pp_q6@@
+```
+```gbox
+@@OUT pp_q6_calc@@
+```
+<p><b>Regression line: Sales = -12 + 1.28 x Temperature.</b> Every extra degree sells about 1.28 more litres of ice cream; at 32 degrees about 29 litres.</p>
+<img class="fig" src="img/pp_q6.png" alt="ice cream sales against temperature with regression line">
+
+=== PP Q7
+<p><b>Supervised learning</b> (classification). The 10,000 emails are labelled Spam / Not Spam and the model learns to predict the label of a new email.</p>
+
+=== PP Q8
+<p><b>Unsupervised learning</b> (clustering). The customer categories are not known in advance; the system groups customers by similar buying behaviour.</p>
+
+=== PP Q9
+<p><b>Reinforcement learning.</b> The robot learns by trial and error from rewards (moving closer) and penalties (hitting a wall).</p>
+
+=== PP Q10
+<p><b>Supervised learning</b> (regression). Past sales with known prices are used to predict a continuous value, the selling price.</p>
+
+=== PP Q11
+<p><b>Unsupervised learning</b> (clustering). There are no predefined categories; the system discovers groups of students with similar behaviour.</p>
+
+=== PP Q12
+<p><b>Reinforcement learning.</b> The chess AI is given no correct move; it plays thousands of games and learns from the reward for winning and the penalty for losing.</p>
+
+=== PP Q13
+<p><b>Supervised learning</b> (classification). Patient records with a confirmed diagnosis (Disease / No Disease) train a model to predict the diagnosis of a new patient.</p>
+
+=== PP Q14
+<p><b>Unsupervised learning</b> (association rule mining / market-basket analysis). No relationships were specified; the system discovers that bread, butter and jam are bought together.</p>
+
+=== PP Q15
+<p><b>Reinforcement learning.</b> The vehicle tries different actions in the simulator and improves its driving strategy from rewards (staying in lane, reaching the destination) and penalties (collisions, unsafe actions).</p>
+
+=== PP Q16
+<p><b>Supervised learning</b> (classification, image classification). The photographs are labelled Tiger, Elephant, Deer and Lion, and the trained model identifies a new photograph.</p>
+
+=== PS Q1
+<p>x = study hours, y = marks, n = 10.</p>
+```table
+@@OUT ps_q1@@
+```
+```gbox
+@@OUT ps_q1_calc@@
+```
+<p><b>r = 0.997.</b> The value is very close to +1: a <b>very strong, positive, linear</b> correlation. Marks rise almost exactly in step with study hours.</p>
+
+=== PS Q2
+<p>The ranks are given, so d = (Maths rank) - (Computer Science rank) and rho = 1 - 6 sum d^2 / (n (n^2 - 1)).</p>
+```table
+@@OUT ps_q2@@
+```
+```gbox
+@@OUT ps_q2_calc@@
+```
+<p><b>rho = 0.939</b>: a very strong positive rank correlation; a student who ranks high in Mathematics tends to rank high in Computer Science.</p>
+
+=== PS Q3
+<p>Raw data, so first rank each variable (smallest value = rank 1; there are no ties here), then find d and d^2.</p>
+```table
+@@OUT ps_q3@@
+```
+```gbox
+@@OUT ps_q3_calc@@
+```
+<p><b>rho = 0.988</b>: a very strong positive association; higher attendance goes with a higher final exam score (this shows association, not that attendance alone causes the score).</p>
+
+=== KT Q1
+<p>Features: Hours Studied and Attendance (%). New student X = (4, 72), K = 3, Euclidean distance.</p>
+```table
+@@OUT kt_q1@@
+```
+```gbox
+@@OUT kt_q1_vote@@
+```
+<p><b>X is classified as Pass</b> (all three nearest students, S3, S4 and S7, passed).</p>
+
+=== KT Q2
+<p>Features: Income (lakhs) and Credit Score. New customer X = (5.5, 660), K = 3, Euclidean distance.</p>
+```table
+@@OUT kt_q2@@
+```
+```gbox
+@@OUT kt_q2_vote@@
+```
+<p><b>X is classified as Loan Approved</b> (2 Approved against 1 Rejected). Note the credit score is on a far larger scale than income, so it decides the distance; the nearest customers are also the ones with the closest credit score.</p>

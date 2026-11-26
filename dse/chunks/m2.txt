@@ -1,0 +1,59 @@
+=== 2.1
+Q: Nov25 Q4, Nov25 Q18, Nov24 Q4, Nov24 Q18a, QA Q2, QA Q5, PD Q1, PD Q2, PD Q3, PD Q4
+<p>Pandas holds tabular data in a <b>DataFrame</b> (a table of labelled columns) and a <b>Series</b> (one column). The commands that appear in every exam:</p>
+<table class="work"><tr><th>Task</th><th>Command</th></tr>
+<tr><td>create</td><td><code>pd.DataFrame({'a': [1, 2], 'b': [3, 4]})</code></td></tr>
+<tr><td>import</td><td><code>pd.read_csv('f.csv')</code>, with <code>usecols=[...]</code>, <code>na_values=['NA']</code></td></tr>
+<tr><td>look</td><td><code>head(n)</code>, <code>tail(n)</code>, <code>shape</code>, <code>columns</code>, <code>dtypes</code>, <code>index</code>, <code>size</code>, <code>info()</code></td></tr>
+<tr><td>statistics</td><td><code>describe()</code> (numbers), <code>describe(include='all')</code>, <code>describe(include='object')</code> (categories), <code>value_counts()</code></td></tr>
+<tr><td>select columns</td><td><code>df['a']</code>, <code>df[['a', 'b']]</code></td></tr>
+<tr><td>select by position</td><td><code>df.iloc[2:6, 0]</code>: rows 2 to 5, first column (end excluded)</td></tr>
+<tr><td>select by label</td><td><code>df.loc[rows, cols]</code>, e.g. <code>df.loc[df['dept'] == 'CSE', ['name', 'cgpa']]</code></td></tr>
+<tr><td>filter</td><td><code>df[df['age'] &gt; 25]</code>; several conditions: <code>df[(df['age'] &gt; 25) &amp; (df['genre'] == 'Female')]</code>; <code>df.query('age &gt; 25 and cgpa &gt; 8')</code>; <code>between(50, 60)</code></td></tr>
+<tr><td>new column</td><td><code>df['total'] = df['a'] + df['b']</code>; <code>df['grade'] = df['t'].apply(lambda m: 'A' if m &gt;= 85 else 'B')</code></td></tr>
+<tr><td>add a row</td><td><code>df.loc[len(df)] = [...]</code></td></tr>
+<tr><td>rename, drop</td><td><code>rename(columns={'old': 'new'})</code>, <code>drop(columns='a', inplace=True)</code></td></tr>
+<tr><td>sort, rank</td><td><code>sort_values(by='a', ascending=False)</code>, <code>df['a'].rank()</code>, <code>sort_index()</code>, <code>reset_index(drop=True)</code></td></tr>
+<tr><td>group</td><td><code>df.groupby('dept')['marks'].mean()</code>, <code>.size()</code>, <code>.agg([...])</code></td></tr>
+<tr><td>sum, mean</td><td><code>df['s'].sum()</code>, <code>mean()</code>, <code>median()</code>, <code>duplicated()</code></td></tr></table>
+<p><b>How to write these answers:</b> number the sub-steps as in the question, one or two lines of code each, with a short comment; when the question shows a table, create the DataFrame from it first (NaN where the table shows NaN). Every answer for these questions in this tutor was run for real and shows its output.</p>
+
+=== 2.2
+Q: Nov25 Q12, Nov25 Q21a, Apr26 Q11, Apr26 Q24a, Apr24 Q12
+<p>A <b>missing value</b> is stored as <code>NaN</code> ("not a number") or <code>None</code>. Find them with <code>df.info()</code>, <code>df.isnull()</code> and <code>df.isnull().sum()</code>.</p>
+<h4>Why they matter</h4>
+<ul><li>They bias statistics (mean, correlation) and can give a wrongly biased model.</li><li>Most machine learning algorithms cannot take NaN.</li><li>Dropping rows or columns blindly loses valuable information.</li></ul>
+<h4>Why they occur</h4>
+<p>Data corruption, incomplete data entry, human error, users deliberately skipping sensitive questions, survey non-response.</p>
+<h4>Handling</h4>
+<table class="work"><tr><th>Method</th><th>Command</th><th>When</th></tr>
+<tr><td>Drop rows</td><td><code>df.dropna()</code> / <code>dropna(how='any', subset=['col'])</code></td><td>few values missing</td></tr>
+<tr><td>Drop columns</td><td><code>df.dropna(axis=1)</code></td><td>column mostly empty</td></tr>
+<tr><td>Constant</td><td><code>df.fillna(0)</code></td><td>rarely right: 0 may look like data</td></tr>
+<tr><td>Mean</td><td><code>df['c'].fillna(df['c'].mean())</code></td><td>symmetric numeric data</td></tr>
+<tr><td>Median</td><td><code>fillna(df['c'].median())</code></td><td>skewed numeric data</td></tr>
+<tr><td>Mode</td><td><code>fillna(df['c'].mode()[0])</code></td><td>categorical data</td></tr>
+<tr><td>Group mean</td><td><code>groupby('g')['c'].transform('mean')</code></td><td>same class as the tuple</td></tr>
+<tr><td>Previous / next</td><td><code>ffill()</code> / <code>bfill()</code> (<code>fillna(method='ffill')</code>)</td><td>ordered data</td></tr>
+<tr><td>Interpolation</td><td><code>interpolate(method='linear')</code></td><td>sequence or time series</td></tr>
+<tr><td>Model</td><td><code>SimpleImputer</code>, <code>KNNImputer(n_neighbors=3)</code>, regression/logistic regression</td><td>most probable value</td></tr></table>
+<p>Other cleaning steps: remove duplicates, fix data types, fix inconsistent spellings, treat outliers, normalise.</p>
+
+=== 2.3
+Q: Nov25 Q3, Nov24 Q12, Nov24 Q18b, Apr26 Q7, Apr26 Q15, Apr26 Q18a, Apr24 Q3, Apr24 Q18
+<table class="work"><tr><th>Plot</th><th>Use it for</th><th>Data</th></tr>
+<tr><td>Bar chart</td><td>compare categories</td><td>categorical vs a number</td></tr>
+<tr><td>Pie chart</td><td>parts of a whole</td><td>categorical</td></tr>
+<tr><td>Histogram</td><td>shape of a distribution (skew, spread, outliers)</td><td>one numeric</td></tr>
+<tr><td>Box plot</td><td>five-number summary, median, IQR, outliers</td><td>one numeric (by group)</td></tr>
+<tr><td>Scatter plot</td><td>relationship and correlation between two variables</td><td>two numeric</td></tr>
+<tr><td>Line graph</td><td>trend over time</td><td>numeric over time</td></tr>
+<tr><td>Heat map</td><td>correlation matrix</td><td>many numeric</td></tr></table>
+<pre class="code" data-lang="python">import matplotlib.pyplot as plt
+plt.bar(df['dept'], df['students'])      # bar chart
+plt.hist(df['marks'], bins=5)            # histogram
+plt.scatter(df['hours'], df['marks'])    # scatter plot
+plt.boxplot(df['marks'])                 # box plot
+plt.xlabel('x'); plt.ylabel('y'); plt.title('title'); plt.show()</pre>
+<h4>Exploratory data analysis (EDA)</h4>
+<p>EDA is looking at the data before modelling: understand columns and types, clean it, describe it with statistics, study one variable (histogram, box plot), then relationships (scatter plot, correlation), detect outliers, and decide on features and the model. Visualisation shows distribution, relationships and outliers at a glance and communicates results to non-technical readers.</p>

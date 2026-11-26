@@ -1,0 +1,328 @@
+=== Nov25 Q1
+<p>In education, data science is used to analyse students' data (attendance, marks, learning-portal activity) so that the institution can <b>predict performance and drop-out risk, personalise learning and improve teaching and decisions</b>.</p>
+
+=== Nov25 Q2
+<p>The components of data science are:</p>
+<ol><li>Statistics</li><li>Visualisation</li><li>Data engineering</li><li>Domain expertise</li><li>Machine learning</li><li>Deep learning</li></ol>
+
+=== Nov25 Q3
+<p>A bar chart compares a numeric value across categories, so a categorical column goes on the x-axis and a numeric column on the y-axis (<code>plt.bar</code>).</p>
+```python
+@@OUT n25_q3.code@@
+```
+<p>Output of the print (the data being plotted) and the chart that <code>plt.show()</code> draws:</p>
+```out
+@@OUT n25_q3@@
+```
+<img class="fig" src="img/n25_q3.png" alt="bar chart of students per department">
+
+=== Nov25 Q4
+<p>The command is <code>sort_values()</code> with <code>ascending=False</code>:</p>
+```python
+@@OUT n25_q4.code@@
+```
+```out
+@@OUT n25_q4@@
+```
+<p>(For a Series: <code>s.sort_values(ascending=False)</code>; to sort by the index use <code>sort_index()</code>.)</p>
+
+=== Nov25 Q5
+<p>The claim "mean blood pressure of men is greater than or equal to 130 mmHg" contains the equality, so the claim is the null hypothesis. The alternative is the opposite of the claim.</p>
+```gbox
+H0 : mu >= 130 mmHg      (claim)
+H1 : mu <  130 mmHg      (left-tailed test)
+```
+
+=== Nov25 Q6
+<p>Measures of central tendency: <b>mean</b> (average), <b>median</b> (middle value of the sorted data) and <b>mode</b> (most frequent value).</p>
+
+=== Nov25 Q7
+```gbox
+Y = 55 + 5X,   X = 4 hours
+Y = 55 + 5 x 4 = 55 + 20 = 75
+```
+<p>Predicted final exam score = <b>75</b>.</p>
+
+=== Nov25 Q8
+<p>Draw the cut level on the dendrogram and count how many vertical branches it crosses; each branch it crosses is one cluster.</p>
+<p>The dashed line crosses <b>4</b> branches, so the final clusters are:</p>
+<ul><li>{a, b, c, d, e}</li><li>{f, g, h}</li><li>{i, j, k, l}</li><li>{m, n}</li></ul>
+<p><b>Number of final clusters = 4.</b> (Cutting lower would give more, smaller clusters; cutting above the next merge would give 2.)</p>
+
+=== Nov25 Q9
+<table class="work"><tr><th></th><th>Content-based filtering</th><th>Collaborative filtering</th></tr>
+<tr><td>Recommends</td><td>items similar to those the user liked before</td><td>items liked by users with similar tastes</td></tr>
+<tr><td>Uses</td><td>item features (genre, keywords) and the user's own profile</td><td>the user-item ratings of many users</td></tr>
+<tr><td>Other users</td><td>not needed</td><td>needed (large community)</td></tr>
+<tr><td>Weakness</td><td>only suggests similar items</td><td>cold start for new users and items</td></tr></table>
+
+=== Nov25 Q10
+<p>Fairness means the model treats individuals and groups equitably and does not discriminate on protected attributes such as gender, race, age or religion. It is important because biased models <b>repeat and amplify unfairness</b> (for example in loans, hiring, health), cause legal and reputational harm, and are not trusted by users.</p>
+
+=== Nov25 Q11
+<p>Data science in the automotive industry:</p>
+<ol>
+<li><b>Predictive maintenance.</b> Sensor and engine data are modelled to predict a part failure before it happens, so service is scheduled early and breakdowns and warranty cost fall.</li>
+<li><b>Autonomous and assisted driving.</b> Camera, radar and lidar data are fed to machine-learning models that recognise lanes, pedestrians and signs and decide how to steer and brake.</li>
+<li><b>Demand forecasting and supply chain.</b> Sales, season and market data forecast demand per model and region, which sets production and parts inventory.</li>
+<li><b>Usage-based insurance, quality control and fleet routing.</b> Driving-behaviour data sets premiums, image analysis finds defects on the line, and route data cuts fuel cost.</li>
+</ol>
+
+=== Nov25 Q12
+<p>Missing values appear as <code>NaN</code> (or <code>None</code>). Commands:</p>
+<ul><li><code>df.isnull()</code> / <code>df.isna()</code>: True where a value is missing</li>
+<li><code>df.isnull().sum()</code>: number of missing values in each column</li>
+<li><code>df.ffill()</code> (same as <code>df.fillna(method='ffill')</code>): <b>forward fill</b>, copies the previous value down into the gap</li>
+<li><code>df.bfill()</code> (same as <code>df.fillna(method='bfill')</code>): <b>backward fill</b>, copies the next value up into the gap</li></ul>
+```python
+@@OUT n25_q12.code@@
+```
+```out
+@@OUT n25_q12@@
+```
+<p>Forward fill leaves a gap at the very top (nothing above it) and backward fill leaves a gap at the very bottom, so any remaining NaN can then be filled with a constant.</p>
+
+=== Nov25 Q13
+<p>Data (already sorted), n = 15: 18, 27, 34, 52, 54, 59, 61, <b>68</b>, 78, 82, 85, 87, 91, 93, 100</p>
+<h4>Five-number summary</h4>
+<ul><li>Minimum = 18, Maximum = 100</li>
+<li>Median (Q2) = 8th value = <b>68</b></li>
+<li>Q1 = median of the lower half (18, 27, 34, <b>52</b>, 54, 59, 61) = <b>52</b></li>
+<li>Q3 = median of the upper half (78, 82, 85, <b>87</b>, 91, 93, 100) = <b>87</b></li></ul>
+```table
+@@OUT n25_q13_five@@
+```
+```gbox
+IQR = Q3 - Q1 = 87 - 52 = 35
+```
+<h4>Box plot</h4>
+<img class="fig" src="img/n25_q13.png" alt="box plot with Q1 52, median 68, Q3 87">
+<p>Outlier check (1.5 x IQR rule):</p>
+```gbox
+@@OUT n25_q13_fence@@
+```
+<p>So the whiskers run to the minimum (18) and the maximum (100). The median sits near the middle of the box (Q2 - Q1 = 16, Q3 - Q2 = 19), so the middle half of the marks is roughly symmetric, and the longer lower whisker (18 to 52) shows a tail of low marks.</p>
+
+=== Nov25 Q14
+<table class="work"><tr><th>Basis</th><th>Agglomerative (bottom-up)</th><th>Divisive (top-down)</th></tr>
+<tr><td>Start</td><td>every point is its own cluster</td><td>all points in one cluster</td></tr>
+<tr><td>Step</td><td>merge the two closest clusters</td><td>split a cluster into two</td></tr>
+<tr><td>End</td><td>one cluster holding all points</td><td>every point alone</td></tr>
+<tr><td>Cost</td><td>cheaper; needs a distance matrix and a linkage rule</td><td>costlier; many ways to split a cluster</td></tr>
+<tr><td>Best at</td><td>finding small, local clusters</td><td>seeing the big structure first</td></tr>
+<tr><td>Both draw</td><td colspan="2">a dendrogram; cutting it at a height gives the clusters</td></tr></table>
+
+=== Nov25 Q15
+<p>A hybrid recommender combines content-based filtering (CBF) and collaborative filtering (CF) so that the strengths of one cover the weakness of the other (cold start, similar-only suggestions). Approaches:</p>
+<table class="work"><tr><th>Approach</th><th>How it combines CBF and CF</th></tr>
+<tr><td>Weighted</td><td>score = a x CF + (1 - a) x CBF with fixed weights</td></tr>
+<tr><td>Switching</td><td>use one method for a situation, e.g. CBF for a new user, CF once ratings exist</td></tr>
+<tr><td>Mixed</td><td>show the results of both side by side</td></tr>
+<tr><td>Cascade</td><td>one method ranks, the other refines the ranking or breaks ties</td></tr>
+<tr><td>Feature combination</td><td>features from one method are fed into the other's model</td></tr>
+<tr><td>Feature augmentation</td><td>the output of one method becomes an input feature of the main one</td></tr>
+<tr><td>Meta-level</td><td>the model learned by one method is the input of the other</td></tr></table>
+
+=== Nov25 Q16
+<table class="work"><tr><th></th><th>Transparency</th><th>Accountability</th></tr>
+<tr><td>Meaning</td><td>being open about what data is used and how the model works and decides</td><td>taking responsibility for the outcomes of the system, good and bad</td></tr>
+<tr><td>Question it answers</td><td>"How and why was this decision made?"</td><td>"Who is answerable, and how is harm put right?"</td></tr>
+<tr><td>Means</td><td>documentation, data sheets, model cards, explaining decisions</td><td>named owners, audit trails, human review, appeal and redress</td></tr>
+<tr><td>Example</td><td>a bank publishes a model card for its loan model and tells a rejected applicant which factors counted</td><td>when the same model wrongly rejects people, the bank's named owner investigates, corrects it and compensates</td></tr></table>
+
+=== Nov25 Q17a
+<p><b>Problem:</b> PowerGrid Utilities loses 10% of distributed energy to inefficiency at peak hours. The goal is to forecast energy demand so the operations team can plan the grid. The data science life cycle for this prediction model:</p>
+<img class="fig" src="img/lifecycle.png" alt="data science life cycle: discovery, data collection, preparation, planning, building, operationalise, communicate">
+<ol class="steps">
+<li><b>Discovery (problem).</b> Define the question: forecast demand for the next hours/days at peak, to cut the 10% distribution loss. Success measure: forecast error (MAPE/RMSE) and the reduction in loss.</li>
+<li><b>Data collection.</b> Smart-meter readings, SCADA and substation loads, weather (temperature, humidity), calendar (hour, weekday, holiday), tariff and past outage logs.</li>
+<li><b>Data preparation.</b> Remove duplicates and sensor glitches, fill missing readings (interpolation), handle outliers, align everything to hourly time stamps, and create features: hour of day, day of week, holiday flag, lagged demand (same hour yesterday, last week), temperature.</li>
+<li><b>Model planning.</b> Explore the data: plot demand against time and temperature, check seasonality and correlation, decide the techniques (linear/multiple regression as baseline, random forest or gradient boosting, LSTM for sequences).</li>
+<li><b>Model building.</b> Split by time into training and testing sets (never shuffle), train the models, compare them on MAE, RMSE and MAPE, tune, and keep the best.</li>
+<li><b>Operationalise.</b> Deploy the model behind an API that feeds the grid-control dashboard, run it every hour, and monitor its error so it can be retrained when demand patterns drift.</li>
+<li><b>Communicate results.</b> Show the operations team the forecast, the peak hours and the expected saving; recommend load shifting and generation scheduling. The findings raise new questions, which restarts the cycle.</li>
+</ol>
+
+=== Nov25 Q17b
+<p>Big data is described by the <b>5 Vs</b>:</p>
+<ul><li><b>Volume</b>: the amount of data (terabytes to zettabytes), e.g. clicks and posts on Facebook every day.</li>
+<li><b>Variety</b>: many forms: structured tables, semi-structured JSON/XML, unstructured text, images, audio, video.</li>
+<li><b>Velocity</b>: the speed at which data is generated, collected and analysed, e.g. live sensor or transaction streams.</li>
+<li><b>Veracity</b>: the quality, accuracy and trustworthiness of the data; inconsistency and uncertainty.</li>
+<li><b>Value</b>: data is useful only when turned into insight and decisions.</li></ul>
+<p>Other features: it is mostly unstructured, cannot be handled by conventional tools and relational databases (needs distributed storage and processing such as Hadoop and Spark, NoSQL stores), and is usually analysed in batches or streams.</p>
+
+=== Nov25 Q18
+<p>The code below was run exactly as shown; the output under it is what it printed.</p>
+```python
+@@OUT n25_q18.code@@
+```
+```out
+@@OUT n25_q18@@
+```
+<p>Notes: the median of Age (25, 30, 28, 35) is 29, so the missing age became 29.0; the filter <code>Salary &gt; 55000</code> drops the row with NaN salary because NaN &gt; 55000 is False.</p>
+
+=== Nov25 Q19a
+<p><b>Formula (Pearson):</b></p>
+```gbox
+r = sum[(x - xbar)(y - ybar)] / sqrt( sum(x - xbar)^2 x sum(y - ybar)^2 )
+```
+<h4>Working table</h4>
+```table
+@@OUT n25_q19a@@
+```
+<h4>Calculation</h4>
+```gbox
+@@OUT n25_q19a_calc@@
+```
+<p><b>Result: r = 0.13.</b> The value is close to 0, so there is only a <b>very weak positive linear correlation</b> between X and Y: knowing X tells almost nothing about Y.</p>
+
+=== Nov25 Q19b
+<p><b>Given:</b> n = 25, sample mean = 2200 kcal, s = 150 kcal, 95% confidence so Z = 1.96.</p>
+```gbox
+CI = xbar +- Z x s / sqrt(n)
+@@OUT n25_q19b@@
+```
+<p><b>The 95% confidence interval for the mean daily calorie intake is (2141.2, 2258.8) kcal.</b> We are 95% confident that the true average intake of adult women in the city lies in this range.</p>
+
+=== Nov25 Q20a
+<p>Points (x1, x2) are called P1 to P10 in the order given. Distance used: Euclidean, d = sqrt((x1 - c1)^2 + (x2 - c2)^2). Each point goes to its nearest centroid, then both centroids are recomputed as the mean of their members.</p>
+<h4>Iteration 1: C1 = (5, 3), C2 = (10, 15)</h4>
+```table
+@@OUT n25_q20a_it1@@
+```
+<p>Updated centroids (mean of each cluster):</p>
+```gbox
+@@OUT n25_q20a_c1@@
+```
+<h4>Iteration 2: C1 = (5, 3), C2 = (47.78, 50.33)</h4>
+```table
+@@OUT n25_q20a_it2@@
+```
+<p>Updated centroids:</p>
+```gbox
+@@OUT n25_q20a_c2@@
+```
+<p><b>Result after two iterations:</b> C1 = {P1, P2, P3, P4} with centroid (13.5, 10); C2 = {P5, P6, P7, P8, P9, P10} with centroid (63.5, 69.33).</p>
+<img class="fig" src="img/n25_q20a.png" alt="K-means clusters after two iterations">
+<p>The clusters are not final yet: in iteration 3 the point P5 (30, 45) is closer to C1 (38.69) than to C2 (41.40) and moves across, giving C1 = (16.8, 17) and C2 = (70.2, 74.2); after that nothing changes.</p>
+```table
+@@OUT n25_q20a_x_it3@@
+```
+
+=== Nov25 Q20b
+<p>Machine learning algorithms fall into three types:</p>
+<table class="work"><tr><th>Type</th><th>Learns from</th><th>Main tasks and algorithms</th><th>Applications</th></tr>
+<tr><td><b>Supervised</b></td><td>labelled data (inputs with the correct output)</td><td><i>Classification</i>: logistic regression, KNN, decision tree. <i>Regression</i>: simple, multiple, polynomial linear regression</td><td>spam filtering, disease diagnosis, loan approval, house-price and sales prediction</td></tr>
+<tr><td><b>Unsupervised</b></td><td>unlabelled data; finds structure on its own</td><td><i>Clustering</i>: K-means, agglomerative. <i>Association</i>: market-basket rules</td><td>customer segmentation, grouping students, "bread implies butter" rules, anomaly detection</td></tr>
+<tr><td><b>Reinforcement</b></td><td>rewards and penalties from trial and error</td><td>agent and environment, policy that maximises reward</td><td>game playing (chess, Go), robotics, self-driving, recommendation tuning</td></tr></table>
+
+=== Nov25 Q21a
+<p>Null (missing) values must be handled before modelling because they bias the mean and correlations and most algorithms cannot take NaN. The techniques are:</p>
+<ol>
+<li><b>Delete</b> rows or columns: <code>df.dropna()</code> (any row with a null), <code>df.dropna(axis=1)</code> (columns with a null), <code>df.dropna(how='any', subset=['marks'])</code> (only rows null in chosen columns). Simple, but loses data; use only when few values are missing.</li>
+<li><b>Fill with a constant</b> (global constant, e.g. 0 or "unknown"): <code>fillna(0)</code>. Can mislead, because 0 may be read as a real value.</li>
+<li><b>Fill with a measure of central tendency:</b> mean for symmetric numeric data, median for skewed data, mode for categorical data.</li>
+<li><b>Fill with the mean or median of the same class/group:</b> <code>transform('mean')</code> after <code>groupby</code>.</li>
+<li><b>Previous or next value:</b> <code>ffill()</code>, <code>bfill()</code> (ordered data).</li>
+<li><b>Interpolation:</b> <code>interpolate(method='linear')</code> estimates the gap from its neighbours (data with an order, such as time).</li>
+<li><b>Predict the value</b> with a model (regression, decision tree) or <code>KNNImputer</code>, <code>SimpleImputer</code> from scikit-learn.</li>
+</ol>
+<p>Example, run for real on a small DataFrame (age, marks and city have nulls):</p>
+```python
+@@OUT n25_q21a.code@@
+```
+```out
+@@OUT n25_q21a@@
+```
+
+=== Nov25 Q21b
+<p>Rows of the matrix are the actual class and columns the predicted class. Spam is the positive class.</p>
+```table
+ | Predicted Spam (P) | Predicted Not Spam (N) | Total
+Actual Spam | TP = 70 | FN = 10 | 80
+Actual Not Spam | FP = 20 | TN = 100 | 120
+!Total | 90 | 110 | 200
+```
+```gbox
+@@OUT n25_q21b@@
+```
+```table
+Metric | Formula | Value
+Accuracy | (TP + TN) / total | 0.85 = 85%
+Recall | TP / (TP + FN) | 0.875 = 87.5%
+Precision | TP / (TP + FP) | 0.778 = 77.8%
+!F1-score | 2PR / (P + R) | 0.824
+```
+<p>The model catches 87.5% of the spam (recall), but 22% of what it flags as spam is really genuine mail (precision 77.8%).</p>
+
+=== Nov25 Q22a
+<p>Features: x1 = rating, x2 = budget. New movie: (7.0, 90), k = 3, Euclidean distance d = sqrt((x1 - 7.0)^2 + (x2 - 90)^2).</p>
+<h4>Step 1: distance from the new movie to every training movie</h4>
+```table
+@@OUT n25_q22a@@
+```
+<h4>Step 2: sort and take the 3 nearest</h4>
+```gbox
+@@OUT n25_q22a_vote@@
+```
+<p><b>Result: the new movie is classified as "Must Watch" (Class 1).</b></p>
+<p>Remark: the budget (tens of millions) is on a much larger scale than the rating (0 to 10), so it controls the distance. With min-max scaling of both features the three nearest are still C, B, A, so the answer does not change.</p>
+
+=== Nov25 Q22b
+<h4>Linear regression</h4>
+<p>Linear regression is a supervised learning technique that models the relationship between a dependent variable y (continuous) and an independent variable x by a straight line. Simple linear regression: <b>y = b0 + b1 x</b>, where b0 is the intercept, b1 the slope (regression coefficient). The error (residual) of a point is e = y - y_hat (actual - predicted). The best-fit line is the one with the smallest sum of squared errors.</p>
+<h4>Least-squares derivation</h4>
+```gbox
+S = sum (yi - b0 - b1 xi)^2                      (sum of squared errors, to be minimised)
+
+dS/db0 = -2 sum (yi - b0 - b1 xi) = 0      =>   sum y  = n b0 + b1 sum x          ...(1)
+dS/db1 = -2 sum xi (yi - b0 - b1 xi) = 0   =>   sum xy = b0 sum x + b1 sum x^2    ...(2)
+
+From (1):   b0 = ybar - b1 xbar
+Put in (2): b1 = [ n sum xy - sum x sum y ] / [ n sum x^2 - (sum x)^2 ]
+               = sum (x - xbar)(y - ybar) / sum (x - xbar)^2
+```
+<p>The best-fit line is therefore <b>y = b0 + b1 x</b> with b1 = Sxy / Sxx and b0 = ybar - b1 xbar.</p>
+<p>Check with numbers: for x = 1 to 5, y = 2, 4, 5, 4, 5: xbar = 3, ybar = 4, Sxy = 6, Sxx = 10, so b1 = 0.6, b0 = 4 - 0.6 x 3 = 2.2 and y = 2.2 + 0.6x (see Apr26 Q19a).</p>
+
+=== Nov25 Q23a
+<table class="work"><tr><th></th><th>User-based CF</th><th>Item-based CF</th></tr>
+<tr><td>Idea</td><td>"users like you liked this": find users whose ratings are similar to the target user's and recommend what they liked</td><td>"people who liked this item also liked that": find items whose rating patterns are similar to items the user liked</td></tr>
+<tr><td>Similarity computed between</td><td>users (rows of the utility matrix)</td><td>items (columns of the utility matrix)</td></tr>
+<tr><td>Prediction</td><td>weighted average of the similar users' ratings of the item</td><td>weighted average of the target user's own ratings of similar items</td></tr>
+<tr><td>Similarity measure</td><td colspan="2">cosine or Pearson (centred cosine) similarity</td></tr>
+<tr><td>Advantages</td><td>captures changing tastes of the community; surprising, diverse recommendations; easy to explain</td><td>item similarities are stable, so they can be computed offline and reused; scales better when users outnumber items; works with few ratings per user</td></tr>
+<tr><td>Disadvantages</td><td>users change and ratings are sparse, so similarity is unstable; recomputing for millions of users is slow; cold start for new users</td><td>needs enough ratings per item; cold start for new items; recommendations tend to be obvious and less diverse</td></tr></table>
+<p>Steps common to both: build the utility matrix, compute similarity (cosine), choose the K most similar users/items, predict the missing rating, recommend the highest predictions. Both need many ratings and suffer from sparsity and the cold-start problem.</p>
+
+=== Nov25 Q23b
+<p>Performance of a recommender is measured in three ways.</p>
+<ol>
+<li><b>Prediction error</b> (predicted vs actual rating): <b>MAE</b> = (1/n) sum |actual - predicted|; <b>RMSE</b> = sqrt((1/n) sum (actual - predicted)^2). Lower is better; RMSE punishes large errors more.</li>
+<li><b>Top-N quality:</b> <b>Hit rate</b> = hits / users, where a hit is a recommended item the user really liked or rated; <b>ARHR</b> (average reciprocal hit rank) = average of 1/rank of the hits, so a hit at the top counts more. Precision and recall of the top-N list are also used.</li>
+<li><b>Beyond accuracy:</b> <b>coverage</b> (share of items the system can recommend), <b>diversity</b> = 1 - average similarity of the recommended items, <b>novelty</b> (how unpopular the recommended items are).</li>
+</ol>
+
+=== Nov25 Q24
+<h4>Analysis of the ethical implications</h4>
+<table class="work"><tr><th>Issue</th><th>What went wrong in the fitness app</th></tr>
+<tr><td><b>Privacy</b></td><td>Location, heart rate and sleep data are highly personal (health and movement patterns). Users lost control over who sees it; a breach exposed it, and linking it with public data re-identified people (a <i>linkage attack</i>), so "anonymised" was not really anonymous. Possible harms: profiling, stalking, discrimination by insurers or employers.</td></tr>
+<tr><td><b>Confidentiality</b></td><td>Data shared with the app was passed to third-party advertisers and then leaked in the breach. The data holder failed to protect it from unauthorised disclosure (weak security, no access control or contractual limits on the advertisers).</td></tr>
+<tr><td><b>Informed consent</b></td><td>Users were not clearly told that their data would go to advertisers, and had no easy opt-out. Consent must be specific, informed and freely given; sharing for a new purpose (advertising) without it breaks purpose limitation.</td></tr></table>
+<h4>Ethical measures I would implement</h4>
+<ul>
+<li><b>Clear opt-in consent</b> in plain language for each use, separate consent for sharing with third parties, an easy opt-out and the right to delete data.</li>
+<li><b>Purpose limitation and data minimisation</b>: collect only what the health insights need; do not sell or share beyond the stated purpose.</li>
+<li><b>Transparency and accountability</b>: a readable privacy policy, a named data-protection owner, an audit trail, and prompt breach notification to users and the regulator (GDPR/HIPAA-style compliance).</li>
+<li><b>Contracts and audits</b> with advertisers: no re-identification, no onward sharing; regular privacy audits.</li>
+</ul>
+<h4>Technical measures</h4>
+<ul>
+<li><b>Proper anonymisation</b>: remove direct identifiers (suppression), generalise (exact location to city or area, age to age range), and test for re-identification with <b>k-anonymity</b>.</li>
+<li><b>Differential privacy</b>: add calibrated noise to aggregates released to advertisers so no individual can be singled out.</li>
+<li><b>Encryption</b> of data in storage and in transit, strong <b>access control</b> (role-based, least privilege), pseudonymised IDs kept separate from the data.</li>
+<li><b>Share aggregated or synthetic data</b>, not individual-level records; keep raw data on the device or on-premises where possible.</li>
+<li><b>Retention limit</b>: delete data when it is no longer needed; monitor and log access to detect a breach early.</li>
+</ul>
+<p>Together these follow the 5 C's of data ethics: <b>consent, confidentiality, control, compliance and communication</b>.</p>

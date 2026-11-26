@@ -1,0 +1,5 @@
+n = 5, mean of Temp = 30, mean of Sales = 26.4
+b1 = 320 / 250 = 1.28
+b0 = mean y - b1 x mean x = 26.4 - 1.28 x 30 = -12
+regression line:  y = -12 + 1.28 x
+x = 32  ->  y = -12 + 1.28 x 32 = 28.96

@@ -1,0 +1,7 @@
+n = 6
+mean of X = 100 / 6 = 16.667
+mean of Y = 91 / 6 = 15.167
+sum of products = 18.333, sum of (X-mean)^2 = 143.333, sum of (Y-mean)^2 = 138.833
+std dev of X = sqrt(143.333 / 6) = 4.888
+std dev of Y = sqrt(138.833 / 6) = 4.81
+r = 18.333 / sqrt(143.333 x 138.833) = 18.333 / 141.065 = 0.13

@@ -1,0 +1,23 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.DataFrame({'hours': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                   'marks': [35, 40, 50, 55, 65, 70, 75, 80, 90, 95]})
+
+fig, ax = plt.subplots(1, 2, figsize=(9, 3.4))
+
+# histogram: shape of the distribution of one numeric column
+ax[0].hist(df['marks'], bins=5, color='steelblue', edgecolor='white')
+ax[0].set_title('histogram of marks')
+ax[0].set_xlabel('marks')
+ax[0].set_ylabel('number of students')
+
+# scatter plot: relationship between two numeric columns
+ax[1].scatter(df['hours'], df['marks'], color='darkred')
+ax[1].set_title('scatter plot: hours studied vs marks')
+ax[1].set_xlabel('hours studied')
+ax[1].set_ylabel('marks')
+
+plt.tight_layout()
+plt.show()
+print(df['marks'].describe())

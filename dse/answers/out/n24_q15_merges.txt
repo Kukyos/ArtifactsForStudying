@@ -1,0 +1,4 @@
+step 1: merge 3 and 5 at distance 2
+step 2: merge 1 and 35 at distance 3
+step 3: merge 2 and 4 at distance 5
+step 4: merge 135 and 24 at distance 6

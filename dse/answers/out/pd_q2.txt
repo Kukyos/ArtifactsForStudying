@@ -1,0 +1,89 @@
+   roll   name dept  marks  project     city
+0     1   asha  CSE   86.0       18  chennai
+1     2   ravi   AI   78.0       15     pune
+2     3  meena  CSE   92.0       19    delhi
+3     4   john  ECE    NaN       12      goa
+4     5  priya   AI   81.0       16  chennai
+   roll   name dept  marks  project     city
+3     4   john  ECE    NaN       12      goa
+4     5  priya   AI   81.0       16  chennai
+5     6  kiran  CSE   67.0       14      NaN
+6     7   sana   AI   74.0       13     pune
+7     8    dev  ECE   88.0       17      goa
+(8, 6)
+['roll', 'name', 'dept', 'marks', 'project', 'city']
+roll         int64
+name        object
+dept        object
+marks      float64
+project      int64
+city        object
+dtype: object
+          roll      marks   project
+count  8.00000   7.000000   8.00000
+mean   4.50000  80.857143  15.50000
+std    2.44949   8.649250   2.44949
+min    1.00000  67.000000  12.00000
+25%    2.75000  76.000000  13.75000
+50%    4.50000  81.000000  15.50000
+75%    6.25000  87.000000  17.25000
+max    8.00000  92.000000  19.00000
+roll       0
+name       0
+dept       0
+marks      1
+project    0
+city       1
+dtype: int64
+roll       0
+name       0
+dept       0
+marks      0
+project    0
+city       0
+dtype: int64
+   roll   name dept      marks  project     city
+0     1   asha  CSE  86.000000       18  chennai
+2     3  meena  CSE  92.000000       19    delhi
+3     4   john  ECE  80.857143       12      goa
+4     5  priya   AI  81.000000       16  chennai
+7     8    dev  ECE  88.000000       17      goa
+   roll   name dept  marks  project     city
+0     1   asha  CSE   86.0       18  chennai
+2     3  meena  CSE   92.0       19    delhi
+5     6  kiran  CSE   67.0       14  unknown
+   roll   name dept  marks  project     city
+1     2   ravi   AI   78.0       15     pune
+4     5  priya   AI   81.0       16  chennai
+   roll   name dept      score  project  total marks  percentage
+0     1   asha  CSE  86.000000       18   104.000000   86.666667
+1     2   ravi   AI  78.000000       15    93.000000   77.500000
+2     3  meena  CSE  92.000000       19   111.000000   92.500000
+3     4   john  ECE  80.857143       12    92.857143   77.380952
+4     5  priya   AI  81.000000       16    97.000000   80.833333
+5     6  kiran  CSE  67.000000       14    81.000000   67.500000
+6     7   sana   AI  74.000000       13    87.000000   72.500000
+7     8    dev  ECE  88.000000       17   105.000000   87.500000
+   roll   name dept      score  project  total marks  percentage
+2     3  meena  CSE  92.000000       19   111.000000   92.500000
+7     8    dev  ECE  88.000000       17   105.000000   87.500000
+0     1   asha  CSE  86.000000       18   104.000000   86.666667
+4     5  priya   AI  81.000000       16    97.000000   80.833333
+3     4   john  ECE  80.857143       12    92.857143   77.380952
+1     2   ravi   AI  78.000000       15    93.000000   77.500000
+6     7   sana   AI  74.000000       13    87.000000   72.500000
+5     6  kiran  CSE  67.000000       14    81.000000   67.500000
+    name      score  rank
+0   asha  86.000000   3.0
+1   ravi  78.000000   6.0
+2  meena  92.000000   1.0
+3   john  80.857143   5.0
+4  priya  81.000000   4.0
+5  kiran  67.000000   8.0
+6   sana  74.000000   7.0
+7    dev  88.000000   2.0
+dept
+AI     77.666667
+CSE    81.666667
+ECE    84.428571
+Name: score, dtype: float64

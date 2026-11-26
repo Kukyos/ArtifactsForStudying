@@ -1,0 +1,7 @@
+n = 7
+mean of Age = 247 / 7 = 35.286
+mean of Spend = 2250 / 7 = 321.429
+sum of products = 8157.143, sum of (Age-mean)^2 = 643.429, sum of (Spend-mean)^2 = 104285.714
+std dev of Age = sqrt(643.429 / 7) = 9.587
+std dev of Spend = sqrt(104285.714 / 7) = 122.057
+r = 8157.143 / sqrt(643.429 x 104285.714) = 8157.143 / 8191.484 = 0.9958

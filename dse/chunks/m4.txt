@@ -1,0 +1,111 @@
+=== 4.1
+Q: Nov25 Q20b, Nov24 Q22b, Apr26 Q2, Apr26 Q4, Apr26 Q6, PP Q7, PP Q8, PP Q9, PP Q10, PP Q11, PP Q12, PP Q13, PP Q14, PP Q15, PP Q16, Apr24 Q7, Apr24 Q8, Apr24 Q10, Apr24 Q20b, Apr24 Q23b
+<p><b>Machine learning</b> is the ability of a machine to learn automatically from past data without being explicitly programmed for every rule. A system has two phases: <b>training</b> and <b>testing</b>. Every real-world problem falls into one of three types:</p>
+<table class="work"><tr><th>Type</th><th>Data</th><th>Tasks</th><th>Algorithms</th></tr>
+<tr><td><b>Supervised</b></td><td>labelled</td><td>classification (category), regression (number)</td><td>logistic regression, KNN, decision tree; simple, multiple, polynomial regression</td></tr>
+<tr><td><b>Unsupervised</b></td><td>unlabelled</td><td>clustering, association</td><td>K-means, agglomerative clustering; recommendation / "X implies Y" rules</td></tr>
+<tr><td><b>Reinforcement</b></td><td>rewards and penalties</td><td>learn a policy by trial and error</td><td>game agents, robots, self-driving</td></tr></table>
+<h4>Recognise the type from the story</h4>
+<ul><li>Examples with a <b>known label</b> for each record (spam / not spam, disease / no disease, a price): <b>supervised</b>. Label is a category: classification; label is a number: regression.</li><li>"Groups not known in advance", "discovers patterns", "no predefined categories": <b>unsupervised</b> (clustering; or association if it finds items bought together).</li><li><b>Rewards and penalties</b>, "learns by trying", a game or a robot: <b>reinforcement</b>.</li></ul>
+
+=== 4.2
+Q: Nov25 Q7, Nov25 Q22b, Nov24 Q14, Nov24 Q23a, Nov24 Q23b, Apr26 Q19a, Apr26 Q19b, PP Q1, PP Q5, PP Q6, Apr24 Q15, Apr24 Q19, Apr24 Q21
+<p><b>Regression</b> builds a prediction model y = f(x) that estimates a response from inputs. Independent variable (x, predictor, feature) and dependent variable (y, target).</p>
+<table class="work"><tr><th>Type</th><th>Equation</th></tr>
+<tr><td>Simple linear</td><td>y = b0 + b1 x</td></tr>
+<tr><td>Multiple linear</td><td>y = b0 + b1 x1 + b2 x2 + ... + bn xn</td></tr>
+<tr><td>Polynomial</td><td>y = b0 + b1 x + b2 x^2 + ... + bk x^k (non-linear regression; a curve)</td></tr></table>
+<h4>Ordinary least squares: how to solve a numeric problem</h4>
+```gbox
+b1 = sum (x - xbar)(y - ybar) / sum (x - xbar)^2
+b0 = ybar - b1 xbar
+residual  e = y - y_hat  (actual - predicted)
+```
+<ol class="steps"><li>Find xbar and ybar.</li><li>Draw the table: x, y, x - xbar, y - ybar, product, (x - xbar)^2 with totals.</li><li>b1 = total product / total of squares; b0 = ybar - b1 xbar.</li><li>Write the line y = b0 + b1 x; predict by substituting x.</li></ol>
+<p>Teacher's worked example: x = 2, 3, 4, 5, 6 and y = 60, 75, 85, 90, 92: xbar = 4, ybar = 80.4, b1 = 79 / 10 = 7.9, b0 = 48.8, so y = 48.8 + 7.9x; at x = 8, y = 112.</p>
+<img class="fig" src="img/pp_q5.png" alt="regression line example">
+<p>Predicting far outside the data range (extrapolation) is unreliable.</p>
+<h4>Error metrics</h4>
+```gbox
+MSE  = (1/N) sum (y - y_hat)^2        RMSE = sqrt(MSE)        MAE = (1/N) sum |y - y_hat|
+R^2  = 1 - sum (y - y_hat)^2 / sum (y - ybar)^2      (closer to 1 = better fit)
+```
+<p>Multiple vs polynomial regression: several different inputs vs powers of one input.</p>
+
+=== 4.3
+Q: Apr26 Q13, Apr24 Q19
+<p>Despite its name, <b>logistic regression is a classification algorithm</b>. It predicts a categorical outcome (Yes/No, 0/1) as a probability. A straight line cannot be used for that, so the linear equation is passed through the <b>sigmoid</b> (S-curve) function that squeezes any value into the range 0 to 1; a threshold (usually 0.5) decides the class.</p>
+```gbox
+sigma(z) = 1 / (1 + e^-z),    z = b0 + b1 x       class 1 if p >= 0.5
+```
+<img class="fig" src="img/sigmoid.png" alt="sigmoid curve">
+<table class="work"><tr><th></th><th>Linear regression</th><th>Logistic regression</th></tr>
+<tr><td>Predicts</td><td>continuous value</td><td>probability of a category</td></tr>
+<tr><td>Problem</td><td>regression</td><td>classification</td></tr>
+<tr><td>Curve</td><td>straight line</td><td>S-shaped sigmoid</td></tr>
+<tr><td>Estimation</td><td>least squares</td><td>maximum likelihood</td></tr></table>
+<p>Example: will an employee be promoted from the performance rating? Output near 1 means likely promoted, near 0 unlikely.</p>
+
+=== 4.4
+Q: Nov25 Q22a, Nov24 Q20, PP Q4, KT Q1, KT Q2
+<p><b>K-nearest neighbours</b> is a simple supervised algorithm (classification mainly, also regression). It is a <b>lazy</b> learner (it memorises the training data) and <b>non-parametric</b> (no assumption about the data). It assumes that similar things are near each other.</p>
+<h4>Procedure</h4>
+<ol class="steps"><li>Choose K (a positive integer, usually odd, e.g. 3).</li><li>Compute the distance from the new point to every training point: <code>d = sqrt((x1 - a1)^2 + (x2 - a2)^2 + ...)</code> (Euclidean; Manhattan and Minkowski are other options).</li><li>Sort the distances in ascending order.</li><li>Take the K nearest points.</li><li>Count the classes among them and choose the <b>majority vote</b>.</li></ol>
+<p><b>Layout for the answer:</b> a table with one row per training point (features, class, squared differences, distance, rank), then the K nearest and the vote, then one line: "the new point is classified as ...".</p>
+<ul><li>There is no rule for K: a larger K reduces the effect of noise; try several.</li><li>Slow for big data; features on larger scales dominate the distance, so scale them (min-max) when units differ a lot.</li></ul>
+<table class="work"><tr><th>Worked (Nov25 Q22a)</th><th>New movie (7.0, 90)</th></tr><tr><td>3 nearest</td><td>C (10.03, Must Watch), B (30.02, Skip), A (40.03, Must Watch)</td></tr><tr><td>Vote</td><td>Must Watch 2, Skip 1</td></tr></table>
+
+=== 4.5
+Q: Nov24 Q7, Nov24 Q22a, Apr26 Q21a, Apr26 Q21b, Apr24 Q6, Apr24 Q20a
+<p>A <b>decision tree</b> is a supervised model (CART, used for classification and regression) in the shape of a flow chart. <b>Root node</b>: first split on the most significant predictor. <b>Internal node</b>: a decision on a predictor. <b>Branch</b>: an outcome (yes/no or value). <b>Leaf</b>: the final class.</p>
+<h4>ID3: entropy and information gain (log base 2)</h4>
+```gbox
+Entropy(S) = - sum p_i log2 p_i         0 = pure, 1 = two classes equally mixed
+Gain(S, A) = Entropy(S) - sum (|Sv|/|S|) Entropy(Sv)       choose the attribute with the highest gain
+```
+<ol class="steps"><li>Entropy of the parent (target variable).</li><li>For every predictor: entropy of each branch, weighted average, information gain.</li><li>The highest gain becomes the root.</li><li>For each branch repeat with the remaining predictors until the data is correctly classified.</li></ol>
+<table class="work"><tr><th>Play golf (14 days)</th><th>Gain</th></tr><tr><td>Outlook</td><td><b>0.247</b></td></tr><tr><td>Humidity</td><td>0.152</td></tr><tr><td>Windy</td><td>0.048</td></tr><tr><td>Temperature</td><td>0.029</td></tr></table>
+<img class="fig" src="img/dt_golf.png" alt="decision tree for play golf">
+<p><b>Advantages:</b> easy to understand, handles numeric and categorical data, no feature scaling, handles non-linearity. <b>Disadvantages:</b> many layers become complex, <b>overfitting</b> (fix by <b>pruning</b> or a random forest), high variance and instability.</p>
+
+=== 4.6
+Q: Nov25 Q20a, Nov24 Q8, Nov24 Q21, Apr26 Q9, Apr26 Q14, Apr26 Q20a, Apr26 Q20b, REV Q2, KM Q1, KM Q2, KM Q3, Apr24 Q9, Apr24 Q22a, Apr24 Q22b
+<p><b>Clustering</b> is unsupervised learning: group similar objects so that objects within a cluster are similar (high intra-cluster similarity) and objects in different clusters are different. Flat (partitioning) methods: K-means, fuzzy c-means. Hierarchical: agglomerative, divisive. <b>Hard</b> clustering puts every object in exactly one cluster (K-means); <b>soft</b> clustering lets an object belong to several (fuzzy c-means).</p>
+<p>Distance measures: Euclidean (q = 2) and Manhattan (q = 1) distances. <code>d = sqrt((x2 - x1)^2 + (y2 - y1)^2)</code>.</p>
+<h4>K-means (the teacher's method)</h4>
+<ol class="steps"><li>Decide K.</li><li>Take the K initial centroids (given in the question).</li><li>Calculate the distance of <b>every</b> point to every centroid.</li><li>Assign each point to its nearest centroid.</li><li>Calculate the new centre of each cluster as the mean of its points (all centroids are updated after all points are assigned).</li><li>Repeat 3 to 5 until the centres no longer change.</li></ol>
+<p><b>Layout for the answer:</b> one table per iteration (point, distance to each centroid, cluster), then the line for each new centroid with the sums shown, then the result.</p>
+<img class="fig" src="img/kmeans_flow.png" alt="K-means flow chart">
+<h4>Choosing K: the elbow method</h4>
+<p>Plot the distortion (sum of squared distances) against K. It falls steeply and then flattens; the bend is the <b>elbow</b> and the best K (in the Nov24 graph, K = 3).</p>
+<p><b>Strengths:</b> simple, fast O(nkt), mutually exclusive clusters. <b>Weaknesses:</b> K fixed in advance, local optimum depending on the start, sensitive to outliers, not for non-convex shapes. <b>Applications:</b> market segmentation, targeted marketing, siting delivery centres, image segmentation.</p>
+
+=== 4.7
+Q: Nov25 Q8, Nov25 Q14, Nov24 Q9, Nov24 Q15, AGG Q1, AGG Q2
+<p><b>Hierarchical clustering</b> organises data into a tree called a <b>dendrogram</b>. No need to fix the number of clusters in advance.</p>
+<table class="work"><tr><th></th><th>Agglomerative (bottom-up)</th><th>Divisive (top-down)</th></tr><tr><td>Start</td><td>each point is a cluster</td><td>all points in one cluster</td></tr><tr><td>Step</td><td>merge the two closest</td><td>split a cluster</td></tr><tr><td>Stop</td><td>one cluster</td><td>singletons</td></tr></table>
+<h4>Linkage criteria (distance between two clusters)</h4>
+<ul><li><b>Single</b>: minimum distance between members (most similar pair).</li><li><b>Complete</b>: maximum distance (most dissimilar pair).</li><li><b>Average</b>: average of all pairwise distances.</li></ul>
+<h4>Single-linkage procedure (the one used in class)</h4>
+<ol class="steps"><li>Each point is its own cluster.</li><li>Compute the distance matrix (Euclidean for raw points).</li><li>Merge the closest pair; the merge height is that distance.</li><li><b>Update the matrix:</b> the new cluster's distance to every other cluster is the <b>minimum</b> of the two old distances.</li><li>Repeat until one cluster remains, then draw the dendrogram with the merge heights on the y-axis.</li></ol>
+<img class="fig" src="img/n24_q15_dend.png" alt="dendrogram example">
+<p><b>Reading a dendrogram:</b> a horizontal cut line at some height; the number of vertical lines it crosses is the number of clusters (Nov25 Q8: 4). <b>Advantages:</b> easy, no K needed, gives an ordering. <b>Disadvantages:</b> a merge can never be undone, different distances give different trees, expensive for large data.</p>
+
+=== 4.8
+Q: Nov25 Q21b, Apr26 Q23b
+<p>A classifier is tested on unseen data and summarised in a <b>confusion matrix</b> (rows = actual class, columns = predicted class):</p>
+```table
+Actual \ Predicted | Positive | Negative
+Positive | TP | FN (Type II error)
+Negative | FP (Type I error) | TN
+```
+<ul><li><b>TP</b>: positive correctly predicted. <b>TN</b>: negative correctly predicted. <b>FP</b>: negative wrongly predicted positive. <b>FN</b>: positive wrongly predicted negative.</li></ul>
+```gbox
+Accuracy    = (TP + TN) / (TP + TN + FP + FN)
+Recall (sensitivity, TPR) = TP / (TP + FN)         of all real positives, how many were found
+Precision   = TP / (TP + FP)                       of all predicted positives, how many are real
+Specificity (TNR) = TN / (TN + FP)
+F1-score    = 2 x Precision x Recall / (Precision + Recall)      harmonic mean
+Error rate  = (FP + FN) / total = 1 - accuracy
+```
+<p>Accuracy can mislead on imbalanced data (a model that always says "no cancer" is 97% accurate if 3% have cancer but finds none): look at precision, recall and F1 too. Teacher's example: TP = 45, FN = 20, FP = 5, TN = 30 gives accuracy 75%, recall 69.2%, specificity 85.7%, precision 90%.</p>

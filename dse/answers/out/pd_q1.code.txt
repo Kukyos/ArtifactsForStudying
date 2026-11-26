@@ -1,0 +1,11 @@
+import pandas as pd
+
+cricket = pd.DataFrame({'player': ['kohli', 'rohit', 'gill', 'pant', 'jadeja', 'bumrah', 'shami', 'siraj'],
+                        'role': ['batter', 'batter', 'batter', 'keeper', 'allrounder', 'bowler', 'bowler', 'bowler'],
+                        'matches': [295, 262, 90, 120, 197, 89, 101, 44],
+                        'runs': [13906, 10709, 4800, 3200, 2800, 300, 250, 60],
+                        'wickets': [5, 8, 0, 0, 220, 149, 195, 71]})
+print(cricket.head(3))
+print(cricket.tail(2))
+print(cricket.shape)
+print(cricket.columns)

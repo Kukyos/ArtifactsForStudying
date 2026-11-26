@@ -1,0 +1,6 @@
+Point | Weight | Size | Class | squared differences, sum | distance d | rank
+A | 150 | 7 | Apple | 625 + 2.25 = 627.25 | 25.04 | 5
+B | 160 | 7.5 | Apple | 225 + 1 = 226 | 15.03 | 3
+C | 170 | 8 | Apple | 25 + 0.25 = 25.25 | 5.02 | 1
+D | 180 | 9 | Orange | 25 + 0.25 = 25.25 | 5.02 | 2
+E | 190 | 9.5 | Orange | 225 + 1 = 226 | 15.03 | 4

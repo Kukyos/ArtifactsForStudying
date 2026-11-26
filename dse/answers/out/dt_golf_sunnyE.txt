@@ -1,0 +1,1 @@
+Sunny: 2 Yes, 3 No, E(Sunny) = 0.971

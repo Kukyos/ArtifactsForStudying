@@ -1,0 +1,30 @@
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({'dept': ['CSE', 'CSE', 'ECE', 'ECE', 'AI', 'AI'],
+                   'age': [20, np.nan, 22, 21, np.nan, 23],
+                   'marks': [80, 75, np.nan, 66, 90, np.nan],
+                   'city': ['pune', None, 'goa', 'goa', 'delhi', 'pune']})
+print(df)
+print(df.isnull().sum())
+
+# 1. delete: rows with any null, columns with any null, or only rows null in chosen columns
+print(df.dropna())
+print(df.dropna(axis=1))
+print(df.dropna(how='any', subset=['marks']))
+
+# 2. a constant
+print(df['marks'].fillna(0))
+
+# 3. mean / median / mode of the column
+print(df['age'].fillna(df['age'].mean()))
+print(df['marks'].fillna(df['marks'].median()))
+print(df['city'].fillna(df['city'].mode()[0]))
+
+# 4. mean of the same group (class)
+print(df['marks'].fillna(df.groupby('dept')['marks'].transform('mean')))
+
+# 5. previous / next value, or interpolation
+print(df['marks'].ffill())
+print(df['marks'].bfill())
+print(df['marks'].interpolate(method='linear'))

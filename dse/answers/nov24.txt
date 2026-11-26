@@ -1,0 +1,290 @@
+=== Nov24 Q1
+<p><b>Qualitative (categorical) data</b> describes a quality or category and cannot be measured with numbers; it is put into groups. Example: blood group (A+, B-, O+), eye colour, gender, city, a student's feedback (Excellent, Good, Poor).</p>
+
+=== Nov24 Q2
+<p><b>Pandas</b> (<code>import pandas as pd</code>): its <code>DataFrame</code> holds tabular, labelled data and it provides reading, cleaning, selecting, grouping and summarising.</p>
+
+=== Nov24 Q3
+<table class="work"><tr><th></th><th>Structured data</th><th>Unstructured data</th></tr>
+<tr><td>Format</td><td>fixed data model, rows and columns</td><td>no predefined model</td></tr>
+<tr><td>Stored in</td><td>relational databases, spreadsheets (SQL)</td><td>non-relational stores (NoSQL), file systems</td></tr>
+<tr><td>Examples</td><td>student table, bank transactions</td><td>emails, images, audio, video, tweets</td></tr></table>
+
+=== Nov24 Q4
+<p><code>data.iloc[2:6, 0]</code> uses <b>position-based</b> indexing: <code>iloc[rows, columns]</code>. It selects the rows at positions <b>2, 3, 4, 5</b> (the end 6 is excluded) and the <b>first column</b> (position 0), and returns them as a Series.</p>
+```python
+@@OUT n24_q4.code@@
+```
+```out
+@@OUT n24_q4@@
+```
+
+=== Nov24 Q5
+<p>Data (n = 15): 3, 12, 7, 17, 3, 14, 9, 6, 11, 10, 1, 4, 19, 7, 15</p>
+```gbox
+@@OUT n24_q5@@
+```
+<p>Mean = 9.2 units, median = 9 units, and the data is <b>bimodal</b>: mode = 3 and 7. The typical demand is about 9 units a day.</p>
+
+=== Nov24 Q6
+<p>Sorted data (n = 11): 1, 2, 5, 6, 7, <b>9</b>, 12, 15, 18, 19, 27</p>
+<ul><li>Minimum = 1, Maximum = 27, Median = 6th value = 9</li>
+<li>Q1 = median of the lower half (1, 2, <b>5</b>, 6, 7) = 5</li>
+<li>Q3 = median of the upper half (12, 15, <b>18</b>, 19, 27) = 18</li></ul>
+```table
+@@OUT n24_q6_five@@
+```
+```gbox
+IQR = Q3 - Q1 = 18 - 5 = 13
+@@OUT n24_q6_fence@@
+```
+<img class="fig" src="img/n24_q6.png" alt="box plot of the 11 values">
+
+=== Nov24 Q7
+<p><b>Information gain</b>, which is computed from <b>entropy</b>, is the measure the ID3 algorithm uses: the attribute with the highest information gain (the biggest drop in entropy) is chosen for the split. (CART trees use the Gini index.)</p>
+
+=== Nov24 Q8
+<p>The graph is the <b>elbow method</b> plot of distortion against K. The curve drops steeply up to K = 3 (about 14.8 to 5.2 to 1.9) and then flattens: from K = 4 onwards, adding a cluster hardly reduces the distortion.</p>
+<p><b>The optimal K = 3</b>, the elbow point.</p>
+
+=== Nov24 Q9
+<p>Cluster similarity (linkage) measures in hierarchical clustering:</p>
+<ul><li><b>Single linkage</b>: minimum distance between members of the two clusters (most similar pair)</li>
+<li><b>Complete linkage</b>: maximum distance between members (most dissimilar pair)</li>
+<li><b>Average linkage</b>: average of all pairwise distances between the members</li></ul>
+
+=== Nov24 Q10
+<p><b>Netflix</b> suggesting movies of the same genre, cast or director as the movie you just watched, or a music app recommending more songs by the artist whose songs you liked, are content-based recommenders. They compare the features of items with the user's profile and do not use other users' ratings.</p>
+
+=== Nov24 Q11
+<table class="work"><tr><th></th><th>Categorical data</th><th>Quantitative (numerical) data</th></tr>
+<tr><td>Nature</td><td>describes a quality, put into groups</td><td>measured or counted; numbers with meaning</td></tr>
+<tr><td>Subtypes</td><td>nominal (no order), ordinal (ordered)</td><td>discrete (counted), continuous (measured)</td></tr>
+<tr><td>Examples</td><td>blood group, T-shirt size, nationality</td><td>age, height, marks, number of employees</td></tr>
+<tr><td>Arithmetic</td><td>mean has no meaning; use mode and counts</td><td>mean, median, variance can be computed</td></tr>
+<tr><td>Graphs</td><td>bar chart, pie chart</td><td>histogram, scatter plot, line graph, box plot</td></tr></table>
+
+=== Nov24 Q12
+<table class="work"><tr><th></th><th>Scatter plot</th><th>Box plot</th></tr>
+<tr><td>Purpose</td><td>shows the relationship between two numeric variables</td><td>shows the spread of one numeric variable, optionally across categories</td></tr>
+<tr><td>Usage</td><td>x and y plotted for every observation</td><td>five-number summary: min, Q1, median, Q3, max</td></tr>
+<tr><td>Insight</td><td>direction and strength of correlation, trend, clusters, outliers</td><td>median, skewness, IQR, outliers (points beyond the whiskers)</td></tr>
+<tr><td>Example</td><td>hours studied vs marks</td><td>marks of each class compared side by side</td></tr>
+<tr><td>Limitation</td><td>says nothing about a single variable's quartiles</td><td>hides the individual points and any relationship between variables</td></tr></table>
+
+=== Nov24 Q13
+<p>Claim: the new product improves satisfaction. n = 50, sample mean = 7.2, population mean before = 6.5, sigma = 1.5, alpha = 5%, critical value 1.645 (right-tailed Z-test, population sigma known).</p>
+```gbox
+@@OUT n24_q13@@
+```
+<p><b>Decision: z = 3.30 &gt; 1.645, so reject H0.</b> There is sufficient evidence at the 5% level to support the company's claim that satisfaction has improved.</p>
+
+=== Nov24 Q14
+<table class="work"><tr><th></th><th>Multiple linear regression</th><th>Polynomial regression</th></tr>
+<tr><td>Input</td><td>several different independent variables x1, x2, ..., xn</td><td>one variable x raised to powers x, x^2, ..., x^k</td></tr>
+<tr><td>Equation</td><td>y = b0 + b1 x1 + b2 x2 + ... + bn xn</td><td>y = b0 + b1 x + b2 x^2 + ... + bk x^k</td></tr>
+<tr><td>Relationship fitted</td><td>a straight line / plane in the variables</td><td>a curve (non-linear in x, but linear in the coefficients)</td></tr>
+<tr><td>Use</td><td>y depends on many factors, e.g. salary on experience + education</td><td>one factor with a bent trend, e.g. growth, braking distance</td></tr>
+<tr><td>Risk</td><td>correlated predictors (multicollinearity)</td><td>overfitting with a high degree</td></tr></table>
+
+=== Nov24 Q15
+<p>Single linkage: the distance between two clusters is the <b>minimum</b> distance between any two of their members. At each step merge the closest pair, then update the matrix by taking the minimum.</p>
+<h4>Step 0: given matrix</h4>
+```table
+@@OUT n24_q15_m0@@
+```
+<p>Smallest distance d(3,5) = 2, so merge {3,5} at height 2. New distances: d(1,{35}) = min(3, 11) = 3; d(2,{35}) = min(7, 10) = 7; d(4,{35}) = min(9, 8) = 8.</p>
+```table
+@@OUT n24_q15_m1@@
+```
+<p>Smallest is d(1,{35}) = 3, merge {1,3,5} at 3. d(2,{135}) = min(9, 7) = 7; d(4,{135}) = min(6, 8) = 6.</p>
+```table
+@@OUT n24_q15_m2@@
+```
+<p>Smallest is d(2,4) = 5, merge {2,4} at 5. d({135},{24}) = min(7, 6) = 6.</p>
+```table
+@@OUT n24_q15_m3@@
+```
+<p>Last merge: {1,3,5} and {2,4} at height 6.</p>
+```gbox
+@@OUT n24_q15_merges@@
+```
+<img class="fig" src="img/n24_q15_dend.png" alt="single linkage dendrogram, merges at 2, 3, 5 and 6">
+
+=== Nov24 Q16
+<ul><li><b>Explicit data</b>: information the user gives directly and knowingly about their preferences. Examples: star ratings of a movie, likes/dislikes, written reviews and comments.</li>
+<li><b>Implicit data</b>: information inferred from the user's behaviour, without being asked. Examples: purchase history, search queries, clicks and pages viewed, watch time of a video.</li></ul>
+<p>Explicit data is accurate but scarce; implicit data is plentiful but noisier (a click is not a like).</p>
+
+=== Nov24 Q17a
+<p><b>Goal:</b> recommend movies and shows to users from their viewing habits, using structured data (demographics, viewing history) and unstructured data (reviews, social media mentions). Steps of the data science life cycle:</p>
+<img class="fig" src="img/lifecycle.png" alt="data science life cycle">
+<ol class="steps">
+<li><b>Discovery (problem).</b> Goal: show each user titles they will watch and enjoy, to raise watch time and retention. Success measures: hit rate, RMSE of predicted ratings, watch time.</li>
+<li><b>Data collection.</b> Structured: user table (age, region, plan), watch log (user, title, time, rating). Unstructured: review text, social media posts, title descriptions and posters.</li>
+<li><b>Data preparation.</b> Clean duplicates and bots, handle missing ratings, encode categorical fields, convert text reviews into numbers (TF-IDF, sentiment score), build the user-item utility matrix and item features (genre, cast).</li>
+<li><b>Model planning.</b> Explore popularity, genre mix and rating distribution; decide on content-based filtering (TF-IDF + cosine similarity), collaborative filtering (user/item similarity) and a hybrid to handle new users.</li>
+<li><b>Model building.</b> Split into training and test sets, compute similarities, predict ratings for unseen titles, rank the top N, tune K and weights; evaluate with MAE, RMSE, hit rate.</li>
+<li><b>Operationalise.</b> Deploy as a service that returns the top-N list when a user opens the app, refresh with new viewing data, monitor accuracy and do A/B tests.</li>
+<li><b>Communicate results.</b> Report the lift in watch time and accuracy to the business team, with limits (cold start, popularity bias) and the next improvements.</li>
+</ol>
+
+=== Nov24 Q17b
+<p>Python libraries used in data science:</p>
+<table class="work"><tr><th>Library</th><th>Use</th></tr>
+<tr><td>NumPy</td><td>fast n-dimensional arrays and mathematical functions</td></tr>
+<tr><td>Pandas</td><td>DataFrames: read, clean, filter, group and summarise tabular data</td></tr>
+<tr><td>Matplotlib</td><td>basic plots: line, bar, histogram, scatter</td></tr>
+<tr><td>Seaborn</td><td>statistical plots (heat maps, box plots) on top of Matplotlib</td></tr>
+<tr><td>SciPy</td><td>scientific computing, statistics, optimisation, hierarchical clustering</td></tr>
+<tr><td>Scikit-learn</td><td>machine learning: regression, KNN, decision trees, K-means, metrics, imputers</td></tr>
+<tr><td>Statsmodels</td><td>statistical models and tests, regression summaries</td></tr>
+<tr><td>TensorFlow / Keras, PyTorch</td><td>deep learning and neural networks</td></tr>
+<tr><td>NLTK / spaCy</td><td>text processing and natural language processing</td></tr></table>
+
+=== Nov24 Q18a
+<p>The nine-row table in the question was typed into a DataFrame (NaN where the table shows NaN) and the code was run exactly as written below.</p>
+```python
+@@OUT n24_q18a.code@@
+```
+```out
+@@OUT n24_q18a@@
+```
+<p>Only Micheal (Score 56) lies between 50 and 60. <code>between(50, 60)</code> includes both end values and the rows whose Score is NaN are not selected. Step 5 prints 36 because the DataFrame has 9 rows x 4 columns = 36 elements.</p>
+
+=== Nov24 Q18b
+<p>Two techniques for numerical data:</p>
+<ol><li><b>Histogram</b>: splits a numeric variable into bins and shows how many values fall in each, so you see the shape (symmetric or skewed), centre, spread and outliers. Example: distribution of students' marks.</li>
+<li><b>Scatter plot</b>: plots pairs (x, y) as points to show the relationship between two numeric variables: direction, strength, non-linear patterns and outliers. Example: hours studied against marks (points rise to the right, a positive correlation).</li></ol>
+<p>(A box plot and a line graph are other options: the box plot shows the five-number summary; the line graph shows a trend over time.)</p>
+```python
+@@OUT n24_q18b.code@@
+```
+<img class="fig" src="img/n24_q18b.png" alt="histogram of marks and scatter plot of hours against marks">
+```out
+@@OUT n24_q18b@@
+```
+
+=== Nov24 Q19a
+@@SAME REV Q1
+
+=== Nov24 Q19b
+<table class="work"><tr><th></th><th>Pearson correlation</th><th>Spearman rank correlation</th></tr>
+<tr><td>Measures</td><td>the <b>linear</b> relationship between two continuous variables</td><td>the <b>monotonic</b> relationship (always rising or always falling) using ranks</td></tr>
+<tr><td>Works on</td><td>the actual values</td><td>the ranks of the values (or given ranks)</td></tr>
+<tr><td>Formula</td><td>r = sum(x - xbar)(y - ybar) / sqrt(sum(x - xbar)^2 sum(y - ybar)^2)</td><td>rho = 1 - 6 sum d^2 / (n (n^2 - 1)), d = difference of ranks</td></tr>
+<tr><td>Outliers</td><td>sensitive</td><td>robust (only the rank matters)</td></tr>
+<tr><td>Use when</td><td>relationship is linear, data roughly normal</td><td>relationship is non-linear but monotonic, ordinal data, ranks given, outliers</td></tr>
+<tr><td>Range</td><td colspan="2">-1 to +1: +1 perfect positive, -1 perfect negative, 0 no relationship</td></tr></table>
+
+=== Nov24 Q20
+<p>Features: Age, Income ($), Monthly purchases. New customer X = (29, 55000, 15), K = 3, Euclidean distance d = sqrt((Age - 29)^2 + (Income - 55000)^2 + (Purchases - 15)^2).</p>
+<h4>Step 1: distance from X to each customer</h4>
+```table
+@@OUT n24_q20@@
+```
+<h4>Step 2: the 3 nearest neighbours and the vote</h4>
+```gbox
+@@OUT n24_q20_vote@@
+```
+<p><b>Result: the new customer is estimated to be in the "Medium" spending category.</b></p>
+<p>Remarks. (1) The third neighbour is a near-tie: C002 (5000.00, High) and C006 (5000.01, Medium); either way the vote is Medium. (2) Income is in tens of thousands, so it swamps age and purchases in the distance. In practice features are scaled first: with min-max scaling the three nearest become C007 (High), C009 (Medium) and C004 (Low), a three-way tie that K = 3 cannot settle. The answer above is for the data exactly as given, with the Euclidean distance the question asks for.</p>
+
+=== Nov24 Q21
+@@SAME REV Q2
+
+=== Nov24 Q22a
+<h4>Working principle</h4>
+<p>A decision tree is a supervised learning model (CART: classification and regression trees) shaped like a flow chart. Each <b>internal node</b> tests one attribute, each <b>branch</b> is an outcome of the test, and each <b>leaf</b> holds a class label. <b>ID3</b> (Iterative Dichotomiser 3) builds it top-down by repeatedly choosing the attribute that separates the classes best, measured by <b>entropy</b> and <b>information gain</b>:</p>
+```gbox
+Entropy(S) = - sum p_i log2 p_i            (0 = pure, 1 = maximum uncertainty for two equal classes)
+Gain(S, A) = Entropy(S) - sum (|Sv| / |S|) x Entropy(Sv)
+```
+<h4>Steps of ID3</h4>
+<ol><li>Compute the entropy of the whole set (the parent).</li><li>For every attribute compute the weighted entropy of its branches and its information gain.</li><li>Choose the attribute with the highest gain as the root (decision) node.</li><li>Make one branch for each value; repeat on each subset with the remaining attributes.</li><li>Stop when a subset is pure (one class), no attributes remain, or no data is left; label the leaf.</li></ol>
+<h4>Worked example: will John play golf? (14 days)</h4>
+```table
+@@OUT dt_golf_data@@
+```
+```gbox
+@@OUT dt_golf_E@@
+```
+```table
+@@OUT dt_golf@@
+```
+<p>Outlook has the highest gain (0.247), so it is the root. The Overcast branch is pure (4 Yes, 0 No), so it becomes a leaf "Yes". The other two branches are split again:</p>
+```gbox
+@@OUT dt_golf_sunnyE@@
+```
+```table
+@@OUT dt_golf_sunny@@
+```
+```gbox
+@@OUT dt_golf_rainE@@
+```
+```table
+@@OUT dt_golf_rain@@
+```
+<p>Sunny splits on Humidity (gain 0.971, pure branches) and Rainy on Windy (gain 0.971, pure branches).</p>
+<img class="fig" src="img/dt_golf.png" alt="decision tree: Outlook, then Humidity for Sunny and Windy for Rainy">
+```gbox
+@@OUT dt_golf_tree@@
+```
+<p>Rules: Overcast: play. Sunny and Humidity High: don't play. Sunny and Humidity Normal: play. Rainy and not Windy: play. Rainy and Windy: don't play.</p>
+
+=== Nov24 Q22b
+<table class="work"><tr><th></th><th>Supervised learning</th><th>Unsupervised learning</th></tr>
+<tr><td>Data</td><td>labelled: inputs with known outputs</td><td>unlabelled: inputs only</td></tr>
+<tr><td>Goal</td><td>learn a mapping to predict the label of new data</td><td>discover hidden structure, groups or rules</td></tr>
+<tr><td>Feedback</td><td>the correct answer is available, so error can be measured</td><td>no correct answer to compare with</td></tr>
+<tr><td>Tasks</td><td>classification, regression</td><td>clustering, association, dimensionality reduction</td></tr>
+<tr><td>Algorithms</td><td>linear/logistic regression, KNN, decision tree</td><td>K-means, agglomerative clustering</td></tr>
+<tr><td>Example</td><td>spam or not spam; house price</td><td>customer segmentation; market-basket rules</td></tr>
+<tr><td>Evaluation</td><td>accuracy, precision, recall, MSE</td><td>cohesion/separation, elbow method, interpretation</td></tr></table>
+
+=== Nov24 Q23a
+<p>Model: <b>Y = a0 + a1 X</b>, with a1 = sum (x - xbar)(y - ybar) / sum (x - xbar)^2 and a0 = ybar - a1 xbar.</p>
+```table
+@@OUT n24_q23a@@
+```
+```gbox
+@@OUT n24_q23a_calc@@
+```
+<p><b>The model is Y = -0.4 + 2.2 X.</b> Predictions: X = 7 gives <b>Y = 15</b>; X = 20 gives <b>Y = 43.6</b>.</p>
+<img class="fig" src="img/n24_q23a.png" alt="scatter plot and regression line y = -0.4 + 2.2x">
+<p>Fit quality: R^2 = 0.953, so the line explains about 95% of the variation in Y. The prediction at X = 7 is slightly outside the data (1 to 5) and X = 20 is far outside it, so it is an extrapolation and should be trusted less.</p>
+
+=== Nov24 Q23b
+<p>Performance metrics for regression models (y = actual, y_hat = predicted, N = number of points):</p>
+<table class="work"><tr><th>Metric</th><th>Formula</th><th>Meaning</th></tr>
+<tr><td><b>MAE</b>, mean absolute error</td><td>(1/N) sum |y - y_hat|</td><td>average size of the error; less sensitive to outliers</td></tr>
+<tr><td><b>MSE</b>, mean squared error</td><td>(1/N) sum (y - y_hat)^2</td><td>penalises large errors more; lower is better</td></tr>
+<tr><td><b>RMSE</b>, root mean squared error</td><td>sqrt(MSE)</td><td>same units as y, easy to read</td></tr>
+<tr><td><b>R^2</b>, coefficient of determination</td><td>1 - sum (y - y_hat)^2 / sum (y - ybar)^2</td><td>share of the variance of y explained by the model; closer to 1 is better</td></tr>
+<tr><td>Adjusted R^2</td><td>1 - (1 - R^2)(N - 1)/(N - p - 1)</td><td>R^2 corrected for the number of predictors p</td></tr></table>
+<p>For the line of Q23a (y_hat = -0.4 + 2.2x) the errors are 0.2, -1.0, 0.8, 0.6, -0.6, so MAE = 0.64, MSE = 2.4 / 5 = 0.48, RMSE = 0.693 and R^2 = 1 - 2.4/50.8 = 0.953.</p>
+
+=== Nov24 Q24a
+<p>A <b>recommender system</b> is a tool that predicts what a user will like and suggests items (movies, products, songs, jobs) automatically, from preferences, past behaviour or similar users. It is an application of machine learning that <i>pushes</i> suggestions, unlike a search engine which <i>pulls</i> results for a query.</p>
+<h4>Importance</h4>
+<ul><li>Too much information: nobody can browse millions of items, so the system filters it.</li><li>Less effort and a better experience for the user; helps discover new items.</li><li>More sales, engagement and customer retention for the business (Netflix, Amazon, YouTube, LinkedIn).</li></ul>
+<h4>Types</h4>
+<table class="work"><tr><th>Type</th><th>Idea</th><th>Uses</th><th>Weakness</th></tr>
+<tr><td><b>Content-based filtering</b></td><td>"more of what I liked": items similar to those the user liked</td><td>item features and the user's profile (TF-IDF, cosine similarity)</td><td>suggests only similar items</td></tr>
+<tr><td><b>Collaborative filtering</b></td><td>"people like me liked this": similar users or similar items</td><td>the utility matrix of ratings (cosine / Pearson similarity)</td><td>cold start, sparsity</td></tr>
+<tr><td><b>Hybrid</b></td><td>combine both</td><td>weighted, switching, mixed, cascade and other combinations</td><td>more complex</td></tr></table>
+
+=== Nov24 Q24b
+<p>Utility matrix (rows = users, columns = items; 0 means not rated):</p>
+```table
+User | Item 1 | Item 2 | Item 3
+X | 5 | 3 | 0
+Y | 4 | 0 | 2
+Z | 1 | 3 | 4
+```
+```gbox
+cosine similarity  sim(a, b) = sum(ai bi) / ( sqrt(sum ai^2) x sqrt(sum bi^2) )
+@@OUT n24_q24b@@
+```
+<p>User X is more similar to Y (0.767) than to Z (0.471). X has not rated Item 3, which Y rated 2 and Z rated 4. The similarity-weighted prediction is (0.767 x 2 + 0.471 x 4) / (0.767 + 0.471) = <b>2.76</b>.</p>
+<p><b>Recommendation:</b> Item 3 is the only item X has not rated, so it is the only candidate; its predicted rating of about 2.8 out of 5 is lowish, so recommend it with low confidence (the closest user, Y, rated it only 2).</p>

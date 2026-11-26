@@ -1,0 +1,5 @@
+Attribute | class counts and entropy of each branch | weighted entropy | Information gain
+Outlook | Overcast: 0 No, 4 Yes, E = 0; Rainy: 2 No, 3 Yes, E = 0.971; Sunny: 3 No, 2 Yes, E = 0.971 | 0.694 | 0.247
+Temperature | Cool: 1 No, 3 Yes, E = 0.811; Hot: 2 No, 2 Yes, E = 1; Mild: 2 No, 4 Yes, E = 0.918 | 0.911 | 0.029
+Humidity | High: 4 No, 3 Yes, E = 0.985; Normal: 1 No, 6 Yes, E = 0.592 | 0.788 | 0.152
+Windy | False: 2 No, 6 Yes, E = 0.811; True: 3 No, 3 Yes, E = 1 | 0.892 | 0.048

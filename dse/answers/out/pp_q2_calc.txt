@@ -1,0 +1,7 @@
+n = 5
+mean of X = 20 / 5 = 4
+mean of Y = 330 / 5 = 66
+sum of products = 190, sum of (X-mean)^2 = 20, sum of (Y-mean)^2 = 1870
+std dev of X = sqrt(20 / 5) = 2
+std dev of Y = sqrt(1870 / 5) = 19.339
+r = 190 / sqrt(20 x 1870) = 190 / 193.391 = 0.9825

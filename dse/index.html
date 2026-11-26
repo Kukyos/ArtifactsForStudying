@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en" data-subject="dse">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script src="../shared/study.js"></script>
+<meta charset="utf-8">
+<title>Data Science Tutor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Same layout as the Quantum tutor. Question pages: the question as a screenshot, then its answer written the way it would be in the exam. */
+table.work{border-collapse:collapse;margin:8px 0;font-size:.9rem;max-width:100%}
+table.work th,table.work td{border:1px solid var(--line);padding:4px 9px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+table.work th{background:var(--code)}
+.tbl.scroll table.work{font-family:var(--mono);font-size:.86rem}
+.tbl.scroll table.work th,.tbl.scroll table.work td{text-align:center;white-space:nowrap;vertical-align:middle}
+table.work tr.hl td{background:var(--warn-soft);font-weight:600}
+.tbl.scroll{overflow-x:auto;max-width:100%}
+.answer img.fig{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px;margin:10px 0}
+.answer h4{margin:14px 0 4px;font-size:.98rem}
+.answer .eq{font-family:var(--mono);background:var(--code);padding:6px 12px;border-radius:6px;margin:6px 0;overflow-x:auto;white-space:pre}
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --ink:#111c26; --muted:#566775; --line:#d8e0e6;
+  --accent:#0a6f8f; --accent-soft:#dff0f5; --accent-ink:#ffffff;
+  --var:#6d2fb0; --var-bg:#efe6fa; --term:#a8480a; --term-bg:#fdeedd;
+  --ok:#1b7f45; --ok-soft:#e0f3e8; --warn:#a8480a; --warn-soft:#fdeedd; --code:#eaf0f4;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161d; --surface:#152029; --ink:#e5ecf2; --muted:#8fa2b1; --line:#26343f;
+  --accent:#4cc2e6; --accent-soft:#16323d; --accent-ink:#06222c;
+  --var:#c9a6f3; --var-bg:#2a2038; --term:#f1b565; --term-bg:#33261a;
+  --ok:#5fd18c; --ok-soft:#173326; --warn:#f1b565; --warn-soft:#33261a; --code:#1b2933; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;padding:0}
+h1,h2,h3{line-height:1.25;text-wrap:balance;margin:0}
+h2{font-size:1.25rem;margin-top:2rem} h3{font-size:1.05rem;margin-top:1.4rem}
+p{margin:.6rem 0} a{color:var(--accent)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+code{background:var(--code);padding:.08em .35em;border-radius:4px}
+.v{color:var(--var);font-weight:600} .t{color:var(--term);font-weight:600}
+.shell{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100vh}
+#side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:20px 12px 30px max(12px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);background:var(--surface)}
+#side h4{margin:20px 0 6px;padding:0 10px;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side a{display:flex;gap:10px;align-items:baseline;padding:5px 10px;text-align:left;border-radius:6px;color:var(--ink);text-decoration:none;font-size:.92rem}
+#side a:hover{background:var(--accent-soft)} #side a.on{background:var(--accent-soft);font-weight:600}
+#side a .no{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:2.2rem;flex:none}
+#side a.home{margin-top:12px}
+#side .srch{position:relative;margin:10px 0 2px;padding:0 6px}
+#side .srch input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem}
+#side .sres{margin-top:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);max-height:62vh;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+#side .sres h5{margin:0;padding:9px 10px 3px;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#side .sres a{display:block;padding:6px 10px;font-size:.86rem;line-height:1.3;border-radius:0}
+#side .sres a.sel,#side .sres a:hover{background:var(--accent-soft)}
+#side .sres a .sn{font-family:var(--mono);font-size:.76rem;color:var(--muted);margin-right:6px}
+#side .sres a small{display:block;color:var(--muted);font-size:.76rem;margin-top:1px;overflow-wrap:anywhere}
+#side .sres .none{padding:10px;color:var(--muted);font-size:.85rem}
+#side .sres .more{padding:4px 10px 8px;color:var(--muted);font-size:.76rem}
+.hit{animation:hit 2.4s ease-out}@keyframes hit{0%{outline:3px solid var(--term);outline-offset:3px}100%{outline:3px solid transparent;outline-offset:3px}}
+
+.nav .btn{text-decoration:none}
+.prog{padding:6px 10px 0;font-size:.8rem;color:var(--muted)}
+.scrim{display:none}
+.dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--muted);flex:none;transform:translateY(1px)}
+.dot.done{background:var(--ok);border-color:var(--ok)} .dot.now{border-color:var(--accent);background:var(--accent-soft)}
+.brand{display:flex;align-items:baseline;gap:10px;font-weight:600;padding:0 10px;font-size:1.05rem}
+.brand small{color:var(--muted);font-weight:400}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 8px 0}
+.bar i{display:block;height:100%;background:var(--ok)}
+main{padding:24px clamp(20px,4vw,56px) 80px;min-width:0;max-width:1060px;width:100%}
+.menu{display:none}
+.kicker{font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.04em}
+.pill{display:inline-block;font-size:.74rem;padding:1px 9px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-left:8px;vertical-align:middle}
+.pill.done{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.now{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px}
+.chip{font-size:.78rem;font-family:var(--mono);padding:2px 8px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+.card.model{border-left:4px solid var(--accent)}
+.card h3:first-child{margin-top:0}
+.callout{background:var(--warn-soft);border-radius:8px;padding:10px 14px;margin:14px 0;font-size:.95rem}
+.callout.ok{background:var(--ok-soft)}
+.tbl{border-collapse:collapse;width:100%;font-size:.93rem}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.tbl th{background:var(--code);font-weight:600}
+.scroll{overflow-x:auto;max-width:100%}
+.g{font-family:var(--mono);font-size:.95rem;white-space:pre-wrap}
+.gbox{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;white-space:pre;overflow-x:auto;margin:10px 0}
+ol.practice{padding-left:0;list-style:none;counter-reset:q;display:grid;gap:12px}
+ol.practice>li{counter-increment:q;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+ol.practice>li::before{content:"Q" counter(q);font-family:var(--mono);font-weight:600;color:var(--accent);margin-right:8px}
+.src{font-family:var(--mono);font-size:.74rem;background:var(--code);padding:1px 7px;border-radius:4px;color:var(--muted);margin-right:6px}
+details.ans{margin-top:8px} details.ans summary{cursor:pointer;color:var(--accent);font-size:.9rem;font-weight:500}
+details.ans>div{margin-top:8px;padding:10px 14px;background:var(--ok-soft);border-radius:8px;font-size:.95rem}
+button,.btn{font:inherit;font-size:.9rem;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 12px;border-radius:7px}
+button:hover{border-color:var(--accent)} button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=number]{font:inherit;font-family:var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:5px 9px;max-width:100%}
+.w{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:14px 0}
+.w .cap{font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.form{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0;font-family:var(--mono);font-size:1.1rem}
+.tok{padding:2px 8px;border-radius:6px;border:1px solid var(--line);min-width:1.9rem;text-align:center}
+.tok.var{background:var(--var-bg);color:var(--var);border-color:transparent;font-weight:600}
+.tok.term{background:var(--term-bg);color:var(--term);font-weight:600;border-color:transparent}
+button.tok.var{cursor:pointer;font:inherit;font-family:var(--mono);font-size:1.1rem;font-weight:600}
+.tok.var.sel{outline:2px solid var(--var);outline-offset:1px}
+.tok.dis{opacity:.4;cursor:default}
+.log{font-family:var(--mono);font-size:.88rem;color:var(--muted);margin:8px 0}
+.log b{color:var(--ink);font-weight:500}
+.split{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.split>*{min-width:0}
+.msg{margin-top:8px;font-size:.93rem}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--warn)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:38px;flex-wrap:wrap}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.big{font-size:2.6rem;font-weight:600;line-height:1;font-family:var(--mono)}
+@media (max-width:820px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:0}
+  #side{position:fixed;inset:0 auto 0 0;width:min(86vw,300px);z-index:30;box-shadow:0 0 24px rgba(0,0,0,.25);transform:translateX(-105%);transition:transform .2s;padding:18px 14px 30px max(16px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);height:100%}
+  body.open #side{transform:none}
+  body.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+  main{padding:56px 16px 80px}
+  .menu{display:inline-block}
+}
+@media (prefers-reduced-motion:reduce){#side{transition:none}}
+.dot.ready{border-color:var(--accent)}
+.pill.ready{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.steps{counter-reset:s;padding-left:0;list-style:none;display:grid;gap:10px;margin:10px 0}
+.steps>li{counter-increment:s;padding-left:36px;position:relative}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:.8rem;font-weight:600}
+.qimg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:6px}
+.pyq{border-left:3px solid var(--term);background:var(--warn-soft);border-radius:6px;padding:8px 12px;margin:6px 0 10px;font-size:.95rem;white-space:pre-line}
+.steps>li,.practice>li{min-width:0;overflow-wrap:anywhere}
+.steps>li .scroll,.card .scroll{max-width:100%}
+.card,.w,.callout{min-width:0;max-width:100%}
+code{overflow-wrap:anywhere}
+pre.sql{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:.88rem;line-height:1.5;white-space:pre;max-width:100%}
+.tbl{margin:10px 0}
+.qa{margin:18px 0 26px;scroll-margin-top:12px}
+.qa .qh{margin:0 0 6px}
+.answer{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:8px;padding:10px 16px;margin-top:8px;min-width:0}
+.answer .kicker{color:var(--ok);font-weight:600}
+.answer.todo{border-left-color:var(--line);color:var(--muted);font-size:.92rem}
+.answer ul{padding-left:1.3rem}
+pre.code,pre.out{font-family:var(--mono);background:var(--code);padding:10px 14px;border-radius:8px;overflow-x:auto;margin:10px 0;font-size:.86rem;line-height:1.5;white-space:pre;max-width:100%}
+pre.code{border-left:3px solid var(--accent)}
+pre.out{background:#0f1720;color:#d5e3ee;border-left:3px solid var(--ok)}
+.qjump{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0}
+.qjump a{font-family:var(--mono);font-size:.78rem;padding:2px 7px;border:1px solid var(--line);border-radius:5px;text-decoration:none;background:var(--surface)}
+.qlinks li{margin:4px 0}
+.qjump a.todo{color:var(--muted);border-style:dashed}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav id="side" aria-label="Contents"></nav>
+  <main id="main"></main>
+</div>
+<div class="scrim" onclick="document.body.classList.remove('open')"></div>
+<script src="answers.js"></script>
+<script src="chunks.js"></script>
+<script>
+/* PYQ: [tag, question text (search and alt text), marks, 1 = no screenshot]. Generated by AutoLAB/Subjects/DSE-theory/pyq/pyq_js.py */
+var PYQ=[
+["Nov25 Q1", "State the purpose of Data Science in the field of Education.", "1 mark"],
+["Nov25 Q2", "List the components of Data Science.", "1 mark"],
+["Nov25 Q3", "Write a Python code to visualize the data using a bar chart.", "1 mark"],
+["Nov25 Q4", "Identify the command used to sort the dataset in descending order.", "1 mark"],
+["Nov25 Q5", "Construct the null and alternative hypotheses for the claim that the mean blood pressure of men is greater than or equal to 130 mmHg.", "1 mark"],
+["Nov25 Q6", "List the statistical measures of central tendency", "1 mark"],
+["Nov25 Q7", "A simple linear regression model is established to predict a student's final exam score (Y) based on the number of hours studied (X). The resulting regression equation is: Y = 55 + 5X. If a student studies for 4 hours, predict the final exam score.", "1 mark"],
+["Nov25 Q8", "Discover the number of final clusters obtained from the bottom-up clustering method when a specific cut level is applied to the dendrogram shown.", "1 mark"],
+["Nov25 Q9", "Differentiate between collaborative filtering and content-based filtering", "1 mark"],
+["Nov25 Q10", "Summarize the importance of fairness in machine learning models.", "1 mark"],
+["Nov25 Q11", "Describe the application of data science in the field of automotive industry.", "3 marks"],
+["Nov25 Q12", "Explain the commands to detect missing values in a Pandas DataFrame and fill them using forward fill and backward fill methods with suitable examples.", "3 marks"],
+["Nov25 Q13", "Construct a box plot and find IQR using the five-number summary for the given data. 18, 27, 34, 52, 54, 59, 61, 68, 78, 82, 85, 87, 91, 93, 100", "3 marks"],
+["Nov25 Q14", "Differentiate between Agglomerative and Divisive Hierarchical Clustering.", "3 marks"],
+["Nov25 Q15", "Explain the approaches to create different hybrid recommendation systems.", "3 marks"],
+["Nov25 Q16", "Differentiate between transparency and accountability in data science with suitable examples.", "3 marks"],
+["Nov25 Q17a", "You're a data scientist at 'PowerGrid Utilities', which is struggling with 10% energy distribution inefficiencies during peak hours. The operations team wants to forecast energy demand patterns to optimize grid management. Explain the data science life cycle for this prediction model.", "8 marks"],
+["Nov25 Q17b", "Discuss various features of Bigdata.", "4 marks"],
+["Nov25 Q18", "Write Python code snippet for the below queries: • Create a dataframe from a dictionary and display it. Sampledata: {'Name':['Alice','Bob','Charlie',NaN,'Eve'],'Age':[25,30,NaN,28,35], 'Salary':[50000, NaN,70000,60000,80000]} • Check for duplicate rows in the dataframe. • Fill NaN in 'Age' column with the median age. • Filter records where ‘Salary’ is above 55000. • Add a new row with values ['Frank', 32, 65000]. • Calculate the total salary of all employees. • Reset the index of the dataframe. • Drop the column ‘Salary’ permanently.", "12 marks"],
+["Nov25 Q19a", "Apply the concept of the Pearson correlation method and calculate the correlation coefficient for the following dataset. X 10 12 16 18 19 25 Y 12 23 10 15 11 20", "8 marks"],
+["Nov25 Q19b", "A nutritionist measures the daily calorie intake of 25 adult women in a city and finds a sample mean of 2200 kcal with a standard deviation of 150 kcal. Calculate a 95% confidence interval for the average daily calorie intake of all adult women in the city (Z=1.96).", "4 marks"],
+["Nov25 Q20a", "Given the initial centroids C1(5, 3) and C2(10, 15), apply the K-Means clustering process for two iterations. Calculate and show the cluster assignments and the updated centroids after each iteration. x1 x2 5 3 10 15 15 12 24 10 30 45 85 70 71 80 60 78 55 52 80 91", "8 marks"],
+["Nov25 Q20b", "Discuss the different types of machine learning algorithms and their applications.", "4 marks"],
+["Nov25 Q21a", "Illustrate the techniques used to pre-process the dataset by handling null values with suitable examples.", "8 marks"],
+["Nov25 Q21b", "A machine learning model was developed to classify emails as 'Spam' (Positive) or 'Not Spam' (Negative). After testing the model on 200 emails, the following Confusion Matrix was obtained: CO4 A 4 Predicted: Spam (P) Predicted: Not Spam (N) Actual: Spam 70 10 Actual:Not Spam 20 100 Calculate the model's Accuracy, Recall, Precision, and F1-score for the model.", ""],
+["Nov25 Q22a", "You are building a movie recommendation system. Movies are classified as either \"Must Watch\" (Class 1) or \"Skip\" (Class 0) based on two features: x1: User Rating (out of 10) x2: Budget (in millions of dollars) The training data is as follows: A new movie has been released with: Rating = 7.0 Budget = 90 million dollars Use the k-Nearest Neighbors (k-NN) algorithm with k=3 to classify this new movie (Should it be \"Must Watch\" or \"Skip\"). Use the Euclidean distance metric.", "8 marks"],
+["Nov25 Q22b", "Explain the concept of Linear Regression. Derive the equation of the best-fit line using the least squares method.", "4 marks"],
+["Nov25 Q23a", "Explain the key differences between user-based collaborative filtering and item-based collaborative filtering in recommendation systems. Discuss the advantages and disadvantages of each approach.", "8 marks"],
+["Nov25 Q23b", "Discuss performance metrics to evaluate the recommendation systems.", "4 marks"],
+["Nov25 Q24", "A popular fitness application collects user data such as location, heart rate, and sleep patterns to provide health insights. Recently, it was discovered that the app shares anonymized user data with third-party advertisers. However, a data breach revealed that some “anonymized” datasets could be re-identified by linking them with external public data sources. Analyze the ethical implications of this situation in terms of privacy, confidentiality, and informed consent. As a data scientist, illustrate the ethical and technical measures you would implement to prevent such ethical breaches in the future.", "12 marks"],
+["Nov24 Q1", "Define qualitative data with an example.", "1 mark"],
+["Nov24 Q2", "Name a Python library widely used for data manipulation and analysis, particularly for handling tabular data structures.", "1 mark"],
+["Nov24 Q3", "Differentiate between structured and unstructured data.", "1 mark"],
+["Nov24 Q4", "Interpret the following command: data.iloc[2:6, 0]", "1 mark"],
+["Nov24 Q5", "Calculate the measures of central tendency to analyze the demand for the product (in units) in the past 15 days. 3, 12, 7, 17, 3, 14, 9, 6, 11, 10, 1, 4, 19, 7, 15.", "1 mark"],
+["Nov24 Q6", "Compute the 'five number summary' and IQR for the following data. 2, 1, 7, 6, 5, 9, 18, 15, 12, 19, 27.", "1 mark"],
+["Nov24 Q7", "Identify the common mathematical measure used to select the best attribute for splitting data in a decision tree", "1 mark"],
+["Nov24 Q8", "Identify the optimal K value from the following graph.", "1 mark"],
+["Nov24 Q9", "List the cluster similarity measures used in hierarchical clustering.", "1 mark"],
+["Nov24 Q10", "Give an example of a content-based recommender system.", "1 mark"],
+["Nov24 Q11", "Differentiate between categorical and quantitative data.", "3 marks"],
+["Nov24 Q12", "Compare and contrast scatterplots with box plots in terms of their purpose, usage, and the type of insights they provide in data analysis.", "3 marks"],
+["Nov24 Q13", "A company claims that its new product improves customer satisfaction. A sample of 50 customers was surveyed, and the average satisfaction score was found to be 7.2. The population mean satisfaction score before the product launch was 6.5 and a standard deviation of 1.5. Evaluate the hypothesis at a 5% significance level with CO2 An 3 a critical value of Zα=1.645 to determine if there is sufficient evidence to support the company's claim.", ""],
+["Nov24 Q14", "Differentiate between polynomial regression and multiple linear regression.", "3 marks"],
+["Nov24 Q15", "Sketch a dendrogram for the following distance matrix using a single linkage agglomerative clustering algorithm. 1 2 3 4 5 1 0 2 9 0 3 3 7 0 4 6 5 9 0 5 11 10 2 8 0", "3 marks"],
+["Nov24 Q16", "Define explicit and implicit data in the context of recommender systems. Provide two examples of each type of data.", "3 marks"],
+["Nov24 Q17a", "As a data scientist working for a streaming service, your goal is to recommend movies and shows to users based on their viewing habits. You have access to structured data (user demographics, viewing history) and unstructured data (user reviews, social media mentions). Describe the steps you would follow through the Data Science lifecycle to develop an effective recommendation system.", "8 marks"],
+["Nov24 Q17b", "Summarize the python libraries employed in the domain of data science.", "4 marks"],
+["Nov24 Q18a", "Refer to the above dataset and write the suitable Python code for the below operations: 1. Import the necessary libraries and datasets 2. Display the statistical information of qualitative and quantitative attributes 3. Fill the null values of Gender with the value F 4. Arrange the Name column in ascending order 5. Display the total number of elements in the dataframe 6. Display the rows that have a Score between 50 to 60", "6 marks"],
+["Nov24 Q18b", "Illustrate two data visualization techniques tailored for numerical data with appropriate examples.", "6 marks"],
+["Nov24 Q19a", "Calculate the Pearson correlation coefficient (r) between Age and Monthly Grocery Spending using the dataset below. Interpret the significance of the correlation coefficient obtained.", "8 marks"],
+["Nov24 Q19b", "Distinguish between Pearson and Spearman correlation coefficient", "4 marks"],
+["Nov24 Q20", "A retail company has collected data on customer purchasing patterns, including variables like age, income, and the number of monthly purchases. The dataset also includes a target label indicating each customer's spending category as either \"Low,\" \"Medium,\" or \"High.\" A new customer has just joined, with characteristics: Age = 29, Income = $55,000, and Monthly Purchases = 15. Using the K-Nearest Neighbors (KNN) algorithm with K=3, estimate the spending category of this new customer.", "12 marks"],
+["Nov24 Q21", "Apply K-Means algorithm to cluster the following 8 samples into 3 clusters: A1=(2,10), A2=(2,5), A3=(8,4), A4=(5,8), A5=(7,5), A6=(6,4), A7=(1,2), A8=(4,9). The initial clusters are A1=(2,10), A4=(5,8), A7=(1,2). Update the centers of new clusters after one iteration.", "12 marks"],
+["Nov24 Q22a", "Explain the working principle of the decision tree for classification with the ID3 algorithm.", "8 marks"],
+["Nov24 Q22b", "Compare and contrast supervised and unsupervised machine learning algorithms.", "4 marks"],
+["Nov24 Q23a", "Determine the coefficients of the simple linear regression model, expressed as Y=a0+a1X, using the provided dataset. Predict the output for the given input (X) values 7 and 20. X 1 2 3 4 5 Y 2 3 7 9 10", "8 marks"],
+["Nov24 Q23b", "Explain the various performance metrics used in evaluating the regression models.", "4 marks"],
+["Nov24 Q24a", "Explain recommender systems, their importance, and the types commonly used in various applications.", "6 marks"],
+["Nov24 Q24b", "Compute the similarity score between users for the given utility matrix using cosine similarity and recommend the item to User X based on the matrix below.", "6 marks"],
+["Apr26 Q1", "List any two applications of Data Science.", "1 mark"],
+["Apr26 Q2", "Identify the types of Machine Learning.", "1 mark"],
+["Apr26 Q3", "Interpret the meaning of correlation between two variables.", "1 mark"],
+["Apr26 Q4", "Distinguish classification from regression.", "1 mark"],
+["Apr26 Q5", "Calculate the mean of the dataset: 10, 15, 20, 25, 30.", "1 mark"],
+["Apr26 Q6", "Predict the machine learning category (supervised or unsupervised) for a customer segmentation problem.", "1 mark"],
+["Apr26 Q7", "State the purpose of Exploratory Data Analysis (EDA).", "1 mark"],
+["Apr26 Q8", "Define Hypothesis Testing.", "1 mark"],
+["Apr26 Q9", "Define Clustering.", "1 mark"],
+["Apr26 Q10", "List any two recommendation techniques.", "1 mark"],
+["Apr26 Q11", "Describe any three methods used for handling missing values in a dataset.", "3 marks"],
+["Apr26 Q12", "Construct a box plot for the following data: 10, 15, 18, 22, 24, 28, 30, 35, 40.", "3 marks"],
+["Apr26 Q13", "Illustrate logistic regression with a real-world example.", "3 marks"],
+["Apr26 Q14", "Examine how clustering differs from classification in solving real-world problems.", "3 marks"],
+["Apr26 Q15", "Discuss the role of data visualization in understanding datasets.", "3 marks"],
+["Apr26 Q16", "Examine the advantages and limitations of content-based recommendation systems.", "3 marks"],
+["Apr26 Q17a", "Explain the Data Science lifecycle with a neat diagram.", "6 marks"],
+["Apr26 Q17b", "Discuss any six real-world applications of Data Science.", "6 marks"],
+["Apr26 Q18a", "Explain the steps involved in Exploratory Data Analysis", "6 marks"],
+["Apr26 Q18b", "Calculate Mean, Median and Mode for the dataset: 10, 15, 12, 18, 15, 20, 25, 15, 30.", "6 marks"],
+["Apr26 Q19a", "For the dataset: X 1 2 3 4 5 Y 2 4 5 4 5 Find the regression equation.", "6 marks"],
+["Apr26 Q19b", "Explain Linear Regression with a suitable example.", "6 marks"],
+["Apr26 Q20a", "Apply one iteration of K-Means clustering for: CO4 A 6 Points: (1,1), (2,2), (8,8), (9,9) Initial centroids: (1,1), (8,8)", ""],
+["Apr26 Q20b", "Explain K-Means clustering algorithm.", "6 marks"],
+["Apr26 Q21a", "Illustrate Decision Tree construction.", "6 marks"],
+["Apr26 Q21b", "Explain entropy and information gain.", "6 marks"],
+["Apr26 Q22a", "Explain Recommendation Systems and their classification.", "6 marks"],
+["Apr26 Q22b", "Compare Collaborative with Content-Based Filtering.", "6 marks"],
+["Apr26 Q23a", "Design a recommendation system for an online bookstore.", "6 marks"],
+["Apr26 Q23b", "Discuss the evaluation metrics used for classification.", "6 marks"],
+["Apr26 Q24a", "Explain various data cleaning techniques used in preprocessing.", "6 marks"],
+["Apr26 Q24b", "Design a movie recommendation system using content-based filtering.", "6 marks"],
+["Apr24 Q1", "What is data science?", "1 mark"],
+["Apr24 Q2", "List any two application of data science in healthcare domain.", "1 mark"],
+["Apr24 Q3", "What is EDA?", "1 mark"],
+["Apr24 Q4", "Define median.", "1 mark"],
+["Apr24 Q5", "What is Hypothesis Testing?", "1 mark"],
+["Apr24 Q6", "What are the advantages of decision tree?", "1 mark"],
+["Apr24 Q7", "How supervised models differ from unsupervised models?", "1 mark"],
+["Apr24 Q8", "List the types of machine learning.", "1 mark"],
+["Apr24 Q9", "Define clustering.", "1 mark"],
+["Apr24 Q10", "List applications unsupervised learning.", "1 mark"],
+["Apr24 Q11", "Discuss exploring various datasets in different repositories.", "3 marks"],
+["Apr24 Q12", "List any two strategies used to handle missing data.", "3 marks"],
+["Apr24 Q13", "Write short on correlation analysis.", "3 marks"],
+["Apr24 Q14", "Construct a box plot for the given data. 18, 27, 34, 52, 54, 59, 61, 68, 78, 82, 85, 87, 91, 93, 100", "3 marks"],
+["Apr24 Q15", "Compare regression and classification.", "3 marks"],
+["Apr24 Q16", "Enumerate the benefits and limitations of content-based recommendation.", "3 marks"],
+["Apr24 Q17a", "Classify Python fundamental libraries.", "6 marks"],
+["Apr24 Q17b", "Write in detail the application of data science in any five domains.", "6 marks"],
+["Apr24 Q18", "Describe in detail about exploratory data analysis.", "12 marks"],
+["Apr24 Q19", "Construct linear and logistics regression with an example.", "12 marks"],
+["Apr24 Q20a", "Illustrate decision trees with suitable examples.", "6 marks"],
+["Apr24 Q20b", "Discuss in detail the various Supervised Machine Learning techniques.", "6 marks"],
+["Apr24 Q21", "Explain regression analysis and types.", "12 marks"],
+["Apr24 Q22a", "Explain different types of clustering.", "6 marks"],
+["Apr24 Q22b", "Describe K means clustering with an example.", "6 marks"],
+["Apr24 Q23a", "Discuss about content-based filtering.", "6 marks"],
+["Apr24 Q23b", "Develop a case study of Sentiment Analysis in Twitter.", "6 marks"],
+["Apr24 Q24", "Explain in detail about the recommender systems and its classification.", "12 marks"],
+["REV Q1", "Pearson correlation between age and monthly grocery spending for the 7 people in the table (age 22, 25, 30, 35, 40, 45, 50; spending $150, 200, 250, 300, 400, 450, 500). Show the means and standard deviations of both variables and explain the significance of r.", "", 2],
+["REV Q2", "Apply k-means and Euclidean distance to cluster 8 examples into 3 clusters: A1=(2,10), A2=(2,5), A3=(8,4), A4=(5,8), A5=(7,5), A6=(6,4), A7=(1,2), A8=(4,9). Initial clusters A1, A4, A7. Update the centres of the new clusters after one iteration.", "", 1],
+["KM Q1", "Given initial centroids C1(5,3) and C2(10,15), apply K-means for two iterations on (5,3), (10,15), (15,12), (24,10), (30,45), (85,70), (71,80), (60,78), (55,52), (80,91). Show the assignments and updated centroids after each iteration.", "", 1],
+["KM Q2", "Apply K-means to cluster 8 samples into 3 clusters: A1=(2,10), A2=(2,5), A3=(8,4), A4=(5,8), A5=(7,5), A6=(6,4), A7=(1,2), A8=(4,9). Initial centroids A1, A4, A7. Update the centres after one iteration.", "", 1],
+["KM Q3", "Write the main steps of K-means clustering with a neat flow diagram. Discuss the strengths, weaknesses and applications of the algorithm.", "", 1],
+["AGG Q1", "Analyze the given distance matrix of six objects A to F and construct a dendrogram using single-linkage agglomerative clustering.", "", 2],
+["AGG Q2", "Calculate the Euclidean distance between each pair of the six points A(1,1), B(2,2), C(3,1), D(6,5), E(7,6), F(6,7) and construct a dendrogram using single-linkage agglomerative clustering.", "", 2],
+["PP Q1", "Ecologists tested the grazing pressure of green crabs on clams: number of crabs (2, 4, 2, 5, 4, 0, 3, 5, 1, 3) against clams remaining (137, 70, 184, 0, 35, 297, 122, 1, 253, 150). Find the equation of the regression line.", "", 1],
+["PP Q2", "Find the Pearson correlation coefficient for 5 students: hours studied X = 1, 3, 4, 5, 7; test score Y = 40, 50, 70, 75, 95.", "", 1],
+["PP Q3", "Two judges ranked 10 participants in an art competition. Judge X: 1 2 3 4 5 6 7 8 9 10; Judge Y: 6 2 9 7 1 4 8 3 10 5. Calculate the Spearman rank correlation coefficient.", "", 1],
+["PP Q4", "Classify a new fruit X = (175 g, 8.5 cm) as Apple or Orange from the table of five fruits (KNN; K is not given in the sheet).", "", 2],
+["PP Q5", "Calculate the linear regression equation of Marks (Y) on Hours Studied (X) for 10 students, and predict the marks for a student who studies 6.5 hours.", "", 2],
+["PP Q6", "Ice cream sales (litres) against temperature: find a regression line that can do the prediction.", "", 2],
+["PP Q7", "Classify the type of machine learning used: Spam filter trained on 10,000 emails already marked Spam / Not Spam.", "", 1],
+["PP Q8", "Classify the type of machine learning used: E-commerce customers divided into groups of similar buying behaviour, categories not known in advance.", "", 1],
+["PP Q9", "Classify the type of machine learning used: Robot learning to reach a target room with a reward for moving closer and a penalty for hitting a wall.", "", 1],
+["PP Q10", "Classify the type of machine learning used: Predicting the selling price of a newly listed house from past sales records.", "", 1],
+["PP Q11", "Classify the type of machine learning used: University finds groups of students with similar learning behaviour, no predefined categories.", "", 1],
+["PP Q12", "Classify the type of machine learning used: Chess AI that plays thousands of games and gets a reward for winning and a penalty for losing.", "", 1],
+["PP Q13", "Classify the type of machine learning used: Hospital model learns from patients with a confirmed Disease / No Disease diagnosis and predicts for a new patient.", "", 1],
+["PP Q14", "Classify the type of machine learning used: Supermarket finds that customers who buy bread also buy butter and jam, with no relationships specified.", "", 1],
+["PP Q15", "Classify the type of machine learning used: Autonomous vehicle trained in a simulator with rewards for staying in lane and penalties for collisions.", "", 1],
+["PP Q16", "Classify the type of machine learning used: Wildlife organisation trains a system on photographs labelled Tiger, Elephant, Deer, Lion and then identifies a new photograph.", "", 1],
+["PS Q1", "Pearson correlation between study hours and marks for 10 students (S1 to S10): hours 2 to 11, marks 45, 50, 52, 60, 65, 68, 72, 78, 82, 88. Interpret the strength and direction.", "", 1],
+["PS Q2", "Spearman rank correlation of Mathematics rank (1 to 10) and Computer Science rank (2, 1, 4, 3, 6, 5, 8, 7, 10, 9) for 10 students.", "", 1],
+["PS Q3", "Spearman rank correlation from raw data: attendance % (62, 75, 68, 90, 82, 95, 71, 87, 65, 93) and final exam score (48, 55, 52, 78, 70, 88, 60, 75, 50, 84). Calculate the ranks, then the coefficient.", "", 1],
+["KT Q1", "Classify a new student X (Hours Studied = 4, Attendance = 72%) as Pass or Fail with KNN, K = 3, from the seven training students.", "", 2],
+["KT Q2", "Classify a new loan customer X (Income = 5.5 lakhs, Credit Score = 660) as Approved or Rejected with KNN, K = 3, from the seven training customers.", "", 2],
+["ETH Q1", "Smart City Healthcare System: a government health department builds a data analytics system from medical records of different hospitals to predict disease trends. (a) Identify and analyse the ethical concerns of collecting and processing sensitive healthcare data. (b) Suggest ethical guidelines and technical measures for data protection, patient privacy and responsible use.", "", 1],
+["ETH Q2", "Online Shopping and Customer Data Analytics: a company collects purchase history, browsing activity, preferences and personal details for recommendations, shares some data with advertising partners without telling customers, and researchers re-identify customers by combining the anonymised data with public data. (a) Examine the concerns on privacy, confidentiality, informed consent and re-identification. (b) Propose ethical practices and technical safeguards.", "", 1],
+["ETH Q3", "Employee Performance Monitoring System: a multinational monitors working hours, computer usage, emails, location and task completion, and employees are not clearly told the extent of the collection or its use. (a) Analyse the concerns on privacy, confidentiality, transparency and informed consent. (b) Recommend ethical guidelines and technical measures for responsible collection, secure storage and fair use.", "", 1],
+["ETH Q4", "Social Media Data Analysis: a research organisation collects posts, comments, likes and shares to predict user interests; usernames are removed but users can still be identified by combining the data with public information. (a) Examine the issues of privacy, informed consent, confidentiality and re-identification. (b) Suggest privacy-preserving techniques and ethical practices.", "", 1],
+["QA Q1", "Define qualitative data with an example.", "", 1],
+["QA Q2", "List the command to obtain the basic statistical details of categorical columns.", "", 1],
+["QA Q3", "Differentiate structured and unstructured data.", "", 1],
+["QA Q4", "As a data scientist at an e-commerce company you improve product recommendations using structured data (customer demographics, purchase logs) and unstructured data (reviews, social media activity). Describe the steps you would take through the data science lifecycle to develop the recommendation model.", "", 1],
+["QA Q5", "Apply Pandas commands to Customers.csv: 1 read the dataset into a dataframe; 2 display the row labels; 3 statistical information of all qualitative and quantitative attributes; 4 number of null values in each column; 5 fill the null values with 0; 6 update the Annual Income column by 10 times and store it in a new column; 7 rows where age > 25 and genre = Female.", "", 1],
+["PD Q1", "Class assignment 20.7: create a DataFrame for cricket with 8 players and 5 features. Display the first three rows, the last two rows, the shape and the column names.", "", 1],
+["PD Q2", "Class assignment 27.7, Working with Data using Pandas: 1 read a CSV, first and last five rows, shape, column names, data types, describe(); 2 identify and count missing values, replace them, explain why handling them matters; 3 filter students scoring above 80, CSE students, AI students with marks > 75; 4 add Total Marks and Percentage columns, remove an unwanted column, rename a column, display; 5 sort, rank, group by a categorical column and average.", "", 1],
+["PD Q3", "Class assignment 29.07: college dataset (Student ID, Name, Department, Semester, Attendance, Internal, External, CGPA, Scholarship Status; some attendance and CGPA missing). Read with usecols and NA as missing; first and last 5 records; dimensions and summary statistics; names and CGPA of CSE students; attendance > 85 and CGPA > 8 with boolean conditions and query(); fill missing attendance with the department average; Total Marks; grades A to D with apply() and a lambda; rename CGPA to Current_CGPA; remove attendance below 60.", "", 1],
+["PD Q4", "Assignment 12.9.26, employees.csv: 1 read the CSV; 2 statistics of Appraisal Marks; 3 data type of Age; 4 first 4 rows with Employee_ID, Name and Age; 5 count of nulls per column; 6 rows where Appraisal Marks is null; 7 fill nulls with the previous value of the same column; 8 fill the remaining nulls with 0; 9 group by Genre; 10 rows where Age > 25 and Genre = Female; 11 drop Gender permanently; 12 sort by Appraisal Marks ascending; 13 drop Overall Score permanently.", "", 1]
+];/* ---------- helpers ---------- */
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+/* every question's screenshot is q/<paper>-q<no>.png, cut by AutoLAB/Subjects/DSE-theory/pyq/crop_q.py */
+function qimg(k){var m=/^(\w+) Q(\w+)$/.exec(k);return 'q/'+m[1].toLowerCase()+'-q'+m[2]+'.png'}
+var WIDGETS={};  /* CONTENT (topic pages) comes from chunks.js, built from chunks/*.txt */
+
+
+/* ===== modules (chunks are filled in as they are built) ===== */
+var TITLES=[
+ {n:1,name:'Basics of Data Science',c:[['1.1','What data science is: applications and the life cycle'],['1.2','Properties of data: types, structured vs unstructured, repositories'],['1.3','Toolbox for data scientists and big data']]},
+ {n:2,name:'Understanding Data',c:[['2.1','Working with data in pandas: import, select, filter, sort, group, rank'],['2.2','Missing values and data cleaning'],['2.3','Data visualisation: which plot for which data']]},
+ {n:3,name:'Statistical Inference',c:[['3.1','Descriptive statistics, five-number summary and box plots'],['3.2','Estimation and confidence intervals'],['3.3','Correlation: covariance, Pearson and Spearman'],['3.4','Hypothesis testing']]},
+ {n:4,name:'Machine Learning',c:[['4.1','Machine learning and its types'],['4.2','Linear regression: simple, multiple, polynomial, and error metrics'],['4.3','Logistic regression'],['4.4','K-nearest neighbours'],['4.5','Decision trees: entropy, information gain, ID3'],['4.6','Clustering and K-means'],['4.7','Hierarchical (agglomerative) clustering and dendrograms'],['4.8','Model evaluation: confusion matrix and metrics']]},
+ {n:5,name:'Recommender Systems',c:[['5.1','Recommender systems and content-based filtering'],['5.2','Collaborative filtering: user-based, item-based, cosine similarity'],['5.3','Hybrid recommenders and evaluating recommenders']]},
+ {n:6,name:'Ethics in Data Science',c:[['6.1','Ethical frameworks, privacy, consent and anonymisation'],['6.2','Bias and fairness'],['6.3','Transparency, explainability and accountability']]}
+];
+var PKEY='dse-progress-v1',PROG={};
+try{PROG=JSON.parse(localStorage.getItem(PKEY))||{}}catch(e){PROG={}}
+function saveProg(){try{localStorage.setItem(PKEY,JSON.stringify(PROG))}catch(e){}}
+var MODS=TITLES.map(function(m){return {n:m.n,name:m.name,chunks:m.c.map(function(x){return {no:x[0],t:x[1]}})}});
+var ALL=[];
+MODS.forEach(function(m){m.chunks.forEach(function(c){c.id='c'+c.no.replace('.','-');c.mod=m;var X=CONTENT[c.no];if(X){c.h=X.h;c.exam=X.qs}ALL.push(c)})});
+var TOTAL=ALL.length,DONE=0,PCT=0,BUILT=ALL.filter(function(c){return c.h}).length;
+function recalc(){
+  var seen=false;
+  ALL.forEach(function(c){if(PROG[c.id])c.s='done';else if(c.h){c.s=seen?'ready':'now';seen=true}else c.s='todo'});
+  DONE=ALL.filter(function(c){return c.s==='done'}).length;PCT=Math.round(DONE/TOTAL*100);
+}
+recalc();
+var PILL={done:'done',now:'up next',ready:'not started',todo:'being built'};
+
+/* ---------- past papers: every question as a screenshot, answered right under it ---------- */
+var SECS=[
+ {id:'s-nov25',t:'End-sem Nov/Dec 2025',code:'23CS2024',d:'Your exact course (23CS2024 Data Science Ecosystem), the only end-sem paper set for it so far. 100 marks: Part A 10 × 1, Part B 6 × 3, Part C any five of Q17–Q23 plus the compulsory Q24, 12 marks each (usually 8 numerical + 4 theory).',re:/^Nov25 /,part:function(n){return 'Part '+(n<=10?'A · 1 mark each':n<=16?'B · 3 marks each':n<=23?'C · 12 marks each, any five of 17–23':'C · compulsory')}},
+ {id:'s-nov24',t:'End-sem Nov/Dec 2024',code:'20CS2031',d:'Introduction to Data Science (20CS2031), the old-regulation course that 23CS2024 replaced. Same modules: data, statistics, regression, KNN, clustering, decision trees, recommenders. Part C questions here carry 8 + 4 or 6 + 6 marks.',re:/^Nov24 /,part:function(n){return 'Part '+(n<=10?'A · 1 mark each':n<=16?'B · 3 marks each':n<=23?'C · 12 marks each':'C · compulsory')}},
+ {id:'s-apr26',t:'End-sem Apr/May 2026',code:'20CS2031',d:'Introduction to Data Science (20CS2031), the most recent old-regulation paper. Mostly definitions and short explanations plus a few small calculations (box plot, regression line, one K-means iteration, decision tree).',re:/^Apr26 /,part:function(n){return 'Part '+(n<=10?'A · 1 mark each':n<=16?'B · 3 marks each':n<=23?'C · 12 marks each (6 + 6), any five of 17–23':'C · compulsory (6 + 6)')}},
+ {id:'s-apr24',t:'End-sem Apr/May 2024',code:'20CS2031',d:'Introduction to Data Science (20CS2031), the oldest of the three old-regulation papers. Mostly definitions and short explanations, plus two 12-mark essays (exploratory data analysis, linear and logistic regression) and a Twitter sentiment-analysis case study.',re:/^Apr24 /,part:function(n){return 'Part '+(n<=10?'A · 1 mark each':n<=16?'B · 3 marks each':'C · 6 to 12 marks')}},
+ {id:'r-rev',rev:1,t:'Revision DSE1 (24.10)',code:'Classroom · Class assignment',d:'The two revision problems from the 24 October class: Pearson correlation of age against grocery spending, and K-means on 8 points.',re:/^REV /},
+ {id:'r-km',rev:1,t:'K-means practice (16.10)',code:'Classroom · Practice',d:'Three K-means questions: two numerical problems and the steps, strengths and weaknesses.',re:/^KM /},
+ {id:'r-agg',rev:1,t:'Agglomerative practice (23.10)',code:'Classroom · Practice',d:'Two single-linkage dendrogram problems: one from a distance matrix, one from raw points.',re:/^AGG /},
+ {id:'r-pp',rev:1,t:'Practicing problems',code:'Classroom · Practice',d:'The Practicing Problem sheet: regression line, Pearson, Spearman and KNN, plus the ice-cream regression and the ten "which type of ML" cases.',re:/^PP /},
+ {id:'r-ps',rev:1,t:'Pearson and Spearman practice',code:'Classroom · Practice',d:'Three problems: Pearson on raw data, Spearman from given ranks, Spearman from raw data (ranks to be found).',re:/^PS /},
+ {id:'r-kt',rev:1,t:'KNN test (remedial IA1)',code:'Classroom · Test',d:'The two KNN questions from the remedial IA1 test, K = 3.',re:/^KT /},
+ {id:'r-eth',rev:1,t:'Ethics case studies',code:'Classroom · Assignment',d:'Four ethics case studies (healthcare, online shopping, employee monitoring, social media), each with part (a) the concerns and part (b) the guidelines and technical measures. Posted as text.',re:/^ETH /},
+ {id:'r-qa',rev:1,t:'Quality Assessment 2',code:'Classroom · Assignment',d:'The A4-sheet assignment: short definitions, the data science life cycle for a recommender, and pandas commands on Customers.csv (run for real).',re:/^QA /},
+ {id:'r-pd',rev:1,t:'Pandas class assignments',code:'Classroom · Class assignments',d:'The pandas assignments from July and September (cricket DataFrame, reading and cleaning, grades, employees.csv). Each was run for real; where the teacher did not post the data it is built in the code, and the output shown is what the code printed.',re:/^PD /}
+];
+function natKey(k){return k.toLowerCase().replace(/\d+/g,function(n){return ('0000'+n).slice(-4)})}
+SECS.forEach(function(S){S.q=PYQ.filter(function(q){return S.re.test(q[0])});S.q.sort(function(a,b){return natKey(a[0])<natKey(b[0])?-1:1})});
+function qid(k){return 'q-'+k.replace(/\W+/g,'-')}
+function srcPage(S){
+  var done=S.q.filter(function(q){return ANS[q[0]]}).length;
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">'+(S.rev?'CLASSROOM':'PAST PAPERS')+' · '+esc(S.code)+'</div><h1 style="font-size:1.8rem;margin-top:6px">'+esc(S.t)+'</h1><p>'+esc(S.d)+'</p>';
+  h+='<p class="log">'+S.q.length+' questions, each shown as set with its answer right under it'+(done<S.q.length?' · '+done+' answered so far':'')+'. Every number was recomputed by a checker before it went in.</p>';
+  h+='<div class="qjump">'+S.q.map(function(q){return '<a href="#'+S.id+'" data-q="'+qid(q[0])+'" class="'+(ANS[q[0]]?'':'todo')+'">'+esc(q[0].split(' ')[1])+'</a>'}).join('')+'</div>';
+  var part='';
+  S.q.forEach(function(q){
+    var n=parseInt(q[0].split(' Q')[1],10),p=S.part?S.part(n):'';
+    if(p&&p!==part){part=p;h+='<h2>'+esc(p)+'</h2>'}
+    h+='<section class="qa" id="'+qid(q[0])+'"><div class="log qh"><b>'+esc(q[0])+'</b>'+(q[2]?' · '+esc(q[2]):'')+'</div>'+((q[3]?'<div class="pyq">'+esc(q[1])+'</div>':'')+(q[3]===1?'':'<img class="qimg" src="'+qimg(q[0])+'" alt="'+esc(q[1])+'" loading="lazy">'))+
+       (ANS[q[0]]?'<div class="answer"><div class="kicker">ANSWER</div>'+ANS[q[0]]+'</div>':'<div class="answer todo">Answer being written.</div>')+'</section>';
+  });
+  return h;
+}
+
+/* ---------- search: chunks, papers, every question and its answer ---------- */
+var LASTQ='',PEND=null;
+function stoks(q){return q.toLowerCase().split(/[\s,;:.()\[\]{}"'“”‘’?!]+/).filter(function(x){return x})}
+function sall(text,toks){for(var i=0;i<toks.length;i++)if(text.indexOf(toks[i])<0)return false;return true}
+function plain(h){return (h||'').replace(/<[^>]+>/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/\s+/g,' ')}
+function renderRes(){
+  var box=$('#qres');if(!box)return;
+  var q=LASTQ.trim(),toks=stoks(q);
+  if(q.length<2||!toks.length){box.hidden=true;box.innerHTML='';return}
+  var topics=ALL.filter(function(c){return sall((c.no+' '+c.t+' '+plain(c.h)).toLowerCase(),toks)}),qs=[];
+  SECS.forEach(function(S){S.q.forEach(function(qq){if(sall((qq[0]+' '+qq[1]+' '+plain(ANS[qq[0]])).toLowerCase(),toks))qs.push({S:S,q:qq})})});
+  var h='';
+  if(!topics.length&&!qs.length){box.innerHTML='<div class="none">Nothing found for “'+esc(q)+'”.</div>';box.hidden=false;return}
+  if(topics.length){h+='<h5>Topics</h5>';topics.slice(0,8).forEach(function(c){h+='<a href="#'+c.id+'"><span class="sn">'+c.no+'</span>'+esc(c.t)+'</a>'})}
+  if(qs.length){
+    h+='<h5>Questions ('+qs.length+')</h5>';
+    qs.slice(0,14).forEach(function(r){h+='<a href="#'+r.S.id+'" data-q="'+qid(r.q[0])+'"><span class="sn">'+esc(r.q[0])+'</span>'+esc(r.q[1].replace(/\s+/g,' ').slice(0,90))+'<small>'+esc(r.S.t)+'</small></a>'});
+    if(qs.length>14)h+='<div class="more">and '+(qs.length-14)+' more. Add another word to narrow it down.</div>';
+  }
+  box.innerHTML=h;box.hidden=false;
+}
+function goQ(id){var el=document.getElementById(id);if(el){el.scrollIntoView({block:'start'});el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}}
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[data-q]');
+  if(a){PEND=a.getAttribute('data-q');if(location.hash===a.getAttribute('href')){e.preventDefault();var p=PEND;PEND=null;document.body.classList.remove('open');goQ(p)}}
+  if(!e.target.closest||!e.target.closest('.srch')){var b=$('#qres');if(b)b.hidden=true}
+});
+var sd=document.getElementById('side');
+sd.addEventListener('input',function(e){if(e.target.id==='qs'){LASTQ=e.target.value;renderRes()}});
+sd.addEventListener('focusin',function(e){if(e.target.id==='qs')renderRes()});
+sd.addEventListener('keydown',function(e){
+  if(e.target.id!=='qs')return;
+  var box=$('#qres'),links=box?$$('a',box):[],cur=links.findIndex(function(a){return a.classList.contains('sel')});
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    if(!links.length)return;e.preventDefault();
+    if(cur>=0)links[cur].classList.remove('sel');
+    cur=e.key==='ArrowDown'?Math.min(links.length-1,cur+1):Math.max(0,cur-1);
+    links[cur].classList.add('sel');links[cur].scrollIntoView({block:'nearest'});
+  }else if(e.key==='Enter'){var t=links[cur>=0?cur:0];if(t){e.preventDefault();t.click()}}
+  else if(e.key==='Escape'){LASTQ='';e.target.value='';renderRes()}
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))){var i=$('#qs');if(i){e.preventDefault();document.body.classList.add('open');i.focus()}}
+});
+
+/* ---------- views ---------- */
+function side(cur){
+  var h='<div class="brand"><span>Data Science Tutor</span><small>23CS2024</small></div><div class="bar" aria-label="progress"><i style="width:'+PCT+'%"></i></div><div class="prog">'+DONE+' of '+TOTAL+' chunks done ('+PCT+'%)'+(BUILT<TOTAL?'<br>'+BUILT+' of '+TOTAL+' chunks built':'')+'</div>';
+  h+='<a href="#home" class="home'+(cur==='home'?' on':'')+'">Overview</a>';
+  h+='<div class="srch"><input id="qs" type="search" placeholder="Search topics, questions…  ( / )" autocomplete="off" spellcheck="false" aria-label="Search the whole site" value="'+esc(LASTQ)+'"><div id="qres" class="sres" hidden></div></div>';
+  h+='<h4>Past papers (answered)</h4>';
+  SECS.filter(function(S){return !S.rev}).forEach(function(S){h+='<a href="#'+S.id+'" class="'+(cur===S.id?'on':'')+'"><span class="no">'+S.q.length+'</span><span>'+esc(S.t)+'</span></a>'});
+  h+='<h4>Classroom sets (answered)</h4>';
+  SECS.filter(function(S){return S.rev}).forEach(function(S){h+='<a href="#'+S.id+'" class="'+(cur===S.id?'on':'')+'"><span class="no">'+S.q.length+'</span><span>'+esc(S.t)+'</span></a>'});
+  MODS.forEach(function(m){
+    h+='<h4>Module '+m.n+' · '+esc(m.name)+'</h4>';
+    m.chunks.forEach(function(c){h+='<a href="#'+c.id+'" class="'+(cur===c.id?'on':'')+'"><span class="dot '+(c.s==='done'?'done':c.s==='now'?'now':c.s==='ready'?'ready':'')+'"></span><span class="no">'+c.no+'</span><span>'+esc(c.t)+'</span></a>'});
+  });
+  $('#side').innerHTML=h;
+}
+function home(){
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">DATA SCIENCE ECOSYSTEM · 23CS2024 · ENDSEM PLAN</div><h1 style="font-size:1.9rem;margin-top:6px">Where you are</h1>';
+  h+='<h2>Past papers, answered</h2><p>Every question is shown exactly as it was set (cut from the paper), with the answer directly under it, written the way you would write it for those marks: formula, substitution, full working table, result and a one-line conclusion, with the diagram drawn from the computed numbers.</p>';
+  h+='<div class="mods">'+SECS.filter(function(S){return !S.rev}).map(function(S){var d=S.q.filter(function(q){return ANS[q[0]]}).length;
+    return '<a class="card" style="margin:0;text-decoration:none;color:inherit" href="#'+S.id+'"><div class="kicker">'+esc(S.code)+(S.code==='23CS2024'?' · START HERE':'')+'</div><div style="font-weight:600;margin:2px 0 8px">'+esc(S.t)+'</div><div class="bar" style="margin:0"><i style="width:'+Math.round(d/S.q.length*100)+'%"></i></div><div class="log" style="margin:6px 0 0">'+d+' of '+S.q.length+' answered</div></a>'}).join('')+'</div>';
+  h+='<h2>Classroom sets, answered</h2><p>Every problem set from the DSE Classroom (revision, K-means, agglomerative, Pearson and Spearman, KNN, the practicing problems, the ethics cases, QA2 and the pandas assignments), in the same format.</p><div class="mods">'+SECS.filter(function(S){return S.rev}).map(function(S){var d=S.q.filter(function(q){return ANS[q[0]]}).length;return '<a class="card" style="margin:0;text-decoration:none;color:inherit" href="#'+S.id+'"><div class="kicker">CLASSROOM</div><div style="font-weight:600;margin:2px 0 4px">'+esc(S.t)+'</div><div class="log" style="margin:0">'+d+' of '+S.q.length+' answered</div></a>'}).join('')+'</div>';
+  h+='<h2>What the exam looks like</h2><p>100 marks in 3 hours: <b>Part A</b> 10 × 1, <b>Part B</b> 6 × 3, <b>Part C</b> any five of Q17–Q23 plus the <b>compulsory Q24</b>, 12 marks each. Part C is mostly <b>solving</b>: Pearson r, K-means for two iterations, KNN with k = 3, a regression line, a confusion matrix, a dendrogram, a box plot from the five-number summary, a confidence interval, plus pandas code. Q24 (CO6) is the ethics case study.</p>';
+  h+='<div class="mods">'+MODS.map(function(m){var d=m.chunks.filter(function(c){return c.s==='done'}).length,b=m.chunks.filter(function(c){return c.h}).length,p=Math.round(d/m.chunks.length*100);
+    return '<div class="card" style="margin:0"><div class="kicker">MODULE '+m.n+'</div><div style="font-weight:600;margin:2px 0 8px">'+esc(m.name)+'</div><div class="bar" style="margin:0"><i style="width:'+p+'%"></i></div><div class="log" style="margin:6px 0 0">'+d+' / '+m.chunks.length+(b<m.chunks.length?' · '+b+' built':'')+'</div></div>'}).join('')+'</div>';
+  h+='<h2>Habits that earn the marks</h2><ul><li><b>Write the formula first, then substitute.</b> The first mark is for the formula, the next for the substitution, the last for the answer.</li><li><b>Draw the working table.</b> Every distance, rank, deviation and sum gets a row and a column; a correct final number with no table loses most of an 8-mark question.</li><li><b>Finish with a sentence.</b> "r = 0.99, a very strong positive correlation", "the new point is Pass", "Reject H0".</li><li><b>Use the teacher’s methods:</b> quartiles as medians of the two halves, tied ranks averaged, single linkage takes the minimum, K-means updates all centroids after assigning every point.</li></ul>';
+  h+='<p class="log" style="margin-top:24px">Progress is saved in this browser only. <button data-resetprog>Reset progress</button></p>';
+  return h;
+}
+function chunk(c,i){
+  var h='<button class="menu" aria-label="Open the list">☰ Menu</button><div class="kicker" style="margin-top:12px">MODULE '+c.mod.n+' · '+esc(c.mod.name.toUpperCase())+'</div><h1 style="font-size:1.8rem;margin-top:6px">'+c.no+' '+esc(c.t)+'<span class="pill '+c.s+'">'+PILL[c.s]+'</span></h1>';
+  if(c.exam&&c.exam.length)h+='<div class="chips"><span class="chip">'+c.exam.length+' exam and revision questions on this topic, listed at the end</span></div>';
+  h+=c.h||'<div class="card"><p>This chunk is still being built. The past papers are already answered: start there.</p></div>';
+  if(c.exam&&c.exam.length)h+='<h2>Questions on this topic</h2><p class="log">Each link opens the question with its full answer.</p><ul class="qlinks">'+c.exam.map(function(k){var S=SECS.filter(function(S){return S.re.test(k)})[0],q=PYQ.filter(function(q){return q[0]===k})[0];return S&&q?'<li><a href="#'+S.id+'" data-q="'+qid(k)+'"><b>'+esc(k)+'</b></a> '+esc(q[1].split(String.fromCharCode(10))[0].slice(0,110))+(q[2]?' <span class="log">('+esc(q[2])+')</span>':'')+'</li>':''}).join('')+'</ul>';
+  if(c.h)h+='<div class="card" style="margin-top:28px"><div class="row" style="justify-content:space-between"><span>'+(c.s==='done'?'You marked this chunk as done.':'Finished this chunk?')+'</span><button data-mark class="'+(c.s==='done'?'':'primary')+'">'+(c.s==='done'?'Mark as not done':'Mark as done')+'</button></div></div>';
+  var p=ALL[i-1],n=ALL[i+1];
+  h+='<div class="nav">'+(p?'<a class="btn" href="#'+p.id+'">← '+p.no+' '+esc(p.t)+'</a>':'<span></span>')+(n?'<a class="btn" href="#'+n.id+'">'+n.no+' '+esc(n.t)+' →</a>':'')+'</div>';
+  return h;
+}
+function hydrate(root){Object.keys(WIDGETS).forEach(function(sel){$$(sel,root).forEach(function(el){if(!el.dataset.hyd){el.dataset.hyd=1;WIDGETS[sel](el)}})})}
+function route(){
+  var id=(location.hash||'#home').slice(1),main=$('#main');
+  document.body.classList.remove('open');recalc();
+  var SS=SECS.filter(function(S){return S.id===id})[0];
+  if(SS){side(id);main.innerHTML=srcPage(SS)}
+  else if(id==='home'||!ALL.some(function(c){return c.id===id})){side('home');main.innerHTML=home()}
+  else{var i=ALL.map(function(c){return c.id}).indexOf(id);side(id);main.innerHTML=chunk(ALL[i],i)}
+  hydrate(main);
+  var mk=$('[data-mark]',main);if(mk)mk.onclick=function(){if(PROG[id])delete PROG[id];else PROG[id]=1;saveProg();var y=window.scrollY;route();window.scrollTo(0,y)};
+  var rp=$('[data-resetprog]',main);if(rp)rp.onclick=function(){if(confirm('Reset all Data Science progress in this browser?')){PROG={};saveProg();route()}};
+  var mb=$('.menu',main);if(mb)mb.onclick=function(){document.body.classList.toggle('open')};
+  var a=$('#side a.on');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest'});
+  window.scrollTo(0,0);
+  if(PEND){var P=PEND;PEND=null;setTimeout(function(){goQ(P)},60)}
+}
+window.addEventListener('hashchange',route);route();
+</script>
+</body></html>

@@ -1,0 +1,5 @@
+step 1: merge C and F at distance 0.11
+step 2: merge B and CF at distance 0.12
+step 3: merge E and BCF at distance 0.15
+step 4: merge D and EBCF at distance 0.16
+step 5: merge A and DEBCF at distance 0.18

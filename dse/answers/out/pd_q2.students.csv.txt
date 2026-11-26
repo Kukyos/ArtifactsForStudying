@@ -1,0 +1,9 @@
+roll,name,dept,marks,project,city
+1,asha,CSE,86,18,chennai
+2,ravi,AI,78,15,pune
+3,meena,CSE,92,19,delhi
+4,john,ECE,,12,goa
+5,priya,AI,81,16,chennai
+6,kiran,CSE,67,14,
+7,sana,AI,74,13,pune
+8,dev,ECE,88,17,goa

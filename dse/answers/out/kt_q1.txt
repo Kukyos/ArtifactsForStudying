@@ -1,0 +1,8 @@
+Point | Hours | Attend. | Class | squared differences, sum | distance d | rank
+S1 | 2 | 60 | Fail | 4 + 144 = 148 | 12.17 | 6
+S2 | 3 | 65 | Fail | 1 + 49 = 50 | 7.07 | 4
+S3 | 4 | 70 | Pass | 0 + 4 = 4 | 2 | 1
+S4 | 5 | 75 | Pass | 1 + 9 = 10 | 3.16 | 2
+S5 | 6 | 80 | Pass | 4 + 64 = 68 | 8.25 | 5
+S6 | 7 | 85 | Pass | 9 + 169 = 178 | 13.34 | 7
+S7 | 3 | 75 | Pass | 1 + 9 = 10 | 3.16 | 3

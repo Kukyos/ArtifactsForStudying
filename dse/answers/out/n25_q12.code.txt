@@ -1,0 +1,12 @@
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({'age': [25, np.nan, 31, np.nan, 40], 'city': ['chennai', 'delhi', None, 'pune', 'goa']})
+print(df)
+
+print(df.isnull())          # True where a value is missing
+print(df.isnull().sum())    # missing values per column
+print(df.isna().sum().sum())  # total missing
+
+print(df.ffill())           # forward fill: copy the previous value down (same as fillna(method='ffill'))
+print(df.bfill())           # backward fill: copy the next value up (same as fillna(method='bfill'))

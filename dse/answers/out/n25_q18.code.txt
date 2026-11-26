@@ -1,0 +1,36 @@
+import pandas as pd
+import numpy as np
+
+data = {'Name': ['Alice', 'Bob', 'Charlie', np.nan, 'Eve'],
+        'Age': [25, 30, np.nan, 28, 35],
+        'Salary': [50000, np.nan, 70000, 60000, 80000]}
+
+# 1. create the dataframe and display it
+df = pd.DataFrame(data)
+print(df)
+
+# 2. check for duplicate rows
+print(df.duplicated())
+print('duplicate rows:', df.duplicated().sum())
+
+# 3. fill NaN in Age with the median age
+df['Age'] = df['Age'].fillna(df['Age'].median())
+print(df)
+
+# 4. filter records where Salary is above 55000
+print(df[df['Salary'] > 55000])
+
+# 5. add a new row ['Frank', 32, 65000]
+df.loc[len(df)] = ['Frank', 32, 65000]
+print(df)
+
+# 6. total salary of all employees
+print('total salary =', df['Salary'].sum())
+
+# 7. reset the index
+df = df.reset_index(drop=True)
+print(df)
+
+# 8. drop the Salary column permanently
+df.drop(columns='Salary', inplace=True)
+print(df)

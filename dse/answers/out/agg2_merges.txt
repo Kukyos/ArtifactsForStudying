@@ -1,0 +1,5 @@
+step 1: merge A and B at distance 1.414
+step 2: merge D and E at distance 1.414
+step 3: merge C and AB at distance 1.414
+step 4: merge F and DE at distance 1.414
+step 5: merge CAB and FDE at distance 5

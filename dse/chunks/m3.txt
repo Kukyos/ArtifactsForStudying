@@ -1,0 +1,69 @@
+=== 3.1
+Q: Nov25 Q6, Nov25 Q13, Nov24 Q5, Nov24 Q6, Apr26 Q5, Apr26 Q12, Apr26 Q18b, Apr24 Q4, Apr24 Q14
+<h4>Central tendency</h4>
+<ul><li><b>Mean</b> = sum / n. Affected by outliers.</li><li><b>Median</b> = middle value of the sorted data (average of the two middle values when n is even).</li><li><b>Mode</b> = most frequent value (there can be none, one or several).</li></ul>
+<p>Symmetric data: mean is about the median. Right-skewed: mean &gt; median. Left-skewed: mean &lt; median.</p>
+<h4>Spread</h4>
+```gbox
+variance   sigma^2 = sum (x - mean)^2 / N      (population);  s^2 = sum (x - mean)^2 / (n - 1)  (sample)
+std dev    sigma = sqrt(variance)
+range      max - min
+IQR        Q3 - Q1
+```
+<p>Variance is the average of the squared differences from the mean; the standard deviation is its square root, in the units of the data.</p>
+<h4>Five-number summary and IQR (the teacher's method)</h4>
+<ol class="steps"><li>Sort the data.</li><li><b>Median (Q2)</b> = middle value.</li><li><b>Q1</b> = median of the data points to the <b>left</b> of the median (lower half).</li><li><b>Q3</b> = median of the data points to the <b>right</b> of the median (upper half).</li><li>Minimum and maximum are the smallest and largest values. IQR = Q3 - Q1.</li></ol>
+<p>When n is odd the median itself is left out of both halves. (Software such as numpy interpolates and can give slightly different quartiles; in the exam use the halves method.)</p>
+<h4>Box plot</h4>
+<p>Draw a box from Q1 to Q3 with a line at the median, and whiskers to the minimum and maximum. Outlier fences: lower = Q1 - 1.5 IQR, upper = Q3 + 1.5 IQR; points beyond a fence are plotted separately as outliers and the whiskers stop at the last point inside.</p>
+<img class="fig" src="img/n25_q13.png" alt="box plot example">
+<p>Worked: 18, 27, 34, 52, 54, 59, 61, 68, 78, 82, 85, 87, 91, 93, 100 gives Q1 = 52, median = 68, Q3 = 87, IQR = 35 (see Nov25 Q13).</p>
+<h4>z-score</h4>
+```gbox
+z = (x - mean) / sd         how many standard deviations one value is from the mean
+```
+<p>Example: mean 60, SD 10, mark 80 gives z = 2. Standard deviation says how spread out the values are; the standard error says how reliable the sample mean is.</p>
+
+=== 3.2
+Q: Nov25 Q19b
+<p><b>Estimation</b> infers a population value from a sample. <b>Point estimation</b> gives a single value (the sample mean is the point estimate of the population mean). <b>Interval estimation</b> gives a range likely to contain the population parameter: a <b>confidence interval</b>.</p>
+```gbox
+standard error     SE = s / sqrt(n)         (good estimate when n > 30)
+confidence interval   xbar +- Z x s / sqrt(n)
+Z = 1.645 for 90%, 1.96 for 95%, 2.576 for 99% confidence
+```
+<p>Teacher's example: 97 women, s = 64.9, mean cholesterol 261.75, 95%: SE = 64.9 / sqrt(97) = 6.59, margin = 1.96 x 6.59 = 12.92, so the interval is (248.83, 274.67).</p>
+<p>Outliers affect the mean; remove them or use the median. Other ways to measure the variability of an estimate: the sampling distribution of the mean, the empirical standard error, and <b>bootstrapping</b> (resampling the sample with replacement many times).</p>
+<p>Population = all members; sample = part of the population used to describe it; a statistic describes a sample, a parameter describes the population.</p>
+
+=== 3.3
+Q: Nov25 Q19a, Nov24 Q19a, Nov24 Q19b, Apr26 Q3, REV Q1, PP Q2, PP Q3, PS Q1, PS Q2, PS Q3, Apr24 Q13
+<h4>Covariance and correlation</h4>
+<ul><li><b>Covariance</b> says whether two variables move together (positive), oppositely (negative) or not related (zero); it ranges from -infinity to +infinity and depends on units.</li><li><b>Correlation</b> measures how strongly two variables are related; it ranges from -1 to +1. Both only measure <b>linear</b> relationships, and correlation is not causation.</li></ul>
+<h4>Pearson correlation</h4>
+```gbox
+r = sum[(x - xbar)(y - ybar)] / sqrt( sum(x - xbar)^2 x sum(y - ybar)^2 )  =  covariance / (sd_x x sd_y)
+```
+<p>Table to draw: x, y, x - xbar, y - ybar, product, (x - xbar)^2, (y - ybar)^2, each with a total. Then substitute.</p>
+<table class="work"><tr><th>r</th><th>Interpretation</th></tr><tr><td>0.8 to 1</td><td>very strong positive</td></tr><tr><td>0.6 to 0.8</td><td>strong positive</td></tr><tr><td>0.4 to 0.6</td><td>moderate</td></tr><tr><td>0.2 to 0.4</td><td>weak</td></tr><tr><td>0 to 0.2</td><td>very weak or none</td></tr></table>
+<p>Negative values read the same way, with the variables moving in opposite directions. Pearson does not work well with outliers and misses non-linear relationships.</p>
+<h4>Spearman rank correlation</h4>
+<p>Measures a <b>monotonic</b> relationship using ranks; use it when the relation is non-linear, the data is ordinal, there are outliers, or ranks are given.</p>
+```gbox
+rho = 1 - 6 sum d^2 / ( n (n^2 - 1) ),      d = rank of x - rank of y
+```
+<ol class="steps"><li>Given X and Y (ranks may already be given).</li><li>If not given, rank both: smallest = 1.</li><li><b>Ties:</b> values that repeat share the average of the ranks they occupy (two 67s at ranks 6 and 7 both get 6.5).</li><li>Find d and d^2 and total d^2.</li><li>Substitute into rho and interpret.</li></ol>
+<p>Pearson vs Spearman: actual values vs ranks; linear vs monotonic; sensitive vs robust to outliers.</p>
+
+=== 3.4
+Q: Nov25 Q5, Nov24 Q13, Apr26 Q8, Apr24 Q5
+<p>A <b>hypothesis</b> is a claim about a population tested with sample data. Two competing statements:</p>
+<ul><li><b>H0, null hypothesis:</b> assumed true until the evidence says otherwise; it always contains the equality (=, &lt;= or &gt;=).</li><li><b>H1, alternative hypothesis:</b> contradicts H0 (&lt;, &gt; or not equal).</li></ul>
+<table class="work"><tr><th>Claim wording</th><th>H0</th><th>H1</th><th>Test</th></tr>
+<tr><td>"is different from / no longer equals 5 g"</td><td>mu = 5</td><td>mu &ne; 5</td><td>two-tailed</td></tr>
+<tr><td>"greater than / overfilled / improved"</td><td>mu = (or &lt;=) value</td><td>mu &gt; value</td><td>right-tailed</td></tr>
+<tr><td>"less than / too high"</td><td>mu = (or &gt;=) value</td><td>mu &lt; value</td><td>left-tailed</td></tr></table>
+<p>If the claim itself contains the equality (for example "at least 130" or "no longer than 10"), the claim is H0.</p>
+<h4>The Z-test (population sigma known, or n large)</h4>
+<ol class="steps"><li>State H0 and H1 and the significance level alpha (5% typical).</li><li>Find the critical value: right- or left-tailed 1.645 at 5%; two-tailed 1.96 at 5%.</li><li>Compute <code>z = (xbar - mu) / (sigma / sqrt(n))</code>.</li><li>Decide: if z falls in the rejection region (beyond the critical value) <b>reject H0</b>; otherwise do not reject.</li><li>Write the conclusion in words.</li></ol>
+<p>Worked: n = 50, xbar = 7.2, mu = 6.5, sigma = 1.5 gives z = 3.30 &gt; 1.645, so reject H0 (Nov24 Q13).</p>

@@ -1,0 +1,4 @@
+sim(X, Y) = (5x4 + 3x0 + 0x2) / (sqrt(5^2+3^2+0^2) x sqrt(4^2+0^2+2^2)) = 20 / (sqrt34 x sqrt20) = 20 / (5.831 x 4.472) = 0.767
+sim(X, Z) = (5x1 + 3x3 + 0x4) / (sqrt34 x sqrt(1^2+3^2+4^2)) = 14 / (sqrt34 x sqrt26) = 14 / (5.831 x 5.099) = 0.471
+sim(Y, Z) = (4x1 + 0x3 + 2x4) / (sqrt20 x sqrt26) = 12 / (4.472 x 5.099) = 0.526
+predicted rating of Item 3 for X = (sim(X,Y) x r(Y,3) + sim(X,Z) x r(Z,3)) / (sim(X,Y) + sim(X,Z)) = (0.767 x 2 + 0.471 x 4) / (0.767 + 0.471) = 2.76

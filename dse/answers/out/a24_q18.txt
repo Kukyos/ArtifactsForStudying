@@ -1,0 +1,39 @@
+(10, 4)
+age        int64
+hours      int64
+marks    float64
+dept      object
+dtype: object
+   age  hours  marks dept
+0   19      2   48.0  CSE
+1   20      3   52.0  ECE
+2   21      4   60.0  CSE
+age      0
+hours    0
+marks    1
+dept     0
+dtype: int64
+duplicate rows: 0
+             age      hours     marks
+count  10.000000  10.000000  10.00000
+mean   23.300000   4.200000  63.50000
+std     7.717944   2.250926  12.95505
+min    19.000000   1.000000  48.00000
+25%    20.000000   3.000000  54.25000
+50%    21.000000   3.500000  60.00000
+75%    22.000000   5.750000  70.50000
+max    45.000000   8.000000  88.00000
+dept
+CSE    4
+ECE    3
+AI     3
+Name: count, dtype: int64
+        age  hours  marks
+age    1.00  -0.37   0.05
+hours -0.37   1.00   0.91
+marks  0.05   0.91   1.00
+dept
+AI     69.000000
+CSE    65.500000
+ECE    55.333333
+Name: marks, dtype: float64

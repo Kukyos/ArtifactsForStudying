@@ -1,0 +1,5 @@
+n = 10, mean of Hours = 5.5, mean of Marks = 65.5
+b1 = 552.5 / 82.5 = 6.697
+b0 = mean y - b1 x mean x = 65.5 - 6.697 x 5.5 = 28.6667
+regression line:  y = 28.667 + 6.697 x
+x = 6.5  ->  y = 28.667 + 6.697 x 6.5 = 72.2

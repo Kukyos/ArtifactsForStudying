@@ -1,0 +1,5 @@
+sorted data : 10, 15, 20, 25, 30
+n = 5, sum = 100
+mean   = sum / n = 100 / 5 = 20
+median = middle value (position 3) = 20
+mode   = 10, 15, 20, 25, 30 (occurs 1 times)

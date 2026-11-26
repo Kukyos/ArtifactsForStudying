@@ -7,6 +7,7 @@
     { id: 'dbms',   name: 'Database Management Systems', tag: '23CS2013', path: 'dbms/' },
     { id: 'webtech', name: 'Web Technology',       tag: '23CS2048', path: 'webtech/' },
     { id: 'quantum', name: 'Quantum Computing',    tag: '23CS2037', path: 'quantum/' },
+    { id: 'dse',     name: 'Data Science Ecosystem', tag: '23CS2024', path: 'dse/' },
     { id: 'pandas', name: 'Pandas Drill',         tag: 'DSE lab',  path: 'pandas/' },
     { id: 'sql',    name: 'SQL*Plus Drill',        tag: 'DBMS lab', path: 'sql/' }
   ];

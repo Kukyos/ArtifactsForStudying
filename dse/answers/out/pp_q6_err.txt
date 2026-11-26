@@ -1,0 +1,3 @@
+SSE = 9.6, SST = 419.2
+MSE = SSE / n = 1.92, RMSE = 1.386
+R^2 = 1 - SSE/SST = 0.9771

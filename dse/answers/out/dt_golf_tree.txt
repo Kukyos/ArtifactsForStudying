@@ -1,0 +1,7 @@
+Outlook = Overcast -> Yes
+Outlook = Rainy
+    Windy = False -> Yes
+    Windy = True -> No
+Outlook = Sunny
+    Humidity = High -> No
+    Humidity = Normal -> Yes

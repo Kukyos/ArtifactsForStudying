@@ -1,0 +1,7 @@
+Point | Rating x1 | Budget x2 | Class | squared differences, sum | distance d | rank
+A | 8.5 | 50 | Must Watch | 2.25 + 1600 = 1602.25 | 40.03 | 3
+B | 6 | 120 | Skip | 1 + 900 = 901 | 30.02 | 2
+C | 7.8 | 80 | Must Watch | 0.64 + 100 = 100.64 | 10.03 | 1
+D | 5.5 | 150 | Skip | 2.25 + 3600 = 3602.25 | 60.02 | 4
+E | 9 | 30 | Must Watch | 4 + 3600 = 3604 | 60.03 | 5
+F | 4 | 200 | Skip | 9 + 12100 = 12109 | 110.04 | 6

@@ -1,0 +1,5 @@
+sorted data : 10, 12, 15, 15, 15, 18, 20, 25, 30
+n = 9, sum = 160
+mean   = sum / n = 160 / 9 = 17.78
+median = middle value (position 5) = 15
+mode   = 15 (occurs 3 times)

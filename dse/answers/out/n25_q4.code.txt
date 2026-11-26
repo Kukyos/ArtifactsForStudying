@@ -1,0 +1,4 @@
+import pandas as pd
+
+df = pd.DataFrame({'name': ['asha', 'ravi', 'meena', 'john'], 'marks': [72, 91, 65, 88]})
+print(df.sort_values(by='marks', ascending=False))

@@ -1,0 +1,1 @@
+step 1: 4 pairs share the smallest distance; step 2: 3 pairs share the smallest distance; step 3: 2 pairs share the smallest distance

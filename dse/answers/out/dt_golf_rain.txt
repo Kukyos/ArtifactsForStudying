@@ -1,0 +1,4 @@
+Attribute | class counts and entropy of each branch | weighted entropy | Information gain
+Temperature | Cool: 1 No, 1 Yes, E = 1; Mild: 1 No, 2 Yes, E = 0.918 | 0.951 | 0.02
+Humidity | High: 1 No, 1 Yes, E = 1; Normal: 1 No, 2 Yes, E = 0.918 | 0.951 | 0.02
+Windy | False: 0 No, 3 Yes, E = 0; True: 2 No, 0 Yes, E = 0 | 0 | 0.971

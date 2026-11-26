@@ -1,0 +1,33 @@
+=== 5.1
+Q: Nov25 Q9, Nov24 Q10, Nov24 Q24a, Apr26 Q10, Apr26 Q16, Apr26 Q22a, Apr26 Q22b, Apr26 Q23a, Apr26 Q24b, Apr24 Q16, Apr24 Q23a, Apr24 Q24
+<p>A <b>recommender system</b> is a tool that predicts what a user will like and suggests it automatically. It is an application of machine learning that works on large numbers of items (movies, products, songs). Netflix and YouTube, Amazon and Flipkart, Facebook and LinkedIn all use it.</p>
+<table class="work"><tr><th></th><th>Search engine</th><th>Recommender system</th></tr><tr><td>Type</td><td>pull: the user asks</td><td>push: the system suggests</td></tr><tr><td>Works on</td><td>keywords of the query</td><td>past preferences</td></tr><tr><td>Purpose</td><td>information retrieval</td><td>information discovery</td></tr></table>
+<h4>Why needed, and data used</h4>
+<ul><li>Too much information; less effort for the user; more sales, engagement and retention; discovery of new items.</li><li><b>Explicit</b> data: ratings, comments, likes. <b>Implicit</b> data: searches, purchase history, clicks. Also item details (keywords, categories) and user details (profile), and user-item interactions.</li></ul>
+<h4>Content-based filtering: "show me more of what I liked"</h4>
+<p>Does not use other users. It describes every <b>item</b> (genre, artist, keywords) and the user <b>profile</b> (from the items liked), then recommends the items most similar to the profile.</p>
+<ol class="steps"><li>Describe each item as a vector (genre flags or TF-IDF of words).</li><li>Build the user profile.</li><li>Compute <b>cosine similarity</b> between the profile and the items.</li><li>Recommend the highest.</li></ol>
+```gbox
+TF = word count in document / total words      IDF = log(total documents / documents containing the word)
+TF-IDF = TF x IDF          (words in every document, like "the", get IDF = 0)
+sim(a, b) = sum(ai bi) / ( sqrt(sum ai^2) x sqrt(sum bi^2) )      1 = same direction, 0 = nothing in common
+```
+<p><b>Advantages:</b> no other users needed, works for new items, easy to explain. <b>Limitations:</b> only similar items (over-specialisation), needs good item features, new-user cold start.</p>
+
+=== 5.2
+Q: Nov25 Q23a, Nov24 Q24b
+<p><b>Collaborative filtering:</b> "tell me what is popular among people like me". It uses only the user-item ratings (the <b>utility matrix</b>, mostly empty, 0 = not rated) and does not need to understand the items. <b>User-based:</b> compare users. <b>Item-based:</b> compare items.</p>
+<ol class="steps"><li>Build the utility matrix.</li><li>Compute the similarity between users (cosine or Pearson).</li><li>Pick the K most similar users who rated the item.</li><li>Predict the rating: the average of their ratings, or the weighted <code>R = sum(sim x rating) / sum(sim)</code>; recommend the highest predictions.</li></ol>
+<p><b>Pearson (centred cosine):</b> some users rate high and some low, so subtract each user's average rating before the cosine; a result of 0 means nothing in common and a negative value means opposite tastes.</p>
+<p>Teacher's example: users A (4, 0, 0, 5, 1, 0, 0) and B (5, 5, 4, 0, 0, 0, 0): dot product = 20, |A| = sqrt 42, |B| = sqrt 66, so cosine = 20 / (6.48 x 8.12) = 0.38.</p>
+<p><b>Limits:</b> needs a large community, the cold-start problem for new users and items, sparsity of the utility matrix.</p>
+<table class="work"><tr><th></th><th>Content-based</th><th>Collaborative</th></tr><tr><td>Based on</td><td>features of items</td><td>ratings of other users</td></tr><tr><td>Other users</td><td>not needed</td><td>needed</td></tr><tr><td>New item</td><td>works</td><td>cold start</td></tr><tr><td>Weakness</td><td>suggests only similar items</td><td>similar users may still differ</td></tr></table>
+
+=== 5.3
+Q: Nov25 Q15, Nov25 Q23b, Nov24 Q16
+<h4>Hybrid recommenders: seven ways to combine</h4>
+<table class="work"><tr><th>Method</th><th>How it works</th></tr><tr><td>Weighted</td><td>add both scores with fixed weights, a x CF + (1 - a) x CBF</td></tr><tr><td>Switching</td><td>choose one method for the situation</td></tr><tr><td>Mixed</td><td>show the results of both together</td></tr><tr><td>Cascade</td><td>one ranks, the other refines or breaks ties</td></tr><tr><td>Feature combination</td><td>features of one feed the other's model</td></tr><tr><td>Feature augmentation</td><td>the output of one becomes an input of the main one</td></tr><tr><td>Meta-level</td><td>the model learned by one becomes the input of the other</td></tr></table>
+<p>Example: a hotel recommender uses content-based filtering (price, location, amenities) for a new guest and adds collaborative filtering (ratings of similar guests) for a returning guest. Benefits: higher accuracy, more variety, better cold-start handling.</p>
+<h4>Evaluating a recommender</h4>
+<ul><li><b>Prediction error:</b> MAE = (1/n) sum |actual - predicted|; RMSE = sqrt((1/n) sum (actual - predicted)^2) (punishes big errors more). Lower is better.</li><li><b>Top-N quality:</b> hit rate = hits / users; ARHR = average of 1/rank of the hits (top positions earn more credit).</li><li><b>Beyond accuracy:</b> coverage (share of items that can be recommended), diversity = 1 - average similarity of the recommended items, novelty (how unpopular the items are).</li></ul>
+<p>Explicit data (ratings) vs implicit data (clicks, purchases, watch time): explicit is accurate but scarce, implicit is plentiful but noisy.</p>

@@ -1,0 +1,298 @@
+=== Apr26 Q1
+<p>Two applications of data science: <b>(1) recommendation systems</b> (Netflix, YouTube, Amazon suggesting what to watch or buy) and <b>(2) fraud and risk detection</b> in banking (flagging unusual transactions). Others: healthcare diagnosis, demand forecasting, speech and image recognition.</p>
+
+=== Apr26 Q2
+<p>The three types of machine learning: <b>supervised</b> learning (labelled data), <b>unsupervised</b> learning (unlabelled data) and <b>reinforcement</b> learning (rewards and penalties).</p>
+
+=== Apr26 Q3
+<p>Correlation measures how strongly two variables are related, and in which direction. It lies between -1 and +1: positive (both rise together), negative (one rises as the other falls), and 0 (no linear relationship). It shows association, not cause and effect.</p>
+
+=== Apr26 Q4
+<table class="work"><tr><th></th><th>Classification</th><th>Regression</th></tr>
+<tr><td>Output</td><td>a category / class label</td><td>a continuous number</td></tr>
+<tr><td>Example</td><td>spam or not spam, disease or no disease</td><td>house price, sales, marks</td></tr>
+<tr><td>Algorithms</td><td>logistic regression, KNN, decision tree</td><td>linear, multiple, polynomial regression</td></tr></table>
+
+=== Apr26 Q5
+```gbox
+mean = (10 + 15 + 20 + 25 + 30) / 5 = 100 / 5 = 20
+```
+<p>Mean = <b>20</b>.</p>
+
+=== Apr26 Q6
+<p>Customer segmentation groups customers by similar behaviour and there are no labels telling which group a customer belongs to, so it is <b>unsupervised learning</b> (clustering, e.g. K-means).</p>
+
+=== Apr26 Q7
+<p>Exploratory Data Analysis (EDA) is used to <b>understand the data before modelling</b>: summarise it with statistics and plots, find patterns, relationships, missing values and outliers, check assumptions, and decide what cleaning and which model to use.</p>
+
+=== Apr26 Q8
+<p><b>Hypothesis testing</b> is a statistical procedure that uses sample data to decide whether a claim about a population (the null hypothesis H0) should be rejected in favour of the alternative hypothesis H1, at a chosen significance level (alpha).</p>
+
+=== Apr26 Q9
+<p><b>Clustering</b> is an unsupervised learning technique that groups unlabelled objects so that objects in the same cluster are similar to each other (high intra-cluster similarity) and different from those in other clusters (low inter-cluster similarity). Examples: K-means, hierarchical clustering.</p>
+
+=== Apr26 Q10
+<p>Two recommendation techniques: <b>content-based filtering</b> and <b>collaborative filtering</b> (a third is the hybrid of both).</p>
+
+=== Apr26 Q11
+<p>Methods for handling missing values (any three):</p>
+<ol><li><b>Delete</b> the rows or columns that contain nulls (<code>df.dropna()</code>); suitable only when few values are missing.</li>
+<li><b>Impute with a central value</b>: mean for symmetric numeric data, median for skewed data, mode for categorical data (<code>df['col'].fillna(df['col'].mean())</code>).</li>
+<li><b>Fill from neighbours</b>: previous or next value (<code>ffill()</code>, <code>bfill()</code>) or interpolation (<code>interpolate()</code>) for ordered data.</li>
+<li>Fill with a constant, or predict the value with a model (regression, KNNImputer).</li></ol>
+
+=== Apr26 Q12
+<p>Data (n = 9, sorted): 10, 15, 18, 22, <b>24</b>, 28, 30, 35, 40</p>
+<ul><li>Min = 10, Max = 40, Median = 5th value = <b>24</b></li>
+<li>Q1 = median of the lower half (10, 15, 18, 22) = (15 + 18) / 2 = <b>16.5</b></li>
+<li>Q3 = median of the upper half (28, 30, 35, 40) = (30 + 35) / 2 = <b>32.5</b></li></ul>
+```table
+@@OUT a26_q12_five@@
+```
+```gbox
+@@OUT a26_q12_fence@@
+```
+<img class="fig" src="img/a26_q12.png" alt="box plot: min 10, Q1 16.5, median 24, Q3 32.5, max 40">
+<p>The box runs from 16.5 to 32.5 with the median line at 24; the whiskers reach 10 and 40; no outliers.</p>
+
+=== Apr26 Q13
+<p>Logistic regression is a <b>classification</b> algorithm that predicts the <b>probability</b> of a binary outcome (Yes/No, 1/0). A linear equation z = b0 + b1 x is passed through the sigmoid (S-shaped) function so the output lies between 0 and 1, and a threshold (usually 0.5) decides the class:</p>
+```gbox
+p = 1 / (1 + e^-z),   z = b0 + b1 x       class = 1 if p >= 0.5, else 0
+```
+<p><b>Real-world example:</b> will a student pass based on hours studied? Take b0 = -4 and b1 = 1 (illustrative values).</p>
+```table
+@@OUT logit_example@@
+```
+<img class="fig" src="img/sigmoid.png" alt="sigmoid curve of probability of passing against hours studied">
+<p>A student who studies 6 hours has a probability 0.88 of passing, so is classified Pass. (Other examples: employee promotion from performance rating, spam or not spam, disease or no disease.)</p>
+
+=== Apr26 Q14
+<table class="work"><tr><th></th><th>Clustering</th><th>Classification</th></tr>
+<tr><td>Learning</td><td>unsupervised</td><td>supervised</td></tr>
+<tr><td>Data</td><td>unlabelled; groups are not known in advance</td><td>labelled; classes are known in advance</td></tr>
+<tr><td>Goal</td><td>discover natural groups</td><td>assign a new item to a known class</td></tr>
+<tr><td>Real-world use</td><td>segment customers by buying behaviour, group similar news or students, detect anomalies</td><td>spam filter, loan approval, disease diagnosis, handwriting recognition</td></tr>
+<tr><td>Output</td><td>cluster number (needs interpretation)</td><td>class label with a measurable accuracy</td></tr></table>
+
+=== Apr26 Q15
+<p>Data visualisation turns data into plots so that patterns are seen at a glance. Its role:</p>
+<ul><li>shows the <b>distribution</b> of a variable (histogram, box plot) and its centre, spread and skew;</li>
+<li>shows <b>relationships</b> between variables (scatter plot) and trends over time (line graph);</li>
+<li>makes <b>outliers</b>, missing patterns and errors easy to spot before modelling;</li>
+<li><b>compares</b> categories (bar chart, pie chart) and communicates the findings to non-technical people.</li></ul>
+
+=== Apr26 Q16
+<table class="work"><tr><th>Advantages</th><th>Limitations</th></tr>
+<tr><td>Does not need other users; works for a single user</td><td>Recommends only items similar to what the user already liked (over-specialisation, no surprises)</td></tr>
+<tr><td>Can recommend new or unpopular items (no cold start for items)</td><td>Needs good item descriptions or features; hard for images, music and video</td></tr>
+<tr><td>Recommendations are easy to explain ("because you liked X")</td><td>The new user needs a profile first (user cold start)</td></tr>
+<tr><td>No privacy exposure of other users' data</td><td>Cannot use the tastes of the wider community</td></tr></table>
+
+=== Apr26 Q17a
+<p>The data science life cycle is the sequence of stages followed to turn raw data into decisions:</p>
+<img class="fig" src="img/lifecycle.png" alt="data science life cycle with feedback loop">
+<ol class="steps">
+<li><b>Discovery / problem understanding:</b> define the business question and the data sources.</li>
+<li><b>Data collection:</b> web logs, social media, census data, APIs, IoT sensors, databases.</li>
+<li><b>Data preparation:</b> clean errors, missing values and wrong formats; transform (normalise) and engineer features.</li>
+<li><b>Model planning:</b> explore the data with statistics, visualisation and correlation; choose techniques.</li>
+<li><b>Model building:</b> split into training and testing data, apply regression, classification or clustering, evaluate.</li>
+<li><b>Operationalise:</b> deploy the model with reports and APIs, monitor its performance.</li>
+<li><b>Communicate results:</b> present the findings and decide whether the project succeeded; the feedback restarts the cycle.</li>
+</ol>
+
+=== Apr26 Q17b
+<ol>
+<li><b>Healthcare:</b> disease prediction from records and scans, personalised medicine, epidemic forecasting.</li>
+<li><b>Finance and banking:</b> fraud detection, credit scoring, risk analysis, stock trend prediction.</li>
+<li><b>E-commerce and retail:</b> recommendations, price comparison, demand forecasting, customer segmentation.</li>
+<li><b>Search and advertising:</b> internet search ranking, targeted ads from past behaviour.</li>
+<li><b>Transport and logistics:</b> airline route planning, delivery route optimisation (DHL, FedEx), self-driving cars.</li>
+<li><b>Image and speech recognition:</b> face tagging on Facebook, voice assistants (Alexa, Siri), chatbots.</li>
+</ol>
+<p>Also: gaming and augmented reality, manufacturing (predictive maintenance), education, agriculture.</p>
+
+=== Apr26 Q18a
+<p>EDA is done step by step before modelling:</p>
+<ol class="steps">
+<li><b>Understand the problem and the data:</b> what each column means, its type (numerical or categorical), size (<code>shape</code>, <code>info()</code>, <code>head()</code>).</li>
+<li><b>Clean the data:</b> find and treat missing values, duplicates, wrong data types and inconsistent entries.</li>
+<li><b>Summarise with descriptive statistics:</b> mean, median, mode, variance, standard deviation, quartiles (<code>describe()</code>); counts for categorical columns.</li>
+<li><b>Univariate analysis:</b> study one variable at a time with histograms, box plots (spread, skew, outliers) and bar charts.</li>
+<li><b>Bivariate and multivariate analysis:</b> relationships between variables with scatter plots, correlation (Pearson, Spearman), a correlation heat map, group-wise comparisons.</li>
+<li><b>Detect outliers</b> (box-plot 1.5 x IQR rule) and decide to keep, cap or remove them.</li>
+<li><b>Draw conclusions and plan:</b> note patterns, which features matter, whether to transform or scale them, and which model suits the data.</li>
+</ol>
+
+=== Apr26 Q18b
+<p>Data (n = 9): 10, 15, 12, 18, 15, 20, 25, 15, 30</p>
+```gbox
+@@OUT a26_q18b@@
+```
+<p>Mean = 17.78 (160 / 9), median = 15, mode = 15 (it occurs 3 times). Mean &gt; median, so the data is slightly right-skewed (pulled up by 25 and 30).</p>
+
+=== Apr26 Q19a
+<p>Model: y = b0 + b1 x, b1 = sum (x - xbar)(y - ybar) / sum (x - xbar)^2, b0 = ybar - b1 xbar.</p>
+```table
+@@OUT a26_q19a@@
+```
+```gbox
+@@OUT a26_q19a_calc@@
+```
+<p><b>The regression equation is y = 2.2 + 0.6 x.</b></p>
+<img class="fig" src="img/a26_q19a.png" alt="scatter plot and regression line y = 2.2 + 0.6x">
+<p>For example x = 6 gives y = 2.2 + 3.6 = 5.8. R^2 = 0.6, so the line explains 60% of the variation in y.</p>
+
+=== Apr26 Q19b
+<p>Linear regression is a <b>supervised</b> technique that predicts a continuous dependent variable y from one or more independent variables x by fitting the best straight line. For one variable (simple linear regression): <b>y = b0 + b1 x</b>, b0 = intercept, b1 = slope. The line is found by <b>ordinary least squares</b>, which minimises the sum of the squared residuals (y - y_hat):</p>
+```gbox
+b1 = sum (x - xbar)(y - ybar) / sum (x - xbar)^2
+b0 = ybar - b1 xbar
+```
+<p><b>Example:</b> temperature (x) and ice-cream sales in litres (y) for five days: (20, 13), (25, 21), (30, 25), (35, 35), (40, 38).</p>
+```table
+@@OUT pp_q6@@
+```
+```gbox
+@@OUT pp_q6_calc@@
+```
+<img class="fig" src="img/pp_q6.png" alt="ice cream sales against temperature with regression line">
+<p>The line y = -12 + 1.28 x predicts about 29 litres at 32 degrees. Quality is judged with MSE, RMSE and R^2.</p>
+
+=== Apr26 Q20a
+<p>Points: P1 (1,1), P2 (2,2), P3 (8,8), P4 (9,9). Initial centroids C1 = (1,1), C2 = (8,8). Euclidean distance d = sqrt((x - c1)^2 + (y - c2)^2).</p>
+```table
+@@OUT a26_q20a_it1@@
+```
+<p>Updated centroids:</p>
+```gbox
+@@OUT a26_q20a_c1@@
+```
+<p><b>After one iteration: C1 = {(1,1), (2,2)} with centroid (1.5, 1.5); C2 = {(8,8), (9,9)} with centroid (8.5, 8.5).</b> A second pass gives the same assignment, so the algorithm has already converged.</p>
+
+=== Apr26 Q20b
+<p>K-means is an <b>unsupervised, partition-based</b> clustering algorithm that groups unlabelled data into a chosen number K of clusters by minimising the distance between each point and the centre (centroid) of its cluster. Euclidean distance is used.</p>
+<h4>Algorithm</h4>
+<ol class="steps">
+<li>Decide the number of clusters K (for example with the elbow method).</li>
+<li>Choose K initial centroids (random points or chosen seeds).</li>
+<li>Calculate the distance of every data point to each centroid.</li>
+<li>Assign every point to its nearest centroid.</li>
+<li>Recompute each centroid as the mean of the points in its cluster.</li>
+<li>Repeat steps 3 to 5 until the centroids stop moving (no point changes cluster).</li>
+</ol>
+<img class="fig" src="img/kmeans_flow.png" alt="flow chart of the K-means algorithm">
+<p><b>Advantages:</b> simple, fast (time O(n k t)), every point goes to exactly one cluster. <b>Limitations:</b> K must be chosen beforehand, result depends on the starting centroids (local optimum), sensitive to outliers, not suitable for non-convex clusters.</p>
+
+=== Apr26 Q21a
+<p>A decision tree is built by ID3: at each node choose the attribute with the highest information gain, split, and repeat until the groups are pure. Example: classify the speed of a vehicle as Slow or Fast.</p>
+```table
+Road type | Obstruction | Speed limit | Speed
+Steep | Yes | Yes | Slow
+Steep | No | Yes | Slow
+Flat | Yes | No | Fast
+Steep | No | No | Fast
+```
+<p><b>Step 1: entropy of the parent (2 Slow, 2 Fast).</b></p>
+```gbox
+@@OUT dt_speed_E@@
+```
+<p><b>Step 2: information gain of each attribute.</b></p>
+```table
+@@OUT dt_speed@@
+```
+<p>Speed limit has the highest gain (1), so it becomes the root. Both of its branches are pure, so they are leaves and the tree is finished.</p>
+<img class="fig" src="img/dt_speed.png" alt="decision tree with Speed limit at the root: No gives Fast, Yes gives Slow">
+<p><b>Rule:</b> if Speed limit = Yes then Slow, else Fast. (The teacher's slide rounds the entropy of Steep to 0.9 and so shows IG(Road type) = 0.325; the exact value is 0.311.)</p>
+
+=== Apr26 Q21b
+<p><b>Entropy</b> measures the impurity (uncertainty, disorder) of a set of examples:</p>
+```gbox
+Entropy(S) = - sum p_i log2 (p_i)
+```
+<ul><li>Entropy = 0: all examples belong to one class (pure, no uncertainty).</li><li>Entropy = 1: two classes equally mixed (maximum uncertainty).</li></ul>
+<p><b>Information gain</b> is the reduction in entropy obtained by splitting on an attribute A; ID3 splits on the attribute with the highest gain:</p>
+```gbox
+Gain(S, A) = Entropy(S) - sum over values v of A of  (|Sv| / |S|) x Entropy(Sv)
+```
+<p><b>Example</b> (the speed data of Q21a): parent has 2 Slow and 2 Fast, so Entropy = -(1/2)log2(1/2) - (1/2)log2(1/2) = 1. Splitting on Speed limit gives two pure groups (entropy 0 each), weighted entropy = (2/4)(0) + (2/4)(0) = 0, so Gain = 1 - 0 = <b>1</b>. Splitting on Obstruction leaves both groups half-and-half (entropy 1), so Gain = 1 - 1 = <b>0</b>: it tells nothing about the speed.</p>
+
+=== Apr26 Q22a
+<p>A <b>recommender system</b> predicts what a user will like and suggests it automatically (movies, products, songs), using the user's preferences, past behaviour or the behaviour of similar users. It is a <i>push</i> system (the system suggests), unlike a search engine (the user asks).</p>
+<h4>Classification</h4>
+<table class="work"><tr><th>Type</th><th>Basis</th></tr>
+<tr><td><b>Content-based filtering</b></td><td>features of the items and the user's profile: recommends items similar to those liked before (TF-IDF, cosine similarity)</td></tr>
+<tr><td><b>Collaborative filtering</b></td><td>ratings of other users: user-based (similar users) or item-based (similar items), cosine or Pearson similarity on the utility matrix</td></tr>
+<tr><td><b>Hybrid</b></td><td>a combination of both (weighted, switching, mixed, cascade, feature combination, feature augmentation, meta-level) to reduce cold start and add variety</td></tr></table>
+<p>Data used: explicit (ratings, likes, comments) and implicit (searches, purchases, clicks).</p>
+
+=== Apr26 Q22b
+<table class="work"><tr><th></th><th>Collaborative filtering</th><th>Content-based filtering</th></tr>
+<tr><td>Based on</td><td>ratings and behaviour of other (similar) users</td><td>features of the items the user liked</td></tr>
+<tr><td>Other users needed</td><td>yes, a large community</td><td>no</td></tr>
+<tr><td>Item details needed</td><td>no, it does not need to understand items</td><td>yes (genre, keywords, tags)</td></tr>
+<tr><td>Method</td><td>cosine / Pearson similarity between users or items</td><td>TF-IDF vectors and cosine similarity between items</td></tr>
+<tr><td>New user / new item</td><td>cold start for both</td><td>works for new items; new user needs a profile</td></tr>
+<tr><td>Variety</td><td>can surprise the user with unexpected items</td><td>suggests only similar items</td></tr>
+<tr><td>Weakness</td><td>sparse utility matrix</td><td>over-specialisation</td></tr></table>
+
+=== Apr26 Q23a
+<p><b>Online bookstore: a hybrid recommender.</b></p>
+<ol class="steps">
+<li><b>Data:</b> books (title, author, genre, keywords, price), users (age, past purchases, browsing, wish-list) and ratings and reviews. Explicit data is ratings; implicit data is purchases, clicks and time spent.</li>
+<li><b>Content-based part:</b> describe each book as a vector (genre, author, keywords by TF-IDF); build a user profile from the books the user bought or liked; recommend the books with the highest cosine similarity to the profile. This also serves new books and new users with a few purchases.</li>
+<li><b>Collaborative part:</b> build the user-book utility matrix; find users with similar rating patterns (cosine or Pearson similarity); recommend the books they liked that this user has not read (or item-based: "customers who bought this also bought").</li>
+<li><b>Hybrid:</b> score = a x CF + (1 - a) x CBF, or switch: content-based for a new customer, collaborative once enough ratings exist.</li>
+<li><b>Output:</b> a ranked top-N list on the home page and the product page, excluding books already bought.</li>
+<li><b>Evaluation:</b> MAE and RMSE of predicted ratings, hit rate and ARHR for the top-N list, plus coverage, diversity and novelty; run A/B tests on conversion.</li>
+<li><b>Problems to handle:</b> cold start, sparse data, popularity bias, and privacy of purchase history.</li>
+</ol>
+
+=== Apr26 Q23b
+<p>Classification is evaluated from the confusion matrix (rows = actual class, columns = predicted class):</p>
+```table
+Actual \ Predicted | Positive | Negative
+Positive | TP | FN (Type II error)
+Negative | FP (Type I error) | TN
+```
+<table class="work"><tr><th>Metric</th><th>Formula</th><th>Meaning</th></tr>
+<tr><td>Accuracy</td><td>(TP + TN) / (TP + TN + FP + FN)</td><td>share of all predictions that are correct (misleading on imbalanced data)</td></tr>
+<tr><td>Precision</td><td>TP / (TP + FP)</td><td>of those predicted positive, how many really are</td></tr>
+<tr><td>Recall / sensitivity</td><td>TP / (TP + FN)</td><td>of all real positives, how many were found</td></tr>
+<tr><td>Specificity</td><td>TN / (TN + FP)</td><td>of all real negatives, how many were found</td></tr>
+<tr><td>F1-score</td><td>2PR / (P + R)</td><td>harmonic mean of precision and recall</td></tr>
+<tr><td>Error rate</td><td>(FP + FN) / total = 1 - accuracy</td><td>share of wrong predictions</td></tr></table>
+<p>Example (spam filter: TP = 45, FN = 20, FP = 5, TN = 30):</p>
+```gbox
+@@OUT a26_q23b@@
+```
+
+=== Apr26 Q24a
+<p>Data cleaning (pre-processing) removes errors and inconsistencies so the analysis and models are reliable. Techniques:</p>
+<ol>
+<li><b>Handle missing values:</b> drop rows or columns, or impute with the mean, median, mode, a constant, the previous or next value, interpolation, or a model.</li>
+<li><b>Remove duplicates:</b> <code>df.duplicated()</code>, <code>df.drop_duplicates()</code>.</li>
+<li><b>Correct data types and formats:</b> convert text to numbers or dates, make units and date formats uniform.</li>
+<li><b>Fix inconsistent or wrong entries:</b> spelling and case ("Delhi" and "delhi"), invalid values (age = -5), typing errors.</li>
+<li><b>Treat outliers:</b> detect with box plots (1.5 x IQR rule) or z-scores, then keep, cap or remove them.</li>
+<li><b>Transform the data:</b> normalise or standardise numeric columns, encode categorical columns.</li>
+<li><b>Smooth noisy data:</b> binning and smoothing by bin means or boundaries.</li>
+</ol>
+
+=== Apr26 Q24b
+<p><b>Movie recommender using content-based filtering.</b> Idea: recommend movies whose features are similar to those of the movies the user liked.</p>
+<ol class="steps">
+<li><b>Item profile:</b> describe each movie by features such as genre, director, cast, keywords. Genres can be a 0/1 vector; plot keywords are weighted with TF-IDF (TF = word count / total words, IDF = log(total documents / documents containing the word), TF-IDF = TF x IDF).</li>
+<li><b>User profile:</b> built from the movies the user rated high or watched (here: the user liked Movie A).</li>
+<li><b>Similarity:</b> cosine similarity between the profile and every other movie, sim(a, b) = sum(ai bi) / (|a| |b|).</li>
+<li><b>Recommend:</b> sort by similarity and give the top N the user has not watched.</li>
+</ol>
+<p>Worked example with genre vectors (Action, Comedy, Romance, SciFi); the user liked Movie A = (1, 0, 0, 1):</p>
+```table
+@@OUT a26_q24b@@
+```
+```gbox
+ranking: @@OUT a26_q24b_rank@@
+```
+<p>Movie D (Action) is the most similar, so it is recommended first; Movie C shares no genre with A, so it is not recommended. The method needs no other users (works for a new movie) but it only suggests movies similar to what the user already liked.</p>

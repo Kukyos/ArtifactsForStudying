@@ -1,0 +1,25 @@
+import pandas as pd
+
+# 1. read the dataset to a dataframe
+df = pd.read_csv('Customers.csv')
+print(df)
+
+# 2. row labels
+print(df.index)
+
+# 3. statistical information of all qualitative and quantitative attributes
+print(df.describe(include='all'))
+
+# 4. number of null values in each column
+print(df.isnull().sum())
+
+# 5. fill the null values with 0
+df = df.fillna(0)
+print(df)
+
+# 6. annual income x 10, stored in a new column
+df['Annual Income x10'] = df['Annual Income (k$)'] * 10
+print(df)
+
+# 7. rows where age > 25 and genre = Female
+print(df[(df['Age'] > 25) & (df['Genre'] == 'Female')])

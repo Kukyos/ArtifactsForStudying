@@ -1,0 +1,2 @@
+Minimum | Q1 | Median (Q2) | Q3 | Maximum | IQR = Q3 - Q1
+1 | 5 | 9 | 18 | 27 | 13

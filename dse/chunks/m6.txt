@@ -1,0 +1,36 @@
+=== 6.1
+Q: Nov25 Q24, ETH Q1, ETH Q2, ETH Q3, ETH Q4
+<p><b>Ethics in data science</b> is the set of principles that govern how data is handled, to ensure fairness, transparency and accountability and to avoid misuse. The three core pillars are <b>fairness</b>, <b>accountability</b> and <b>transparency</b>.</p>
+<h4>Ethical frameworks and principles</h4>
+<table class="work"><tr><th>Framework</th><th>Idea</th><th>Example</th></tr>
+<tr><td>Utilitarianism</td><td>maximise well-being of the greatest number</td><td>using location data to control an outbreak despite some loss of privacy</td></tr>
+<tr><td>Deontological</td><td>follow moral duties and rules whatever the consequence</td><td>refusing to collect data without explicit consent even if it would improve the service</td></tr>
+<tr><td>Virtue ethics</td><td>moral character: honesty, fairness, compassion</td><td>a developer refusing to build facial recognition for surveillance</td></tr>
+<tr><td>Rights-based / care-based</td><td>protect individual rights; care for vulnerable people</td><td>privacy and autonomy rights</td></tr></table>
+<p>Principles: <b>beneficence</b> (do good), <b>non-maleficence</b> (avoid harm), <b>autonomy</b> (respect choices), <b>justice</b> (fair burdens and benefits), plus fidelity, integrity, respect and responsibility.</p>
+<h4>Privacy and confidentiality</h4>
+<table class="work"><tr><th></th><th>Privacy</th><th>Confidentiality</th></tr><tr><td>Meaning</td><td>the individual's right to control their personal data</td><td>protection of sensitive data once shared, against unauthorised disclosure</td></tr><tr><td>Stage</td><td>before data is shared</td><td>after data is shared</td></tr><tr><td>Responsibility</td><td>mainly the individual</td><td>mainly the data holder</td></tr><tr><td>Breach example</td><td>tracking without consent</td><td>leaking medical records</td></tr></table>
+<p>Types of privacy: informational, physical, decisional, proprietary. Loss of privacy leads to identity theft, profiling, discrimination and distress.</p>
+<h4>Data collection and consent</h4>
+<ul><li><b>Informed consent:</b> people must clearly understand what is collected and how it is used (opt-in, plain language). Issues: secondary use or selling to third parties, misleading terms, unrelated permissions.</li><li><b>GDPR principles:</b> purpose limitation, data minimisation, lawful basis, transparency and fairness, accuracy, storage limitation, integrity and confidentiality. <b>HIPAA</b> governs US medical data.</li><li><b>The 5 C's:</b> consent, confidentiality, control, compliance, communication.</li></ul>
+<h4>Anonymisation and de-identification</h4>
+<ul><li><b>Anonymisation</b> removes all personal identifiers so the data cannot be traced back (irreversible). <b>De-identification</b> removes or masks identifiers but can still be reversed by data matching.</li><li>Techniques: <b>suppression</b> (remove zip codes), <b>generalisation</b> (age 34 becomes 30-39), <b>noise addition</b>, <b>differential privacy</b> (statistical noise so no individual is exposed), k-anonymity, encryption, access control.</li><li><b>Re-identification (linkage attack):</b> joining "anonymous" data with public data to identify people; this is the usual twist of the case-study questions.</li></ul>
+<h4>How to answer a case-study question (12 marks)</h4>
+<ol class="steps"><li>Name the data and the stakeholders from the case.</li><li>Analyse each concern asked for (privacy, confidentiality, consent, re-identification, transparency) and tie it to a fact in the case.</li><li>Ethical measures: opt-in consent, minimisation, purpose limitation, policy, audit, breach notification, compliance.</li><li>Technical measures: anonymisation (k-anonymity), differential privacy, encryption, access control, aggregation, retention limit.</li><li>Close with the 5 C's.</li></ol>
+
+=== 6.2
+Q: Nov25 Q10
+<p><b>Bias</b> is a systematic error that leads to unfair outcomes. Types:</p>
+<table class="work"><tr><th>Type</th><th>Meaning and example</th></tr><tr><td>Historical</td><td>inherited discrimination in the data (past hiring biases)</td></tr><tr><td>Representation</td><td>under-representation of a group (voice assistants failing on regional accents)</td></tr><tr><td>Measurement</td><td>inaccurate proxies (zip code standing for income)</td></tr><tr><td>Algorithmic</td><td>from the model design or learning (credit scores penalising certain zip codes)</td></tr></table>
+<p><b>Fairness</b> means treating individuals and groups equitably, without discrimination on protected attributes (race, gender, age, religion, disability).</p>
+<ul><li><b>Group fairness (demographic parity):</b> the approval rate is the same for each group.</li><li><b>Individual fairness:</b> two applicants with the same credit history and income get the same decision, whatever their gender or race.</li><li><b>Equal opportunity:</b> among those who would repay, the same share of each group is approved.</li></ul>
+<h4>Mitigating bias in ML models</h4>
+<table class="work"><tr><th>Stage</th><th>Actions</th></tr><tr><td>Pre-processing (data)</td><td>diverse data collection, reweighing or oversampling, find and mask proxy features</td></tr><tr><td>In-processing (training)</td><td>fairness constraints in the objective, adversarial debiasing</td></tr><tr><td>Post-processing (deployment)</td><td>continuous audit and monitoring, human in the loop for high-stakes decisions, explainable AI</td></tr></table>
+
+=== 6.3
+Q: Nov25 Q16
+<ul><li><b>Transparency</b> builds trust and allows audit: documentation (datasheets and model cards), open access to datasets and models, and clear communication of model decisions to affected users, especially in healthcare and finance.</li><li><b>Accountability</b> is the obligation of people and organisations to take ultimate responsibility for the outcomes, good and bad, of the AI systems they build and deploy. Three functions: <b>assigning responsibility</b> (who), <b>enabling auditability</b> (how: the process can be examined afterwards) and <b>providing redress and recourse</b> (the fix when a decision is unfair or harmful).</li></ul>
+<h4>Explainability and interpretability</h4>
+<table class="work"><tr><th></th><th>Explainability</th><th>Interpretability</th></tr><tr><td>Meaning</td><td>ability to describe <i>why</i> a model made a specific prediction</td><td>simplicity of the model's structure so a non-expert can follow it</td></tr><tr><td>Example</td><td>a health model explaining the likelihood of a disease from the inputs</td><td>a decision tree for credit scoring with clear approval rules</td></tr></table>
+<p>Techniques: <b>LIME</b> (explains a single prediction of a complex model by approximating it with a simple one), <b>SHAP</b> (feature importance for any model), decision trees (inherently interpretable). Trade-off: high-accuracy models such as deep learning are often hard to interpret, which makes them hard to justify in critical decisions.</p>
+<p>The FAT flow framework applies these across the stages: data gathering (privacy, consent), pre-processing (re-identification, fair relabelling), modelling (discrimination-aware, explainable), evaluation (honest reporting, no p-hacking) and deployment (governance, unintended consequences).</p>

@@ -1,0 +1,4 @@
+H0: mu = 6.5 (no improvement)    H1: mu > 6.5 (satisfaction improved)    one-tailed, alpha = 0.05, critical z = 1.645
+standard error = sigma / sqrt(n) = 1.5 / sqrt(50) = 1.5 / 7.071 = 0.2121
+z = (xbar - mu) / SE = (7.2 - 6.5) / 0.2121 = 3.3
+3.3 > 1.645, so z falls in the rejection region

@@ -1,0 +1,4 @@
+Attribute | split and entropy of each branch | weighted entropy | Information gain
+Road type | Flat: 1 Fast, 0 Slow, E = 0; Steep: 1 Fast, 2 Slow, E = 0.918 | 0.689 | 0.311
+Obstruction | No: 1 Fast, 1 Slow, E = 1; Yes: 1 Fast, 1 Slow, E = 1 | 1 | 0
+Speed limit | No: 2 Fast, 0 Slow, E = 0; Yes: 0 Fast, 2 Slow, E = 0 | 0 | 1

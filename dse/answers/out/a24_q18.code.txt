@@ -1,0 +1,34 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.DataFrame({'age': [19, 20, 21, 20, 22, 21, 23, 20, 45, 22],
+                   'hours': [2, 3, 4, 3, 6, 5, 7, 3, 1, 8],
+                   'marks': [48, 52, 60, 55, 72, 66, 80, 54, None, 88],
+                   'dept': ['CSE', 'ECE', 'CSE', 'AI', 'AI', 'CSE', 'AI', 'ECE', 'ECE', 'CSE']})
+
+# 1. understand the data
+print(df.shape)
+print(df.dtypes)
+print(df.head(3))
+
+# 2. clean: missing values and duplicates
+print(df.isnull().sum())
+print('duplicate rows:', df.duplicated().sum())
+df['marks'] = df['marks'].fillna(df['marks'].median())
+
+# 3. summary statistics
+print(df.describe())
+print(df['dept'].value_counts())
+
+# 4. one variable at a time: histogram and box plot (outlier in age)
+fig, ax = plt.subplots(1, 2, figsize=(8, 3))
+ax[0].hist(df['marks'], bins=5, color='steelblue', edgecolor='white')
+ax[0].set_title('marks')
+ax[1].boxplot(df['age'])
+ax[1].set_title('age (45 is an outlier)')
+plt.tight_layout()
+plt.show()
+
+# 5. two variables: correlation
+print(df[['age', 'hours', 'marks']].corr().round(2))
+print(df.groupby('dept')['marks'].mean())

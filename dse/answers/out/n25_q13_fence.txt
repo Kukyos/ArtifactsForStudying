@@ -1,0 +1,3 @@
+lower fence = Q1 - 1.5 x IQR = 52 - 1.5 x 35 = -0.5
+upper fence = Q3 + 1.5 x IQR = 87 + 1.5 x 35 = 139.5
+no value lies outside the fences, so there are no outliers
